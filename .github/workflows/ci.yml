@@ -14,13 +14,14 @@ concurrency:
 
 jobs:
   quality:
-    name: 类型与格式
+    name: 类型、规则与格式
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
       - run: pnpm format:check
+      - run: pnpm lint
       - run: pnpm check
 
   packages:
@@ -36,7 +37,7 @@ jobs:
       - uses: ./.github/actions/setup
       - run: pnpm build
       - run: pnpm test
-      - run: pnpm pack:ui
+      - run: pnpm check:package
       - run: pnpm lsp:verify
       - uses: actions/upload-artifact@v4
         with:
@@ -59,6 +60,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
       - run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+      - run: pnpm test:component --project=${{ matrix.browser }}
       - run: pnpm build
       - run: pnpm test:browser --project=${{ matrix.browser }}
       - uses: actions/upload-artifact@v4

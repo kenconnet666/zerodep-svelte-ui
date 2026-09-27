@@ -7,7 +7,7 @@ Svelte 5 组件库与直接编写网页的文档站。当前完成开发、打�
 ```text
 packages/ui/               组件库（Svelte 源组件、JS 与类型声明）
   src/lib/                 正式源码和公共入口
-  test/                    包入口、SSR 与后续组件测试
+  test/                    包入口、SSR、浏览器组件与类型测试
 apps/docs/                 SvelteKit 静态文档网站
   src/routes/              Svelte 页面与路由
   src/app.css              站点基础样式
@@ -33,19 +33,52 @@ pnpm dev 先构建组件库，再并行监听组件库与启动网站；访问�
 
 常用命令：
 
-| 命令                            | 用途                                        |
-| ------------------------------- | ------------------------------------------- |
-| pnpm check                      | Svelte、TypeScript 和测试配置类型检查       |
-| pnpm build                      | 组件库打包 + 文档静态站构建                 |
-| pnpm test                       | 构建后的包入口与 SSR 焦点测试               |
-| pnpm format / pnpm format:check | 格式整理 / 只检查                           |
-| pnpm pack:ui                    | 构建后打包到 artifacts；不会发布            |
-| pnpm test:browser               | 构建后执行 Playwright；浏览器矩阵通常交 CI  |
-| pnpm lsp:setup                  | 生成当前机器的 Codex 配置                   |
-| pnpm lsp:verify                 | 验证 TS/Svelte 诊断、补全、悬停、定义和引用 |
-| pnpm lsp:inspect <相对文件路径> | 独立进程内检查指定文件                      |
+| 命令                                   | 用途                                        |
+| -------------------------------------- | ------------------------------------------- |
+| pnpm check                             | Svelte、TypeScript 和测试配置类型检查       |
+| pnpm lint                              | ESLint 规则与组件库导入边界检查             |
+| pnpm check:package                     | 构建组件库、打包并用 publint 检查 tarball   |
+| pnpm build                             | 组件库打包 + 文档静态站构建                 |
+| pnpm test                              | 构建后的包入口与 SSR 焦点测试               |
+| pnpm test:component --project=chromium | 单浏览器组件测试；首次需安装 Chromium       |
+| pnpm format / pnpm format:check        | 格式整理 / 只检查                           |
+| pnpm pack:ui                           | 构建后打包到 artifacts；不会发布            |
+| pnpm test:browser                      | 构建后执行 Playwright；浏览器矩阵通常交 CI  |
+| pnpm lsp:setup                         | 生成当前机器的 Codex 配置                   |
+| pnpm lsp:verify                        | 验证 TS/Svelte 诊断、补全、悬停、定义和引用 |
+| pnpm lsp:inspect <相对文件路径>        | 独立进程内检查指定文件                      |
 
 TypeScript 固定在 6.0.3，因为当前 Svelte 检查器/语言服务的 peer 范围尚未包含 7；不跟随 latest 跨主版本升级。
+
+ESLint 使用 Flat Config，按组件库、文档站和 Node 脚本分别配置环境。组件库禁止导入 SvelteKit 应用模块、文档站或文档站别名；格式仍交给 Prettier。所有新增依赖继续使用 catalog 固定版本，不修改全局工具。
+
+## 组件测试与包检查
+
+组件浏览器测试使用 Vitest Browser Mode、Playwright provider 和 vitest-browser-svelte，配置在 packages/ui/vitest.config.ts。测试使用与消费端一致的 CSS 绑定插件顺序，不依赖文档站路由。
+
+```sh
+pnpm exec playwright install chromium
+pnpm test:component --project=chromium
+```
+
+不传 --project 会运行 Chromium、Firefox、WebKit 三个项目，完整矩阵通常交 CI。组件测试关注独立挂载与交互；现有 Playwright 测试关注文档站导航、水合和消费端集成；Node 测试继续负责包入口和 SSR。
+
+当前浏览器用例复用 RenderProbe，验证挂载、npm CSS 生效、props 更新与文本转义。test/types 中的正反类型用例随 pnpm check 执行。它们验证测试基础设施，尚不代表已有公共组件或组件行为验收；首个组件落地时补充真实 props、绑定、snippet、键盘和可访问性用例。
+
+pnpm check:package 会重新构建组件库，将实际 tarball 写入根目录 artifacts，再执行 publint --strict；不会发布 npm。pnpm pack:ui 仅打包已有构建产物，也写入根目录 artifacts。正式组件出现后，继续用文档站和消费端测试验证包导出、SSR 与 CSS，不能仅凭包检查通过判定组件可用。
+
+## 已安装的运行时依赖
+
+packages/ui 已显式声明以下 npm 依赖；根目录的 Zod 仍单独用于 MCP 工具，两个用途统一使用 catalog 版本。
+
+| 依赖                    | 当前用途边界                                             |
+| ----------------------- | -------------------------------------------------------- |
+| @floating-ui/dom        | 为浮层定位预备；焦点、键盘、关闭逻辑与 ARIA 仍需组件实现 |
+| zod                     | 为表单和数据校验预备；尚未确定公共表单 API               |
+| decimal.js              | 为精确十进制输入和计算预备；尚未确定组件绑定值类型       |
+| @internationalized/date | 为日期、日历与时区能力预备；尚未确定日期组件 API         |
+
+安装这些依赖不会自动导出它们，也没有提前实现浮层、表单、数字或日期组件。主题与组件上下文仍优先复用 zerodep-css 和 Svelte 原生能力，具体契约在首个组件设计时确定。
 
 ## CSS 框架接入
 
@@ -68,12 +101,16 @@ pnpm lsp:verify 会临时生成错误/正确的 TS 与 Svelte 文件，并往返
 
 GitHub Actions 分组并行：
 
-- 类型与格式检查。
-- Ubuntu / Windows 构建、包入口/SSR、打包和 LSP 验证。
-- Chromium / Firefox / WebKit 导航、水合、窄屏、键盘和 axe 无障碍冒烟。
+- 类型、ESLint 规则与格式检查。
+- Ubuntu / Windows 构建、包入口/SSR、tarball 检查和 LSP 验证。
+- Chromium / Firefox / WebKit 独立组件测试，以及文档站导航、水合、窄屏、键盘和 axe 无障碍冒烟。
 - 构建任务保留 npm tarball 与静态站目录 7 天；浏览器失败时上传报告和 trace。
 
 测试无需仓库密钥。本地只执行相关检查，完整浏览器与耗时场景交 CI。推送不等于远程测试已通过；下一次提交前检查前次结果。
+
+当前 CI 使用 Playwright 管理的桌面浏览器版本。这是现有验证范围，尚未承诺旧版浏览器或移动端最低版本；公共组件发布前需补充支持范围与相应验收。
+
+当前仍有两项工具链提示需要跟进：Vitest 5.0.2 / Vite 8.3.1 会提示 mock 拦截插件的 configureServer 钩子被忽略，已验证的组件用例不使用模块 mock，后续引入模块 mock 前需专项验证并复核上游修复；文档站约 716 kB 的 chunk 提示在基础提交 98532ae 的 CI 中已存在，后续需根据产物分析定位体积来源。本项目没有屏蔽这些提示。
 
 文档站构建目录是 apps/docs/build。默认部署到站点根目录；子路径部署时设置 BASE_PATH，例如 /zerodep-svelte-ui，链接通过 $app/paths 自动适配。目前未部署网站，也未添加发布令牌或发布流程。
 

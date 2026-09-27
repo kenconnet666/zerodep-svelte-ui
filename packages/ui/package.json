@@ -21,7 +21,8 @@
     "dev": "svelte-package --watch",
     "build": "svelte-package",
     "check": "svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "test:component": "vitest run"
   },
   "peerDependencies": {
     "svelte": "^5.57.0"
@@ -29,13 +30,22 @@
   "devDependencies": {
     "@sveltejs/package": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
+    "@types/node": "catalog:",
+    "@vitest/browser-playwright": "catalog:",
+    "playwright": "catalog:",
     "svelte": "catalog:",
     "svelte-check": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "vitest-browser-svelte": "catalog:"
   },
   "dependencies": {
+    "@floating-ui/dom": "catalog:",
+    "@internationalized/date": "catalog:",
+    "decimal.js": "catalog:",
     "zerodep-css": "catalog:",
-    "zerodep-css-svelte": "catalog:"
+    "zerodep-css-svelte": "catalog:",
+    "zod": "catalog:"
   }
 }
