@@ -1,0 +1,8 @@
+# BEGIN UI LANGUAGE SERVICES
+[mcp_servers.zerodep_ui_lsp]
+command = __NODE__
+args = ["scripts/language-services/server.mjs", "."]
+cwd = __ROOT__
+startup_timeout_sec = 30
+tool_timeout_sec = 90
+# END UI LANGUAGE SERVICES

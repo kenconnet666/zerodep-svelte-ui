@@ -1,0 +1,16 @@
+node_modules/
+dist/
+build/
+.svelte-kit/
+.idea/
+.codex/config.toml
+.env
+.env.*
+!.env.example
+artifacts/
+test-results/
+playwright-report/
+coverage/
+*.log
+*.tsbuildinfo
+.DS_Store

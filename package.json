@@ -1,0 +1,39 @@
+{
+  "name": "zerodep-svelte-ui-workspace",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.34.5",
+  "engines": {
+    "node": ">=24 <25",
+    "pnpm": "10.34.5"
+  },
+  "scripts": {
+    "dev": "pnpm --filter zerodep-svelte-ui build && pnpm -r --parallel dev",
+    "sync": "pnpm --filter @zerodep-ui/docs sync",
+    "check": "pnpm sync && pnpm -r check && tsc -p tsconfig.json",
+    "build": "pnpm -r build",
+    "test": "pnpm --filter zerodep-svelte-ui test",
+    "test:browser": "playwright test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lsp:setup": "node scripts/language-services/setup.mjs",
+    "lsp:verify": "pnpm sync && node scripts/language-services/verify.mjs",
+    "lsp:inspect": "node scripts/language-services/inspect.mjs .",
+    "pack:ui": "pnpm --filter zerodep-svelte-ui pack --out artifacts/zerodep-svelte-ui.tgz"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "catalog:",
+    "@modelcontextprotocol/sdk": "catalog:",
+    "@playwright/test": "catalog:",
+    "@types/node": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-svelte": "catalog:",
+    "svelte": "catalog:",
+    "svelte-language-server": "catalog:",
+    "typescript": "catalog:",
+    "typescript-language-server": "catalog:",
+    "typescript-svelte-plugin": "catalog:",
+    "vscode-jsonrpc": "catalog:",
+    "zod": "catalog:"
+  }
+}

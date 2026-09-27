@@ -1,0 +1,141 @@
+:root {
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  color: #1d2939;
+  background: #f6f7f9;
+  font-synthesis: none;
+  line-height: 1.7;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+a {
+  color: #2555c7;
+  text-underline-offset: 0.25em;
+}
+a:focus-visible {
+  outline: 3px solid #2555c7;
+  outline-offset: 5px;
+}
+header,
+main,
+footer {
+  width: min(1100px, calc(100% - 48px));
+  margin-inline: auto;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-block: 26px;
+  border-bottom: 1px solid #d8dee8;
+}
+.brand {
+  color: inherit;
+  font-size: 22px;
+  font-weight: 750;
+  text-decoration: none;
+}
+.brand span {
+  color: #526078;
+  font-size: 14px;
+  font-weight: 500;
+}
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+}
+nav a {
+  color: #526078;
+  text-decoration: none;
+}
+nav a[aria-current='page'] {
+  color: #2555c7;
+  text-decoration: underline;
+}
+main {
+  padding-block: clamp(48px, 9vw, 100px);
+  min-height: 70vh;
+}
+.eyebrow {
+  font-size: 14px;
+  font-weight: 650;
+  color: #2555c7;
+  letter-spacing: 0.06em;
+}
+h1 {
+  font-size: clamp(32px, 5vw, 58px);
+  line-height: 1.3;
+  letter-spacing: -0.03em;
+  margin-block: 18px 24px;
+}
+.lead {
+  font-size: 20px;
+  color: #526078;
+  max-width: 650px;
+}
+.principles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin-top: 72px;
+}
+.principles article {
+  border-top: 2px solid #d8dee8;
+  padding-top: 18px;
+}
+h2 {
+  font-size: 20px;
+}
+.principles p,
+.status,
+footer {
+  color: #526078;
+}
+.status {
+  margin-top: 52px;
+  font-size: 14px;
+}
+.prose {
+  max-width: 720px;
+  margin-top: 48px;
+}
+footer {
+  padding-block: 24px;
+  border-top: 1px solid #d8dee8;
+  font-size: 13px;
+}
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  transform: translateY(-200%);
+  padding: 8px 16px;
+  background: white;
+  z-index: 1;
+}
+.skip-link:focus {
+  transform: none;
+}
+@media (max-width: 600px) {
+  header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .principles {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 48px;
+  }
+}

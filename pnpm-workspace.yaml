@@ -1,0 +1,34 @@
+packages:
+  - packages/ui
+  - apps/docs
+
+catalog:
+  zerodep-css: 0.1.0
+  zerodep-css-svelte: 0.1.0
+  zerodep-css-sveltekit: 0.1.0
+  '@axe-core/playwright': 4.13.0
+  '@modelcontextprotocol/sdk': 1.30.1
+  '@playwright/test': 1.63.0
+  '@sveltejs/adapter-static': 3.0.10
+  '@sveltejs/kit': 2.70.3
+  '@sveltejs/package': 2.5.8
+  '@sveltejs/vite-plugin-svelte': 7.3.1
+  '@types/node': 24.13.5
+  'prettier': 3.9.9
+  'prettier-plugin-svelte': 4.1.1
+  'svelte': 5.57.1
+  'svelte-check': 4.7.6
+  'svelte-language-server': 0.18.4
+  'typescript': 6.0.3
+  'typescript-language-server': 6.0.1
+  'typescript-svelte-plugin': 0.3.52
+  'vite': 8.3.1
+  'vscode-jsonrpc': 8.2.1
+  'zod': 4.6.5
+
+catalogMode: strict
+linkWorkspacePackages: false
+strictPeerDependencies: true
+autoInstallPeers: false
+onlyBuiltDependencies:
+  - esbuild
