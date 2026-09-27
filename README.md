@@ -80,6 +80,14 @@ packages/ui 已显式声明以下 npm 依赖；根目录的 Zod 仍单独用于 
 
 安装这些依赖不会自动导出它们，也没有提前实现浮层、表单、数字或日期组件。主题与组件上下文仍优先复用 zerodep-css 和 Svelte 原生能力，具体契约在首个组件设计时确定。
 
+## 图标资源依赖
+
+首个组件计划为 Icon。已安装 Lucide 官方数据包 @lucide/icons 1.48.0，仅由它提供 SVG 结构数据；Icon 的渲染、属性、样式和可访问性由本组件库负责。当前先准备依赖，Icon API 待讨论，公共入口尚未导出 Icon。
+
+组件库将 @lucide/icons 声明为必需的 peer dependency（兼容范围 ^1.48.0），开发时通过 devDependencies 使用 catalog 固定版本。文档站作为消费端，在 dependencies 中显式安装同一版本。未来使用组件库的应用也应显式安装兼容的 @lucide/icons；本仓库的 autoInstallPeers: false 不会强制改变外部应用的包管理器设置。
+
+图标可以按需导入，例如 import { Search as search } from '@lucide/icons'。不引入框架图标组件包，也不维护全量图标注册表。
+
 ## CSS 框架接入
 
 - 组件库已安装 npm 的 zerodep-css、zerodep-css-svelte，均为 0.1.0。

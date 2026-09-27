@@ -11,6 +11,7 @@
     "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort"
   },
   "dependencies": {
+    "@lucide/icons": "catalog:",
     "zerodep-svelte-ui": "workspace:*",
     "zerodep-css": "catalog:",
     "zerodep-css-svelte": "catalog:",

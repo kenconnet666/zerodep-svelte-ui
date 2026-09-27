@@ -25,9 +25,11 @@
     "test:component": "vitest run"
   },
   "peerDependencies": {
+    "@lucide/icons": "^1.48.0",
     "svelte": "^5.57.0"
   },
   "devDependencies": {
+    "@lucide/icons": "catalog:",
     "@sveltejs/package": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
     "@types/node": "catalog:",
