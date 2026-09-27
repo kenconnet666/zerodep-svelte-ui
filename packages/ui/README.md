@@ -13,6 +13,8 @@ Svelte 5 组件库。当前完成工程基础，公共组件 API 尚未开始实
 
 已安装 `@floating-ui/dom`、`zod`、`decimal.js`、`@internationalized/date`，版本由根目录 catalog 统一固定。目前仅准备依赖，尚未确定对应组件 API，也没有从公共入口重新导出这些包。
 
-首个组件计划为 `Icon`，现阶段先安装 `@lucide/icons` 作为必需 peer dependency 和本包开发依赖。Lucide 仅提供 SVG 结构数据，组件渲染与 API 由本库负责；消费应用需要安装兼容版本。当前尚未实现或导出 `Icon`，API 待讨论。
+首个组件调整为 `Provider`：注入自定义 CSS 作者与公共配置，同时提供主题容器。普通组件读取同一作用域实例，语义外观属性映射到注入的 CSS 属性，默认值直接写在 `$props()` 中。消费项目必须启用 `zerodep-css-svelte/vite`。完整边界见根目录 `.design/provider.md`，当前尚未实现或导出 `Provider`。
+
+`Icon` 在 Provider 基础建立后实现，使用 `<Icon icon={Search} />`。已安装 `@lucide/icons` 作为必需 peer dependency 和本包开发依赖；Lucide 仅提供 SVG 结构数据，组件渲染与 API 由本库负责。
 
 根目录的 `pnpm check:package` 会构建并检查实际 tarball；当前维持 private，不发布 npm。浏览器与类型用例仍使用测试夹具，不能替代正式组件的行为、SSR 和可访问性验收。

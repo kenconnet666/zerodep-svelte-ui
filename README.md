@@ -82,11 +82,11 @@ packages/ui 已显式声明以下 npm 依赖；根目录的 Zod 仍单独用于 
 
 ## 图标资源依赖
 
-首个组件计划为 Icon。已安装 Lucide 官方数据包 @lucide/icons 1.48.0，仅由它提供 SVG 结构数据；Icon 的渲染、属性、样式和可访问性由本组件库负责。当前先准备依赖，Icon API 待讨论，公共入口尚未导出 Icon。
+已安装 Lucide 官方数据包 @lucide/icons 1.48.0，仅由它提供 SVG 结构数据；Icon 的渲染、属性、样式和可访问性由本组件库负责。首个组件已调整为 Provider，Icon 在共享 CSS 作者与注入配置建立后实现，公共入口尚未导出二者。
 
 组件库将 @lucide/icons 声明为必需的 peer dependency（兼容范围 ^1.48.0），开发时通过 devDependencies 使用 catalog 固定版本。文档站作为消费端，在 dependencies 中显式安装同一版本。未来使用组件库的应用也应显式安装兼容的 @lucide/icons；本仓库的 autoInstallPeers: false 不会强制改变外部应用的包管理器设置。
 
-图标可以按需导入，例如 import { Search as search } from '@lucide/icons'。不引入框架图标组件包，也不维护全量图标注册表。
+图标直接使用官方名称，例如 `import { Search } from '@lucide/icons'`，计划写法为 `<Icon icon={Search} />`。不引入框架图标组件包，也不维护全量图标注册表。
 
 ## CSS 框架接入
 
@@ -126,6 +126,8 @@ GitHub Actions 分组并行：
 
 zerodep-css（通常位于 ../zerodep-css）仍是核心项目。CSS 框架与绑定插件的通用修复回到该仓库，组件和站点改动留在这里，具体分工见 AGENTS.md。
 
-下一步讨论首个组件的使用示例与 API、主题与组件上下文，然后以一个完整组件同时验证库产物、网页示例、键盘、SSR 和浏览器行为。基础站点不是最终视觉设计；当前不以测试夹具充当产品组件。
+下一步先设计 Provider：向下注入组件库自定义的 CSS 作者实例与配置，同时提供真实主题容器。普通组件只读取注入实例；size/color 采用语义名称并映射到自定义 CSS 属性；props 默认值就近放在 $props() 中。所有消费项目必须启用 zerodep-css-svelte/vite，不设计无插件兼容路径。
+
+设计范围、继承规则与待定项见 [Provider 设计草案](.design/provider.md)。草案尚未实现；确认后以 Provider 验证库产物、文档示例、嵌套配置、SSR 与浏览器行为，再继续 Icon。基础站点不是最终视觉设计，测试夹具不作为产品组件。
 
 发布前仍需确定许可证、首发组件范围、npm 元数据和站点部署目标。这些是尚未开展的发布工作，当前 private 用于防止提前发布。
