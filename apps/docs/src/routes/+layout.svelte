@@ -26,6 +26,9 @@
         href={resolve('/provider')}
         aria-current={page.route.id === '/provider' ? 'page' : undefined}>Provider</a
       >
+      <a href={resolve('/icon')} aria-current={page.route.id === '/icon' ? 'page' : undefined}
+        >Icon</a
+      >
       <a href="https://github.com/kenconnet666/zerodep-svelte-ui">GitHub</a>
     </nav>
   </header>

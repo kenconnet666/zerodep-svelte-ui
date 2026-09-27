@@ -8,6 +8,8 @@ export default defineConfig({
   root: import.meta.dirname,
   // 与消费端保持一致：先处理显式 CSS 绑定，再编译 Svelte。
   plugins: [cssBindings(), svelte()],
+  // 图标数据提前优化；编译器注入的绑定运行时由 CSS 插件声明。
+  optimizeDeps: { include: ['@lucide/icons'] },
   test: {
     attachmentsDir: resolve(import.meta.dirname, '../../test-results/components'),
     include: ['test/**/*.browser.test.ts'],

@@ -1,6 +1,6 @@
 # zerodep-svelte-ui
 
-Svelte 5 组件库。已提供 Provider、UiCss、useCss 与 useConfig，暂不发布 npm。
+Svelte 5 组件库。已提供 Provider、Icon、UiCss、useCss 与 useConfig，暂不发布 npm。
 
 - `src/lib/`：可打包的组件与公共入口。
 - `test/`：浏览器组件、SSR 和包入口测试；测试夹具不进入产物。
@@ -17,6 +17,6 @@ Svelte 5 组件库。已提供 Provider、UiCss、useCss 与 useConfig，暂不�
 
 Provider 支持 css、theme（light/dark）、locale 与原生容器属性。css 为初始化值；theme/locale 可动态继承和覆盖。根默认值为新 UiCss、light、zh-CN；没有 dir 属性。默认容器只提供主题变量、文字颜色和 color-scheme，背景与布局交给调用方。
 
-`Icon` 在 Provider 基础建立后实现，使用 `<Icon icon={Search} />`。已安装 `@lucide/icons` 作为必需 peer dependency 和本包开发依赖；Lucide 仅提供 SVG 结构数据，组件渲染与 API 由本库负责。
+`Icon` 使用 `<Icon icon={Search} />`。size 为 sm/md/lg，color 为 inherit/text/muted/primary/success/warning/danger，strokeWidth 默认 2。语义属性来自注入的作者，连续描边值使用 bx；消费端必须启用编译插件。默认装饰图标隐藏，提供 aria-label/aria-labelledby 时生成 img 角色。`@lucide/icons` 是必需 peer，Lucide 仅提供 SVG 结构数据。
 
-根目录的 `pnpm check:package` 会构建并检查实际 tarball；当前维持 private，不发布 npm。浏览器与类型用例仍使用测试夹具，不能替代正式组件的行为、SSR 和可访问性验收。
+根目录的 `pnpm check:package` 会构建并检查实际 tarball，`pnpm test:consumer` 会创建独立安装的消费项目。当前维持 private，不发布 npm。测试覆盖实际 Provider/Icon 的行为、类型、SSR、键盘与可访问性；这些结果不代表后续组件已完成。

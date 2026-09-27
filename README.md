@@ -1,6 +1,6 @@
 # zerodep-svelte-ui
 
-Svelte 5 组件库与直接编写网页的文档站。已实现 Provider、共享 CSS 作者和配置注入，并具备打包、语言服务与 CI 基础。项目仍保持 private，尚未发布 npm。
+Svelte 5 组件库与直接编写网页的文档站。已实现 Provider、Icon、共享 CSS 作者和配置注入，并具备打包、语言服务与 CI 基础。项目仍保持 private，尚未发布 npm。
 
 ## 目录
 
@@ -40,6 +40,7 @@ pnpm dev 先构建组件库，再并行监听组件库与启动网站；访问�
 | pnpm check:package                     | 构建组件库、打包并用 publint 检查 tarball   |
 | pnpm build                             | 组件库打包 + 文档静态站构建                 |
 | pnpm test                              | 构建后的包入口与 SSR 焦点测试               |
+| pnpm test:consumer                     | 独立安装 tarball，检查类型及客户端/SSR 编译 |
 | pnpm test:component --project=chromium | 单浏览器组件测试；首次需安装 Chromium       |
 | pnpm format / pnpm format:check        | 格式整理 / 只检查                           |
 | pnpm pack:ui                           | 构建后打包到 artifacts；不会发布            |
@@ -63,7 +64,9 @@ pnpm test:component --project=chromium
 
 不传 --project 会运行 Chromium、Firefox、WebKit 三个项目，完整矩阵通常交 CI。组件测试关注独立挂载与交互；现有 Playwright 测试关注文档站导航、水合和消费端集成；Node 测试继续负责包入口和 SSR。
 
-RenderProbe 验证测试基础设施。Provider 另有实例共享、嵌套配置、主题切换、类型、正式包产物 SSR 和文档站水合/可访问性用例；test/types 中的正反类型用例随 pnpm check 执行。后续组件仍需补充自己的行为验收。
+RenderProbe 验证测试基础设施。Provider 和 Icon 另有实例共享、嵌套配置、语义外观、主题切换、键盘/可访问性、规则回收、类型、正式包产物 SSR 和文档站水合用例；test/types 中的正反类型用例随 pnpm check 执行。
+
+pnpm test:consumer 会创建临时项目，从实际 tarball 安装组件库和显式 peer，检查公共类型、SSR、客户端构建，以及缺少绑定插件时的错误。它需要 npm registry 或可用的 pnpm 缓存，结束后自动清理临时项目；普通 pnpm test 不执行这项独立安装。跨仓修复发布前，可以通过 ZERODEP_CSS_TEST_RELEASE 指向 CSS 仓库的 release:pack 产物目录，仅在临时消费者中验证候选 tarball，不修改正式依赖。
 
 pnpm check:package 会重新构建组件库，将实际 tarball 写入根目录 artifacts，再执行 publint --strict；不会发布 npm。pnpm pack:ui 仅打包已有构建产物，也写入根目录 artifacts。正式组件出现后，继续用文档站和消费端测试验证包导出、SSR 与 CSS，不能仅凭包检查通过判定组件可用。
 
@@ -82,16 +85,16 @@ packages/ui 已显式声明以下 npm 依赖；根目录的 Zod 仍单独用于 
 
 ## 图标资源依赖
 
-已安装 Lucide 官方数据包 @lucide/icons 1.48.0，仅由它提供 SVG 结构数据；Icon 的渲染、属性、样式和可访问性由本组件库负责。Provider 已导出，Icon 在其基础上继续实现。
+已安装 Lucide 官方数据包 @lucide/icons 1.48.0，仅由它提供 SVG 结构数据；Icon 的渲染、属性、样式和可访问性由本组件库负责。
 
 组件库将 @lucide/icons 声明为必需的 peer dependency（兼容范围 ^1.48.0），开发时通过 devDependencies 使用 catalog 固定版本。文档站作为消费端，在 dependencies 中显式安装同一版本。未来使用组件库的应用也应显式安装兼容的 @lucide/icons；本仓库的 autoInstallPeers: false 不会强制改变外部应用的包管理器设置。
 
-图标直接使用官方名称，例如 `import { Search } from '@lucide/icons'`，计划写法为 `<Icon icon={Search} />`。不引入框架图标组件包，也不维护全量图标注册表。
+图标直接使用官方名称，例如 `import { Search } from '@lucide/icons'`，使用写法为 `<Icon icon={Search} />`。不引入框架图标组件包，也不维护全量图标注册表。
 
 ## CSS 框架接入
 
-- 组件库已安装 npm 的 zerodep-css、zerodep-css-svelte，均为 0.1.0。
-- 文档站安装相同版本，并添加 zerodep-css-sveltekit 0.1.0。Vite 中 CSS 绑定插件放在 SvelteKit 前面，支持后续组件中的显式 bx。
+- 组件库已安装 npm 的 zerodep-css、zerodep-css-svelte，均为 0.1.1。
+- 文档站安装相同版本，并添加 zerodep-css-sveltekit 0.1.1。Vite 中 CSS 绑定插件放在 SvelteKit 前面，支持组件中的显式 bx。
 - hooks.server.ts 创建每请求样式宿主，app.html 的占位符接收 SSR 样式；hooks.client.ts 在水合前恢复登记。
 - 根布局使用组件库 Provider；src/lib/css.ts 转导出组件库 useCss。页面和组件读取同一个作者实例，首页链接使用 npm CSS 包生成样式。
 
@@ -117,6 +120,26 @@ useCss() 取得当前作者，useConfig() 取得只读的有效配置，均在�
 
 Provider 提供真实 div 容器、主题变量、color-scheme 与文字颜色，背景和布局由使用者设置。默认规则在 @layer zerodep-ui 中，未分层的外部 CSS 可覆盖。只有显式 theme/css 的内层容器重建主题边界，语言覆盖不会抹掉父级局部 token。网页示例位于 /provider。
 
+## Icon
+
+```svelte
+<script lang="ts">
+  import { Search } from '@lucide/icons';
+  import { Provider, Icon } from 'zerodep-svelte-ui';
+</script>
+
+<Provider>
+  <Icon icon={Search} />
+  <Icon icon={Search} size="lg" color="primary" aria-label="搜索" />
+</Provider>
+```
+
+icon 必须是 LucideIconData。size 为 sm/md/lg（默认 md），color 为 inherit/text/muted/primary/success/warning/danger（默认 inherit）。它们映射到注入的 UiCss 属性；Icon 不自行创建作者。strokeWidth 为数值（默认 2），由 bx 编译成 CSS 变量。精确宽高、原始颜色、动画等通过 class/style 设置。
+
+默认图标作为装饰内容隐藏；提供 aria-label 或 aria-labelledby 时自动设置 img 角色，显式 aria-hidden/role 保持优先。图标默认不增加 Tab 停靠点，按钮自身承担名称与交互。SVG 根属性可透传，但 children、width/height、viewBox 和原生 stroke-width 由组件管理。图形数据保持只读，递归子节点使用正确的 SVG 命名空间，内部 key 元数据不输出。网页交互示例位于 /icon。
+
+已安装包的 Vite 依赖 SSR 会使用带缓存查询的 .svelte 文件路径；完整消费链路需要 zerodep-css-svelte 0.1.1 的对应编译修复。不得以跳过插件或只测试工作区源码代替 tarball 验收。
+
 ## Codex LSP
 
 执行 pnpm lsp:setup 后，在 Codex 中打开并信任本项目，重载会话以加载 zerodep_ui_lsp。这是 [Codex 项目级配置](https://learn.chatgpt.com/docs/config-file/config-basic)，不会修改全局配置或其他项目服务。
@@ -130,7 +153,7 @@ pnpm lsp:verify 会临时生成错误/正确的 TS 与 Svelte 文件，并往返
 GitHub Actions 分组并行：
 
 - 类型、ESLint 规则与格式检查。
-- Ubuntu / Windows 构建、包入口/SSR、tarball 检查和 LSP 验证。
+- Ubuntu / Windows 构建、包入口/SSR、tarball 检查、独立消费端安装和 LSP 验证。
 - Chromium / Firefox / WebKit 独立组件测试，以及文档站导航、水合、窄屏、键盘和 axe 无障碍冒烟。
 - 构建任务保留 npm tarball 与静态站目录 7 天；浏览器失败时上传报告和 trace。
 
@@ -146,6 +169,6 @@ GitHub Actions 分组并行：
 
 zerodep-css（通常位于 ../zerodep-css）仍是核心项目。CSS 框架与绑定插件的通用修复回到该仓库，组件和站点改动留在这里，具体分工见 AGENTS.md。
 
-Provider 的作者、继承、编译和 SSR 契约见 [Provider 设计记录](.design/provider.md)。下一阶段继续 Icon。基础站点不是最终视觉设计，已有少量组件的通过不能代表整个组件库已完成生产验收。
+Provider 的作者、继承、编译和 SSR 契约见 [Provider 设计记录](.design/provider.md)。基础站点不是最终视觉设计，Provider 与 Icon 的通过不能代表整个组件库已完成生产验收。后续组件继续沿用相同的作者和配置体系。
 
 发布前仍需确定许可证、首发组件范围、npm 元数据和站点部署目标。这些是尚未开展的发布工作，当前 private 用于防止提前发布。

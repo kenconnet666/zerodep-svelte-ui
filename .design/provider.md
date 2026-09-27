@@ -1,6 +1,6 @@
 # Provider 与组件作者模型
 
-Provider、UiCss 和注入协议已实现，Icon 在此基础上继续实现。本文记录采用的契约。
+Provider、UiCss、注入协议和 Icon 已实现。本文记录采用的契约。
 
 ## 作者与配置
 

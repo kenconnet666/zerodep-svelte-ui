@@ -85,3 +85,54 @@ test('Provider 的配置与主题在禁用 JavaScript 的首屏可用', async ({
     await context.close();
   }
 });
+
+test('Icon 文档通过真实组件演示语义外观、主题、bx 与键盘行为', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.goto('/icon/');
+  await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+  const icon = page.getByRole('img', { name: '预览图标' });
+  await expect(icon).toHaveCSS('width', '16px');
+  expect(await icon.locator('circle').evaluate((el) => el.namespaceURI)).toBe(
+    'http://www.w3.org/2000/svg',
+  );
+  await page.getByRole('combobox', { name: '尺寸', exact: true }).selectOption('lg');
+  await page.getByRole('combobox', { name: '颜色', exact: true }).selectOption('success');
+  await page.getByRole('combobox', { name: '主题', exact: true }).selectOption('dark');
+  await expect(icon).toHaveCSS('width', '24px');
+  await expect(icon).toHaveCSS('color', 'rgb(134, 239, 172)');
+  const stableClass = await icon.getAttribute('class');
+  await page.getByRole('slider', { name: '描边', exact: true }).press('ArrowRight');
+  await expect
+    .poll(() => icon.evaluate((el) => parseFloat(getComputedStyle(el).strokeWidth)))
+    .toBe(2.25);
+  await expect(icon).toHaveAttribute('class', stableClass!);
+  await page.getByRole('combobox', { name: '图标', exact: true }).selectOption('Check');
+  await expect(icon.locator('circle')).toHaveCount(0);
+  await page.getByRole('button', { name: '搜索', exact: true }).press('Enter');
+  await expect(page.getByRole('status', { name: '搜索次数' })).toHaveText('1');
+  const results = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+    .analyze();
+  expect(results.violations).toEqual([]);
+  await page.setViewportSize({ width: 360, height: 780 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test('Icon 无 JavaScript 首屏包含可访问 SVG 和正确初始样式', async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  try {
+    const page = await context.newPage();
+    await page.goto('/icon/');
+    const icon = page.getByRole('img', { name: '预览图标' });
+    await expect(icon).toBeVisible();
+    await expect(icon).toHaveCSS('width', '16px');
+    await expect(icon).toHaveCSS('color', 'rgb(29, 78, 216)');
+    expect(await icon.locator('path').evaluate((el) => el.namespaceURI)).toBe(
+      'http://www.w3.org/2000/svg',
+    );
+  } finally {
+    await context.close();
+  }
+});

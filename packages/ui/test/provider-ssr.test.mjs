@@ -44,3 +44,14 @@ test('缺少 Provider 或 SSR 宿主时明确失败', () => {
   assert.throws(() => entry.renderWithoutProvider(), /inside a Provider/);
   assert.throws(() => entry.renderWithoutHost(), /CSS server host is unavailable/);
 });
+
+test('正式包产物的 Icon 在 SSR 输出 SVG、名称和 bx 初始样式', () => {
+  const result = entry.renderIcon('查找 <内容>');
+  assert.match(result.body, /<svg[^>]*role="img"/);
+  assert.match(result.body, /aria-label="查找 &lt;内容(?:>|&gt;)"/);
+  assert.match(result.body, /<path/);
+  assert.match(result.body, /<circle/);
+  assert.doesNotMatch(result.body, /\skey=/);
+  assert.match(result.css, /stroke-width:var\(--/);
+  assert.match(result.css, /:1\.5;/);
+});

@@ -38,6 +38,7 @@ jobs:
       - run: pnpm build
       - run: pnpm test
       - run: pnpm check:package
+      - run: pnpm test:consumer
       - run: pnpm lsp:verify
       - uses: actions/upload-artifact@v4
         with:

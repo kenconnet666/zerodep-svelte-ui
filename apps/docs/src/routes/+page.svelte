@@ -40,4 +40,4 @@
   </article>
 </section>
 
-<p class="status">组件正在设计中。当前网站展示项目方向，正式组件与使用示例将逐步补充。</p>
+<p class="status">首批 Provider 与 Icon 已提供交互示例，组件库仍在持续完善，尚未发布 npm。</p>

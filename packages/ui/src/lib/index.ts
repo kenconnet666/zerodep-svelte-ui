@@ -1,4 +1,5 @@
 export { default as Provider } from './Provider.svelte';
+export { default as Icon } from './Icon.svelte';
 export { UiCss, UiColorCss, UiBackgroundColorCss, UiFontSizeCss } from './css.js';
 export type { UiTheme, UiSize, UiColor } from './css.js';
 export { useConfig, useCss } from './context.js';

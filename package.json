@@ -15,6 +15,7 @@
     "check:package": "pnpm --filter zerodep-svelte-ui build && pnpm pack:ui && publint artifacts/zerodep-svelte-ui.tgz --strict",
     "build": "pnpm -r build",
     "test": "pnpm --filter zerodep-svelte-ui test",
+    "test:consumer": "pnpm --filter zerodep-svelte-ui test:consumer",
     "test:component": "pnpm --filter zerodep-svelte-ui test:component",
     "test:browser": "playwright test",
     "format": "prettier --write .",

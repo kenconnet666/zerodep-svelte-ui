@@ -22,6 +22,7 @@
     "build": "svelte-package",
     "check": "svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
     "test": "node --test test/*.test.mjs",
+    "test:consumer": "node --test test/consumer/*.test.mjs",
     "test:component": "vitest run"
   },
   "peerDependencies": {
