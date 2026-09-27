@@ -93,8 +93,8 @@ packages/ui 已显式声明以下 npm 依赖；根目录的 Zod 仍单独用于 
 
 ## CSS 框架接入
 
-- 组件库已安装 npm 的 zerodep-css、zerodep-css-svelte，均为 0.1.1。
-- 文档站安装相同版本，并添加 zerodep-css-sveltekit 0.1.1。Vite 中 CSS 绑定插件放在 SvelteKit 前面，支持组件中的显式 bx。
+- 组件库已安装 npm 的 zerodep-css、zerodep-css-svelte，均为 0.1.2，包含中文属性、关键字和方法调用文档。
+- 文档站安装相同版本，并添加 zerodep-css-sveltekit 0.1.2。Vite 中 CSS 绑定插件放在 SvelteKit 前面，支持组件中的显式 bx。
 - hooks.server.ts 创建每请求样式宿主，app.html 的占位符接收 SSR 样式；hooks.client.ts 在水合前恢复登记。
 - 根布局使用组件库 Provider；src/lib/css.ts 转导出组件库 useCss。页面和组件读取同一个作者实例，首页链接使用 npm CSS 包生成样式。
 
