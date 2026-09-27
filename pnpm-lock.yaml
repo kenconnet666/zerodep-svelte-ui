@@ -106,14 +106,14 @@ catalogs:
       specifier: 8.2.1
       version: 8.2.1
     zerodep-css:
-      specifier: 0.1.2
-      version: 0.1.2
+      specifier: 0.1.3
+      version: 0.1.3
     zerodep-css-svelte:
-      specifier: 0.1.2
-      version: 0.1.2
+      specifier: 0.1.3
+      version: 0.1.3
     zerodep-css-sveltekit:
-      specifier: 0.1.2
-      version: 0.1.2
+      specifier: 0.1.3
+      version: 0.1.3
     zod:
       specifier: 4.6.5
       version: 4.6.5
@@ -193,13 +193,13 @@ importers:
         version: 1.48.0
       zerodep-css:
         specifier: 'catalog:'
-        version: 0.1.2(magic-string@1.4.2)(typescript@6.0.3)
+        version: 0.1.3(magic-string@1.4.2)(typescript@6.0.3)
       zerodep-css-svelte:
         specifier: 'catalog:'
-        version: 0.1.2(svelte@5.57.1(@typescript-eslint/types@8.70.1))
+        version: 0.1.3(svelte@5.57.1(@typescript-eslint/types@8.70.1))
       zerodep-css-sveltekit:
         specifier: 'catalog:'
-        version: 0.1.2(@sveltejs/kit@2.70.3(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.1(@typescript-eslint/types@8.70.1))(vite@8.3.1(@types/node@24.13.5)))(svelte@5.57.1(@typescript-eslint/types@8.70.1))(typescript@6.0.3)(vite@8.3.1(@types/node@24.13.5)))(svelte@5.57.1(@typescript-eslint/types@8.70.1))
+        version: 0.1.3(@sveltejs/kit@2.70.3(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.1(@typescript-eslint/types@8.70.1))(vite@8.3.1(@types/node@24.13.5)))(svelte@5.57.1(@typescript-eslint/types@8.70.1))(typescript@6.0.3)(vite@8.3.1(@types/node@24.13.5)))(svelte@5.57.1(@typescript-eslint/types@8.70.1))
       zerodep-svelte-ui:
         specifier: workspace:*
         version: link:../../packages/ui
@@ -239,10 +239,10 @@ importers:
         version: 10.6.0
       zerodep-css:
         specifier: 'catalog:'
-        version: 0.1.2(magic-string@1.4.2)(typescript@6.0.3)
+        version: 0.1.3(magic-string@1.4.2)(typescript@6.0.3)
       zerodep-css-svelte:
         specifier: 'catalog:'
-        version: 0.1.2(svelte@5.57.1(@typescript-eslint/types@8.70.1))
+        version: 0.1.3(svelte@5.57.1(@typescript-eslint/types@8.70.1))
       zod:
         specifier: 'catalog:'
         version: 4.6.5
@@ -1929,20 +1929,20 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zerodep-css-svelte@0.1.2:
-    resolution: {integrity: sha512-vNDjhx6Rd06F359RVkIRHOj73oz1GGUqtd/a9C88UQ+yoW/vpzy2V/lRo1QnOuvk5Diltc7yJRPi84ijk5nKTA==}
+  zerodep-css-svelte@0.1.3:
+    resolution: {integrity: sha512-f2DeQy1tsfbfHCoogKPdrLXOk1CP3JyMva4Xt5mTOXri2PBBnPyyhzAVEPXqP6IIr9JmGfLoeKZwBn7zPkISsQ==}
     engines: {node: '>=24'}
     peerDependencies:
       svelte: ^5.20.0
 
-  zerodep-css-sveltekit@0.1.2:
-    resolution: {integrity: sha512-LHbE79vhbKMw67TFk9P8WpluUDygh7Aetz9m/5oZe6g/VKW0FRNtGICr2GsPIVo57TlP/vI/xuqRwkUU8419+g==}
+  zerodep-css-sveltekit@0.1.3:
+    resolution: {integrity: sha512-h3Qkl9ieuTN+SWEQhy7jPoUYUI9bG7VgoCNtE04IpvA/2P8VKpSKrre59nUXeFIGGUm7lt0cXAFhxcecMNIOtQ==}
     engines: {node: '>=24'}
     peerDependencies:
       '@sveltejs/kit': ^2.0.0
 
-  zerodep-css@0.1.2:
-    resolution: {integrity: sha512-RCbv1gdrlKvQceYPWW5H6Gy4JrptTfx7+IIZj4vmJ5QzuILBsuZk1SDpgc9TDxLaIPELJINKcq62CtkU9bekhQ==}
+  zerodep-css@0.1.3:
+    resolution: {integrity: sha512-V2ApPK/t+PBYTDjLd2EpuvY8dj1uDEks4bfna55axSQ+O/HxiKAVPJzDusZBKZ5J9mYOBLL8JNdVkRUIctRXjw==}
     engines: {node: '>=24'}
     peerDependencies:
       magic-string: ^1.4.2
@@ -3566,21 +3566,21 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zerodep-css-svelte@0.1.2(svelte@5.57.1(@typescript-eslint/types@8.70.1)):
+  zerodep-css-svelte@0.1.3(svelte@5.57.1(@typescript-eslint/types@8.70.1)):
     dependencies:
       magic-string: 1.4.2
       svelte: 5.57.1(@typescript-eslint/types@8.70.1)
       typescript: 6.0.3
-      zerodep-css: 0.1.2(magic-string@1.4.2)(typescript@6.0.3)
+      zerodep-css: 0.1.3(magic-string@1.4.2)(typescript@6.0.3)
 
-  zerodep-css-sveltekit@0.1.2(@sveltejs/kit@2.70.3(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.1(@typescript-eslint/types@8.70.1))(vite@8.3.1(@types/node@24.13.5)))(svelte@5.57.1(@typescript-eslint/types@8.70.1))(typescript@6.0.3)(vite@8.3.1(@types/node@24.13.5)))(svelte@5.57.1(@typescript-eslint/types@8.70.1)):
+  zerodep-css-sveltekit@0.1.3(@sveltejs/kit@2.70.3(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.1(@typescript-eslint/types@8.70.1))(vite@8.3.1(@types/node@24.13.5)))(svelte@5.57.1(@typescript-eslint/types@8.70.1))(typescript@6.0.3)(vite@8.3.1(@types/node@24.13.5)))(svelte@5.57.1(@typescript-eslint/types@8.70.1)):
     dependencies:
       '@sveltejs/kit': 2.70.3(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.1(@typescript-eslint/types@8.70.1))(vite@8.3.1(@types/node@24.13.5)))(svelte@5.57.1(@typescript-eslint/types@8.70.1))(typescript@6.0.3)(vite@8.3.1(@types/node@24.13.5))
-      zerodep-css-svelte: 0.1.2(svelte@5.57.1(@typescript-eslint/types@8.70.1))
+      zerodep-css-svelte: 0.1.3(svelte@5.57.1(@typescript-eslint/types@8.70.1))
     transitivePeerDependencies:
       - svelte
 
-  zerodep-css@0.1.2(magic-string@1.4.2)(typescript@6.0.3):
+  zerodep-css@0.1.3(magic-string@1.4.2)(typescript@6.0.3):
     dependencies:
       csstype: 3.2.3
     optionalDependencies:
