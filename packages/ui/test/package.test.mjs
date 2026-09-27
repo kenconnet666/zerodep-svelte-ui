@@ -13,7 +13,8 @@ test('包入口和声明来自正式构建产物', async () => {
   for (const file of new Set(Object.values(entry))) {
     await readFile(new URL('../' + file, import.meta.url));
   }
-  await import('zerodep-svelte-ui');
+  const entrySource = await readFile(new URL('../' + entry.svelte, import.meta.url), 'utf8');
+  assert.match(entrySource, /Provider\.svelte/);
 });
 
 test('Svelte 服务端编译链保留文本转义并收集 npm CSS 包的样式', async () => {

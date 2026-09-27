@@ -49,3 +49,39 @@ test('键盘可跳过导航进入正文', async ({ page }) => {
   await page.keyboard.press('Enter');
   await expect(page.locator('main')).toBeFocused();
 });
+
+test('Provider 文档的配置继承、主题覆盖和恢复', async ({ page }) => {
+  await page.goto('/provider/');
+  await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+  await page.getByRole('combobox', { name: '父主题', exact: true }).selectOption('dark');
+  await page.getByRole('combobox', { name: '语言', exact: true }).selectOption('en-US');
+  await expect(page.locator('[data-provider-value="子级"]')).toHaveText('子级：dark / en-US');
+  await expect(page.locator('[data-provider-value="子级"]')).toHaveCSS(
+    'color',
+    'rgb(147, 197, 253)',
+  );
+  await page.getByRole('combobox', { name: '子主题', exact: true }).selectOption('light');
+  await expect(page.locator('[data-provider-value="子级"]')).toHaveText('子级：light / en-US');
+  await expect(page.locator('[data-provider-value="兄弟"]')).toHaveText('兄弟：dark / en-US');
+  await page.getByRole('combobox', { name: '子主题', exact: true }).selectOption('inherit');
+  await expect(page.locator('[data-provider-value="子级"]')).toHaveText('子级：dark / en-US');
+  const results = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+    .analyze();
+  expect(results.violations).toEqual([]);
+});
+
+test('Provider 的配置与主题在禁用 JavaScript 的首屏可用', async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  try {
+    const page = await context.newPage();
+    await page.goto('/provider/');
+    await expect(page.locator('[data-provider-value="子级"]')).toHaveText('子级：light / zh-CN');
+    await expect(page.locator('[data-provider-value="子级"]')).toHaveCSS(
+      'color',
+      'rgb(29, 78, 216)',
+    );
+  } finally {
+    await context.close();
+  }
+});

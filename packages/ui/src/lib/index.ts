@@ -1,2 +1,5 @@
-// 公共组件从这里具名导出；基础阶段不预设尚未确定的组件 API。
-export {};
+export { default as Provider } from './Provider.svelte';
+export { UiCss, UiColorCss, UiBackgroundColorCss, UiFontSizeCss } from './css.js';
+export type { UiTheme, UiSize, UiColor } from './css.js';
+export { useConfig, useCss } from './context.js';
+export type { UiConfig } from './context.js';

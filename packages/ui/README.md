@@ -1,6 +1,6 @@
 # zerodep-svelte-ui
 
-Svelte 5 组件库。当前完成工程基础，公共组件 API 尚未开始实现，暂不发布 npm。
+Svelte 5 组件库。已提供 Provider、UiCss、useCss 与 useConfig，暂不发布 npm。
 
 - `src/lib/`：可打包的组件与公共入口。
 - `test/`：浏览器组件、SSR 和包入口测试；测试夹具不进入产物。
@@ -13,7 +13,9 @@ Svelte 5 组件库。当前完成工程基础，公共组件 API 尚未开始实
 
 已安装 `@floating-ui/dom`、`zod`、`decimal.js`、`@internationalized/date`，版本由根目录 catalog 统一固定。目前仅准备依赖，尚未确定对应组件 API，也没有从公共入口重新导出这些包。
 
-首个组件调整为 `Provider`：注入自定义 CSS 作者与公共配置，同时提供主题容器。普通组件读取同一作用域实例，语义外观属性映射到注入的 CSS 属性，默认值直接写在 `$props()` 中。消费项目必须启用 `zerodep-css-svelte/vite`。完整边界见根目录 `.design/provider.md`，当前尚未实现或导出 `Provider`。
+`Provider` 注入自定义 CSS 作者与公共配置，同时提供真实主题容器。普通组件读取同一作用域实例，语义外观属性映射到注入的 CSS 属性，默认值直接写在 `$props()` 中。消费项目必须启用 `zerodep-css-svelte/vite`。完整边界见根目录 `.design/provider.md`。
+
+Provider 支持 css、theme（light/dark）、locale 与原生容器属性。css 为初始化值；theme/locale 可动态继承和覆盖。根默认值为新 UiCss、light、zh-CN；没有 dir 属性。默认容器只提供主题变量、文字颜色和 color-scheme，背景与布局交给调用方。
 
 `Icon` 在 Provider 基础建立后实现，使用 `<Icon icon={Search} />`。已安装 `@lucide/icons` 作为必需 peer dependency 和本包开发依赖；Lucide 仅提供 SVG 结构数据，组件渲染与 API 由本库负责。
 

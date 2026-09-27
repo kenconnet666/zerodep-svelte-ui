@@ -9,6 +9,7 @@ export default defineConfig({
   // 与消费端保持一致：先处理显式 CSS 绑定，再编译 Svelte。
   plugins: [cssBindings(), svelte()],
   test: {
+    attachmentsDir: resolve(import.meta.dirname, '../../test-results/components'),
     include: ['test/**/*.browser.test.ts'],
     setupFiles: ['vitest-browser-svelte'],
     browser: {

@@ -1,6 +1,6 @@
 # zerodep-svelte-ui
 
-Svelte 5 组件库与直接编写网页的文档站。当前完成开发、打包、语言服务和 CI 基础，尚未实现公共组件或发布 npm。
+Svelte 5 组件库与直接编写网页的文档站。已实现 Provider、共享 CSS 作者和配置注入，并具备打包、语言服务与 CI 基础。项目仍保持 private，尚未发布 npm。
 
 ## 目录
 
@@ -63,7 +63,7 @@ pnpm test:component --project=chromium
 
 不传 --project 会运行 Chromium、Firefox、WebKit 三个项目，完整矩阵通常交 CI。组件测试关注独立挂载与交互；现有 Playwright 测试关注文档站导航、水合和消费端集成；Node 测试继续负责包入口和 SSR。
 
-当前浏览器用例复用 RenderProbe，验证挂载、npm CSS 生效、props 更新与文本转义。test/types 中的正反类型用例随 pnpm check 执行。它们验证测试基础设施，尚不代表已有公共组件或组件行为验收；首个组件落地时补充真实 props、绑定、snippet、键盘和可访问性用例。
+RenderProbe 验证测试基础设施。Provider 另有实例共享、嵌套配置、主题切换、类型、正式包产物 SSR 和文档站水合/可访问性用例；test/types 中的正反类型用例随 pnpm check 执行。后续组件仍需补充自己的行为验收。
 
 pnpm check:package 会重新构建组件库，将实际 tarball 写入根目录 artifacts，再执行 publint --strict；不会发布 npm。pnpm pack:ui 仅打包已有构建产物，也写入根目录 artifacts。正式组件出现后，继续用文档站和消费端测试验证包导出、SSR 与 CSS，不能仅凭包检查通过判定组件可用。
 
@@ -82,7 +82,7 @@ packages/ui 已显式声明以下 npm 依赖；根目录的 Zod 仍单独用于 
 
 ## 图标资源依赖
 
-已安装 Lucide 官方数据包 @lucide/icons 1.48.0，仅由它提供 SVG 结构数据；Icon 的渲染、属性、样式和可访问性由本组件库负责。首个组件已调整为 Provider，Icon 在共享 CSS 作者与注入配置建立后实现，公共入口尚未导出二者。
+已安装 Lucide 官方数据包 @lucide/icons 1.48.0，仅由它提供 SVG 结构数据；Icon 的渲染、属性、样式和可访问性由本组件库负责。Provider 已导出，Icon 在其基础上继续实现。
 
 组件库将 @lucide/icons 声明为必需的 peer dependency（兼容范围 ^1.48.0），开发时通过 devDependencies 使用 catalog 固定版本。文档站作为消费端，在 dependencies 中显式安装同一版本。未来使用组件库的应用也应显式安装兼容的 @lucide/icons；本仓库的 autoInstallPeers: false 不会强制改变外部应用的包管理器设置。
 
@@ -93,9 +93,29 @@ packages/ui 已显式声明以下 npm 依赖；根目录的 Zod 仍单独用于 
 - 组件库已安装 npm 的 zerodep-css、zerodep-css-svelte，均为 0.1.0。
 - 文档站安装相同版本，并添加 zerodep-css-sveltekit 0.1.0。Vite 中 CSS 绑定插件放在 SvelteKit 前面，支持后续组件中的显式 bx。
 - hooks.server.ts 创建每请求样式宿主，app.html 的占位符接收 SSR 样式；hooks.client.ts 在水合前恢复登记。
-- src/lib/css.ts 仅创建文档站的上下文键，根布局每次实例化 Css。首页链接实际使用 npm 包生成样式，构建与浏览器验收可覆盖这条接入链路。
+- 根布局使用组件库 Provider；src/lib/css.ts 转导出组件库 useCss。页面和组件读取同一个作者实例，首页链接使用 npm CSS 包生成样式。
 
-当前没有把 CSS 作者实例或 SSR 宿主做成全局单例，也没有使用本地兄弟仓库 link。组件库自身的主题/提供者 API 留待首个组件设计时确定。
+CSS 作者实例和 SSR 宿主按作用域/请求隔离，没有使用本地兄弟仓库 link。所有消费者都必须启用 zerodep-css-svelte/vite，放在 Svelte/SvelteKit 插件之前。
+
+## Provider
+
+```svelte
+<script lang="ts">
+  import { Provider, UiCss } from 'zerodep-svelte-ui';
+  const appCss = new UiCss();
+</script>
+
+<Provider css={appCss} theme="light" locale="zh-CN">
+  <Content />
+  <Provider theme="dark"><Panel /></Provider>
+</Provider>
+```
+
+根 Provider 省略 css 时创建一次默认 UiCss；子 Provider 默认复用父实例。theme/locale 响应式继承，undefined 撤销覆盖。css 仅用于初始化，更换实例需用 key 块重建作用域。没有 dir 属性；lang 由 locale 设置。
+
+useCss() 取得当前作者，useConfig() 取得只读的有效配置，均在后代组件初始化时调用。组件 props 默认值直接写在 $props()；size/color 等语义属性由组件映射到 UiCss 属性。自定义主题可继承 UiCss 并覆盖 theme(mode)，自定义作者属性可继承对应的 UiColorCss 等类型。
+
+Provider 提供真实 div 容器、主题变量、color-scheme 与文字颜色，背景和布局由使用者设置。默认规则在 @layer zerodep-ui 中，未分层的外部 CSS 可覆盖。只有显式 theme/css 的内层容器重建主题边界，语言覆盖不会抹掉父级局部 token。网页示例位于 /provider。
 
 ## Codex LSP
 
@@ -126,8 +146,6 @@ GitHub Actions 分组并行：
 
 zerodep-css（通常位于 ../zerodep-css）仍是核心项目。CSS 框架与绑定插件的通用修复回到该仓库，组件和站点改动留在这里，具体分工见 AGENTS.md。
 
-下一步先设计 Provider：向下注入组件库自定义的 CSS 作者实例与配置，同时提供真实主题容器。普通组件只读取注入实例；size/color 采用语义名称并映射到自定义 CSS 属性；props 默认值就近放在 $props() 中。所有消费项目必须启用 zerodep-css-svelte/vite，不设计无插件兼容路径。
-
-设计范围、继承规则与待定项见 [Provider 设计草案](.design/provider.md)。草案尚未实现；确认后以 Provider 验证库产物、文档示例、嵌套配置、SSR 与浏览器行为，再继续 Icon。基础站点不是最终视觉设计，测试夹具不作为产品组件。
+Provider 的作者、继承、编译和 SSR 契约见 [Provider 设计记录](.design/provider.md)。下一阶段继续 Icon。基础站点不是最终视觉设计，已有少量组件的通过不能代表整个组件库已完成生产验收。
 
 发布前仍需确定许可证、首发组件范围、npm 元数据和站点部署目标。这些是尚未开展的发布工作，当前 private 用于防止提前发布。

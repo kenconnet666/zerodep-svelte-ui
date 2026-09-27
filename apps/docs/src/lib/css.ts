@@ -1,4 +1,2 @@
-import { Css, createCssContext } from 'zerodep-css-svelte';
-
-// 模块级只保存上下文键；作者实例由根布局按请求创建。
-export const { provideCss, useCss } = createCssContext<Css>();
+// 文档与组件共享 Provider 中的作者，不创建第二套上下文键。
+export { useCss } from 'zerodep-svelte-ui';
