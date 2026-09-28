@@ -81,7 +81,11 @@ import { Provider, Icon } from 'zerodep-svelte-ui';`}</code
   <h2>属性</h2>
   <table>
     <thead><tr><th>属性</th><th>说明</th></tr></thead><tbody>
-      <tr><td>icon</td><td>必填，LucideIconData 图形数据，支持响应式替换。</td></tr>
+      <tr
+        ><td>icon</td><td
+          >必填，LucideIconData 图形数据，支持响应式替换，不接受子组件或 children。</td
+        ></tr
+      >
       <tr><td>size</td><td>sm / md / lg，默认 md，映射到作者的 fontSize 语义属性。</td></tr>
       <tr
         ><td>color</td><td

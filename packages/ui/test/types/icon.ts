@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'svelte';
+import type { ComponentProps, Snippet } from 'svelte';
 import { Search } from '@lucide/icons';
 import { Icon } from '../../src/lib/index.js';
 
@@ -20,3 +20,8 @@ export const badSize: Props = { icon: Search, size: 24 };
 export const badColor: Props = { icon: Search, color: '#fff' };
 // @ts-expect-error viewBox 由图标数据决定。
 export const badGeometry: Props = { icon: Search, viewBox: '0 0 1 1' };
+declare const children: Snippet;
+// @ts-expect-error 图形只通过 icon 数据传入，不接受 children snippet。
+export const badChildren: Props = { icon: Search, children };
+// @ts-expect-error icon 接收 SVG 数据，不接受 Svelte 组件。
+export const badComponent: Props = { icon: Icon };

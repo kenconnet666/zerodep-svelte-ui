@@ -134,7 +134,7 @@ Provider 提供真实 div 容器、主题变量、color-scheme 与文字颜色�
 </Provider>
 ```
 
-icon 必须是 LucideIconData。size 为 sm/md/lg（默认 md），color 为 inherit/text/muted/primary/success/warning/danger（默认 inherit）。它们映射到注入的 UiCss 属性；Icon 不自行创建作者。strokeWidth 为数值（默认 2），由 bx 编译成 CSS 变量。精确宽高、原始颜色、动画等通过 class/style 设置。
+icon 必须是 LucideIconData，只通过 `<Icon icon={Search} />` 传入，不接受子组件或 children snippet。size 为 sm/md/lg（默认 md），color 为 inherit/text/muted/primary/success/warning/danger（默认 inherit）。它们映射到注入的 UiCss 属性；Icon 不自行创建作者。strokeWidth 为数值（默认 2），由 bx 编译成 CSS 变量。精确宽高、原始颜色、动画等通过 class/style 设置。
 
 默认图标作为装饰内容隐藏；提供 aria-label 或 aria-labelledby 时自动设置 img 角色，显式 aria-hidden/role 保持优先。图标默认不增加 Tab 停靠点，按钮自身承担名称与交互。SVG 根属性可透传，但 children、width/height、viewBox 和原生 stroke-width 由组件管理。图形数据保持只读，递归子节点使用正确的 SVG 命名空间，内部 key 元数据不输出。网页交互示例位于 /icon。
 

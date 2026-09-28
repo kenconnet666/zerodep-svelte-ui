@@ -30,27 +30,16 @@
     ...rest
   }: Props = $props();
 
-  const viewBox = $derived(
-    `0 0 ${icon.size ?? icon.width ?? 24} ${icon.size ?? icon.height ?? 24}`,
-  );
   const named = $derived(Boolean(label?.trim() || labelledBy?.trim()));
   const hidden = $derived(ariaHidden ?? (named ? undefined : true));
-  const effectiveRole = $derived(
-    role ?? (named && hidden !== true && hidden !== 'true' ? 'img' : undefined),
-  );
-
-  function svgAttributes(attributes: LucideIconNode[1]) {
-    // Lucide 的 key 是渲染器元数据，不属于 SVG 属性；不修改用户共享的数据。
-    return Object.fromEntries(Object.entries(attributes).filter(([name]) => name !== 'key'));
-  }
 </script>
 
 <svg
   {...rest}
   xmlns="http://www.w3.org/2000/svg"
-  {viewBox}
+  viewBox="0 0 {icon.size ?? icon.width ?? 24} {icon.size ?? icon.height ?? 24}"
   {focusable}
-  role={effectiveRole}
+  role={role ?? (named && hidden !== true && hidden !== 'true' ? 'img' : undefined)}
   aria-label={label}
   aria-labelledby={labelledBy}
   aria-hidden={hidden}
@@ -76,8 +65,9 @@
   ]}
 >
   {#snippet nodes(items: LucideIconNode[])}
-    {#each items as [tag, attributes, nested], index (index)}
-      <svelte:element this={tag} {...svgAttributes(attributes)} xmlns="http://www.w3.org/2000/svg">
+    <!-- 解构时分离 Lucide 的节点 key，只用于列表标识，不输出到 SVG。 -->
+    {#each items as [tag, { key, ...attributes }, nested], index (key ?? index)}
+      <svelte:element this={tag} {...attributes} xmlns="http://www.w3.org/2000/svg">
         {#if nested}{@render nodes(nested)}{/if}
       </svelte:element>
     {/each}
