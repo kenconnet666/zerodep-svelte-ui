@@ -20,6 +20,7 @@ test('调用方的 Svelte 响应式对象字段更新传递到嵌套后代', asy
   const screen = await render(ProviderMutableHarness, {});
   await screen.getByRole('button', { name: '更新对象字段' }).click();
   await expect.element(screen.getByTestId('value')).toHaveStyle({ color: 'rgb(128, 0, 128)' });
+  await expect.element(screen.getByTestId('value')).toHaveAttribute('data-primary', 'purple');
   await expect.element(screen.getByTestId('value-message')).toHaveTextContent('处理中');
   await expect.element(screen.getByTestId('value-time')).toHaveTextContent('07:00');
   expect(lightTheme.color.primary).toBe('#1d4ed8');
@@ -99,6 +100,12 @@ test('自定义主题对象直接驱动后代，切换语言和作者不丢失�
   await expect
     .element(screen.getByTestId('nested-value'))
     .toHaveStyle({ color: 'rgb(128, 0, 128)', fontSize: '21px' });
+  await expect
+    .element(screen.getByTestId('nested-value'))
+    .toHaveAttribute('data-primary', 'purple');
+  await expect
+    .element(screen.getByTestId('nested-value'))
+    .toHaveAttribute('data-font-size', '21px');
   await expect
     .element(screen.getByTestId('local-value'))
     .toHaveStyle({ color: 'rgb(128, 0, 128)' });

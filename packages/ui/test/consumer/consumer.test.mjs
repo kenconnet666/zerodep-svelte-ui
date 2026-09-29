@@ -104,7 +104,11 @@ test(
 
       export const provider:ComponentProps<typeof Provider>={css:(readTheme)=>new UiCss(readTheme),theme:darkTheme,lang:enUSLanguage,locale:usLocale};
       // @ts-expect-error 内部 context 设置器不进入公共导出。
-      import {provideConfig} from 'zerodep-svelte-ui';
+      import {provideCss} from 'zerodep-svelte-ui';
+      // @ts-expect-error 聚合配置入口已移除。
+      import {useConfig} from 'zerodep-svelte-ui';
+      // @ts-expect-error 聚合配置类型已移除。
+      import type {UiConfig} from 'zerodep-svelte-ui';
       export const icon:ComponentProps<typeof Icon>={icon:Search,size:'sm',color:'primary'};
       // @ts-expect-error 不接受任意颜色名称
       export const bad:ComponentProps<typeof Icon>={icon:Search,color:'blue'};`,

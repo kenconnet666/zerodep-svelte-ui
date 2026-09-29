@@ -125,7 +125,9 @@
   </table>
   <h2>消费配置</h2>
   <pre class={code}><code
-      >{`const config = useConfig();
+      >{`const theme = useTheme();
+const locale = useLocale();
+const lang = useLang();
 const s = useCss();
 // 在模板或 $derived 中读取，才能随配置替换更新。
 const appearance = $derived(css(s.color.primary, s.fontSize.md));`}</code
@@ -142,9 +144,9 @@ const appearance = $derived(css(s.color.primary, s.fontSize.md));`}</code
   </p>
   <h2>接入约定</h2>
   <p>
-    所有库组件及 useCss()、useConfig() 必须在 Provider 后代中使用，缺少 Provider
-    会直接报错。Provider 应包裹消费组件；同一个组件的初始化代码不能读取自己模板中 Provider 提供的
-    context。
+    所有库组件及 useCss()、useTheme()、useLocale()、useLang() 必须在 Provider 后代中使用，缺少
+    Provider 会直接报错。Provider 应包裹消费组件；同一个组件的初始化代码不能读取自己模板中 Provider
+    提供的 context。
   </p>
   <p>
     应用启用 zerodep-css-svelte/vite；SvelteKit 接入 zerodep-css-sveltekit 的服务端 handle 与客户端

@@ -14,6 +14,7 @@ import {
 import ProviderSsr from './ProviderSsr.svelte';
 import PublicConfigProbe from './PublicConfigProbe.svelte';
 import IconSsr from './IconSsr.svelte';
+import ContextWithoutProvider from './ContextWithoutProvider.svelte';
 
 export async function renderProvider(dark: boolean, brand: string) {
   const host = createServerCssHost();
@@ -52,6 +53,12 @@ export function renderWithoutHost() {
 }
 export function renderIconWithoutProvider() {
   return withCssHost(createServerCssHost(), () => render(Icon, { props: { icon: Search } }).body);
+}
+export function readWithoutProvider(kind: 'theme' | 'locale' | 'lang' | 'css') {
+  return withCssHost(
+    createServerCssHost(),
+    () => render(ContextWithoutProvider, { props: { kind } }).body,
+  );
 }
 export function renderIcon(label: string) {
   const host = createServerCssHost();

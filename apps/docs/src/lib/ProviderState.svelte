@@ -1,13 +1,15 @@
 <script lang="ts">
   import { css } from 'zerodep-css-svelte';
-  import { useConfig, useCss } from 'zerodep-svelte-ui';
+  import { useTheme, useLocale, useLang, useCss } from 'zerodep-svelte-ui';
   let { label }: { label: string } = $props();
-  const config = useConfig();
+  const theme = useTheme();
+  const locale = useLocale();
+  const lang = useLang();
   const s = useCss();
   const appearance = $derived(css(s.color.primary, s.fontSize.md));
   const time = $derived(
-    new Intl.DateTimeFormat(config.locale.code, {
-      timeZone: config.locale.timeZone,
+    new Intl.DateTimeFormat(locale.code, {
+      timeZone: locale.timeZone,
       hour: '2-digit',
       minute: '2-digit',
       hourCycle: 'h23',
@@ -16,9 +18,9 @@
 </script>
 
 <p class={appearance} data-provider-value={label}>
-  {label}：{config.theme.themeName} / {config.lang.code}
+  {label}：{theme.themeName} / {lang.code}
 </p>
-<p data-provider-language={label}>{config.lang.messages.loading}</p>
+<p data-provider-language={label}>{lang.messages.loading}</p>
 <p>
-  {config.locale.code} · {config.locale.timeZone} · <time data-provider-time={label}>{time}</time>
+  {locale.code} · {locale.timeZone} · <time data-provider-time={label}>{time}</time>
 </p>

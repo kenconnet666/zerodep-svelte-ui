@@ -12,4 +12,3 @@ export * from './provider/locale/us.js';
 export * from './provider/theme/dark.js';
 export * from './provider/theme/light.js';
 export * from './provider/theme/types.js';
-export * from './provider/types.js';

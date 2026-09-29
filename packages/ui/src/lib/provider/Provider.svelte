@@ -3,8 +3,13 @@
   import type { HTMLAttributes } from 'svelte/elements';
   import { css as styleClass, type CssInput } from 'zerodep-css-svelte';
   import { UiCss, type UiCssFactory } from './css.js';
-  import { parentConfig, provideConfig } from '../../internal/provider-context.js';
-  import type { UiConfig } from './types.js';
+  import {
+    themeContext,
+    localeContext,
+    langContext,
+    cssFactoryContext,
+    provideCss,
+  } from '../../internal/provider-context.js';
   import type { UiTheme } from './theme/types.js';
   import type { UiLanguage } from './lang/types.js';
   import type { UiLocale } from './locale/types.js';
@@ -22,27 +27,51 @@
   };
 
   let { css, theme, lang, locale, children, class: className, ...rest }: Props = $props();
-  const parent = parentConfig();
+  const parentTheme = themeContext.optional();
+  const parentLocale = localeContext.optional();
+  const parentLang = langContext.optional();
+  const parentFactory = cssFactoryContext.optional();
   const initialCss = untrack(() => css);
   const createCss: UiCssFactory =
-    initialCss ?? parent?.createCss ?? ((readTheme) => new UiCss(readTheme));
+    initialCss ?? parentFactory ?? ((readTheme) => new UiCss(readTheme));
   // 传读取函数而不是主题快照；嵌套 Provider 使用独立作者，避免主题串到兄弟子树。
-  const s = createCss(() => theme ?? parent?.theme ?? lightTheme);
-  // context 的外层对象稳定；getter 读取当前 props，让替换与嵌套继承保持响应式。
-  const config: UiConfig = {
-    css: s,
-    createCss,
-    get theme() {
-      return s.theme;
-    },
-    get lang() {
-      return lang ?? parent?.lang ?? zhCNLanguage;
-    },
-    get locale() {
-      return locale ?? parent?.locale ?? chinaLocale;
-    },
-  };
-  provideConfig(config);
+  const s = createCss(() => theme ?? parentTheme ?? lightTheme);
+  // 各对象引用稳定，字段 getter 跟踪当前 props；整体替换不会让后代持有旧快照。
+  themeContext.provide(
+    Object.freeze({
+      get themeName() {
+        return s.theme.themeName;
+      },
+      get color() {
+        return s.theme.color;
+      },
+      get fontSize() {
+        return s.theme.fontSize;
+      },
+    }),
+  );
+  const language = langContext.provide(
+    Object.freeze({
+      get code() {
+        return (lang ?? parentLang ?? zhCNLanguage).code;
+      },
+      get messages() {
+        return (lang ?? parentLang ?? zhCNLanguage).messages;
+      },
+    }),
+  );
+  localeContext.provide(
+    Object.freeze({
+      get code() {
+        return (locale ?? parentLocale ?? chinaLocale).code;
+      },
+      get timeZone() {
+        return (locale ?? parentLocale ?? chinaLocale).timeZone;
+      },
+    }),
+  );
+  cssFactoryContext.provide(createCss);
+  provideCss(s);
 
   // 作者与绑定所有者按作用域固定；主题、语言、地区对象可直接替换。
   $effect.pre(() => {
@@ -56,7 +85,7 @@
 
 <div
   {...rest}
-  lang={config.lang.code}
+  lang={language.code}
   class={styleClass(s.colorScheme.raw(s.theme.themeName), s.color.text, className)}
 >
   {@render children?.()}

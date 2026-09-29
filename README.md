@@ -115,7 +115,7 @@ CSS 作者实例和 SSR 宿主按作用域/请求隔离，没有使用本地兄�
 
 Provider 位于 src/lib/provider/Provider.svelte，三个子目录分别提供 JS 配置对象：theme 包含 lightTheme/darkTheme，lang 包含 zhCNLanguage/enUSLanguage，locale 包含 chinaLocale/usLocale（地区代码及 IANA 时区）。theme/lang/locale 独立响应式继承，显式对象整体替换，undefined 撤销覆盖。容器 lang 取自语言对象，地区和时区交给 Intl 格式化，不依赖机器默认时区。
 
-必须在消费组件外包裹 Provider；组件、useCss() 和 useConfig() 缺少 Provider 时直接报错，不创建隐式默认作者。同一个组件的初始化代码不能读取自己模板中 Provider 提供的 context。每个 Provider 创建独立 UiCss，传入当前主题的读取函数；useCss() 返回带主题语义属性的工具，useConfig() 返回配置。可选 css prop 为 (readTheme) => new AppCss(readTheme)，创建函数向下继承，但实例不共享；只用于初始化，更换函数需用 key 块重建。
+必须在消费组件外包裹 Provider；组件、useCss()、useTheme()、useLocale() 和 useLang() 缺少 Provider 时直接报错，不创建隐式默认作者。同一个组件的初始化代码不能读取自己模板中 Provider 提供的 context。每个 Provider 创建独立 UiCss，传入当前主题的读取函数；useCss() 返回带主题语义属性的工具，useTheme()、useLocale()、useLang() 分别返回对应的只读对象。可选 css prop 为 (readTheme) => new AppCss(readTheme)，创建函数向下继承，但实例不共享；只用于初始化，更换函数需用 key 块重建。
 
 主题通过 Svelte context 向下传递，并注入 UiCss。组件在模板或 $derived 中使用 s.color.primary、s.backgroundColor.surface、s.fontSize.md；s.theme 提供原始主题对象。语义属性由 getter 读取当前主题，不使用主题 CSS 变量。UiCss、UiColorCss、UiBackgroundColorCss、UiFontSizeCss 可通过继承扩展，原生属性和 raw() 仍可使用。自定义主题使用普通对象，例如 `{ ...lightTheme, color: { ...lightTheme.color, primary: 'purple' } }`。默认预设冻结，用户对象不会被 Provider 修改。容器提供 color-scheme 与文字颜色，背景和布局由调用者设置；class/style 不会改变后代读取的配置数据。网页示例位于 /provider。
 
@@ -188,3 +188,5 @@ zerodep-css（通常位于 ../zerodep-css）仍是核心项目。CSS 框架与�
 Provider 的作者、继承、编译和 SSR 契约见 [Provider 设计记录](.design/provider.md)。基础站点不是最终视觉设计，Provider 与 Icon 的通过不能代表整个组件库已完成生产验收。后续组件继续沿用相同的作者和配置体系。
 
 发布前仍需确定许可证、首发组件范围、npm 元数据和站点部署目标。这些是尚未开展的发布工作，当前 private 用于防止提前发布。
+
+Firefox 组件测试暂时串行执行文件，避免多页面并行时真实键盘输入受到焦点干扰；跟踪 https://github.com/vitest-dev/vitest/issues/7916 ，待所用版本在 CI 的并行键盘测试稳定后恢复。

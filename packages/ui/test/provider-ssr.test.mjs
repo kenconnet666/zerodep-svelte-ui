@@ -52,6 +52,9 @@ test('正式包产物的 Provider 隔离并发 SSR 和嵌套主题作者', async
 test('缺少 Provider 或 SSR 宿主时明确失败', () => {
   assert.throws(() => entry.renderWithoutProvider(), /inside a Provider/);
   assert.throws(() => entry.renderIconWithoutProvider(), /inside a Provider/);
+  for (const kind of ['theme', 'locale', 'lang', 'css']) {
+    assert.throws(() => entry.readWithoutProvider(kind), /inside a Provider/);
+  }
   assert.throws(() => entry.renderWithoutHost(), /CSS server host is unavailable/);
 });
 

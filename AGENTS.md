@@ -6,6 +6,7 @@
 - pnpm 工作区只包含两个子项目：`packages/ui` 负责组件库，`apps/docs` 负责文档网站。文档内容直接写 Svelte 页面和交互示例，不引入 Markdown、MDX、mdsvex 或文档生成框架。
 - `packages/ui/src/lib` 是公开 API 目录，所有模块都从 `src/lib/index.ts` 导出；入口由 `pnpm exports:generate` 自动维护，不手写。不公开的实现放在 `src/internal` 等其他目录。Provider 放在 `src/lib/provider`，lang/locale/theme 分别存放语言、地区时区和主题对象。
 - Provider 通过 Svelte context 注入 JS 配置对象，主题不依赖 CSS 变量。消费代码在模板或派生表达式中读取配置，保证对象替换与嵌套继承能响应更新。
+- theme、locale、lang 使用独立 context 注入，通过 useTheme()、useLocale()、useLang() 返回各自只读对象；不再提供聚合的 UiConfig/useConfig。
 - 组件必须在 Provider 后代中使用，缺失时直接报错，不在组件内创建默认作者。Provider 将主题读取函数传给 UiCss；组件优先使用 s.color.primary、s.fontSize.md 等语义属性。每个 Provider 创建独立作者，css prop 接收创建函数，嵌套继承创建函数而不是共享主题作者实例。
 - `C:\Users\lionheart\WebstormProjects\zerodep-css` 同样是持续维护的核心项目，当前通常位于本仓库的相邻目录 `../zerodep-css`。有需要时可以继续完善，不能为了绕开问题而在 UI 内复制一套 CSS 框架。
 - 改动应落在真正拥有该职责的仓库和文件：CSS 作者 API、生成器、绑定编译器及框架适配属于 zerodep-css；组件行为、组件 API、可访问性属于本仓库的 packages/ui；展示、示例、站点导航属于 apps/docs。先读目标仓库的 AGENTS.md，再修改并分别验证、提交和推送。

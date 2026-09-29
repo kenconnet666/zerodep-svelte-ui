@@ -1,6 +1,6 @@
 # Provider 与公开入口
 
-Provider 使用 Svelte context 注入三个普通 JS 对象；公共消费入口为 useConfig() 和 useCss()。
+Provider 使用 Svelte context 注入三个普通 JS 对象；主题、地区、语言使用独立 context 键分别注入，公共消费入口为 useTheme()、useLocale()、useLang() 和 useCss()。
 
 ## 目录边界
 
@@ -16,7 +16,7 @@ Provider 使用 Svelte context 注入三个普通 JS 对象；公共消费入口
 - lang: UiLanguage，包含 code 和通用 messages。默认 zhCNLanguage，另有 enUSLanguage。Provider 容器的 lang 来自该对象。
 - locale: UiLocale，包含 code 和显式 IANA timeZone。默认 chinaLocale，另有 usLocale。通过 Intl 格式化日期/数值；不读取服务器或浏览器的默认时区。
 - 三个维度独立继承。显式对象整体覆盖，不做隐式深合并；undefined 恢复最近父级，根部恢复默认值。
-- context 外层对象固定，getter 读取当前 props 和父配置；子组件保留 config 引用，在模板或 $derived 中读取，支持替换和 Svelte 响应式对象更新。
+- 三个 context 对象引用分别固定，字段 getter 读取当前 props 和对应父对象；子组件保留 theme、locale、lang 引用，在模板或 $derived 中读取属性，支持替换和 Svelte 响应式对象更新。初始化时解构字段会形成快照。
 - 默认预设及其子对象冻结；Provider 不修改用户对象。context 随组件树和 SSR 请求隔离，无全局可变配置。
 
 ## 作者与样式
@@ -37,4 +37,4 @@ Provider 使用 Svelte context 注入三个普通 JS 对象；公共消费入口
 
 ## 必须提供上下文
 
-所有消费组件及 useCss()/useConfig() 必须位于 Provider 后代中；缺失时统一抛出明确错误，不做默认作者回退。根 Provider 可以没有父级，并提供默认主题、语言与地区；只有 Provider 处理默认值。SSR 与浏览器使用相同约束。
+所有消费组件及 useCss()/useTheme()/useLocale()/useLang() 必须位于 Provider 后代中；缺失时统一抛出明确错误，不做默认作者回退。根 Provider 可以没有父级，并提供默认主题、语言与地区；只有 Provider 处理默认值。SSR 与浏览器使用相同约束。

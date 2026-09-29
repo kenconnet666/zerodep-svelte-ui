@@ -6,7 +6,9 @@ import {
   lightTheme,
   enUSLanguage,
   usLocale,
-  type UiConfig,
+  useTheme,
+  useLocale,
+  useLang,
 } from '../../src/lib/index.js';
 
 type Props = ComponentProps<typeof Provider>;
@@ -27,11 +29,16 @@ export const badLanguage: Props = { lang: 'en' };
 export const badLocale: Props = { locale: { code: 'en-US' } };
 // @ts-expect-error 作者应实现 Css。
 export const badCss: Props = { css: {} };
-export function readonlyConfig(config: UiConfig) {
-  // @ts-expect-error 注入配置只读。
-  config.locale = usLocale;
-  // @ts-expect-error 默认主题也以只读数据提供。
-  config.theme.color.primary = 'red';
+export function readonlyObjects() {
+  const theme = useTheme();
+  const locale = useLocale();
+  const lang = useLang();
+  // @ts-expect-error 主题通过只读对象提供。
+  theme.color.primary = 'red';
+  // @ts-expect-error 地区通过只读对象提供。
+  locale.timeZone = 'UTC';
+  // @ts-expect-error 语言通过只读对象提供。
+  lang.messages.loading = 'Loading';
 }
 
 // @ts-expect-error 必须传创建函数，让 Provider 注入当前作用域的主题。

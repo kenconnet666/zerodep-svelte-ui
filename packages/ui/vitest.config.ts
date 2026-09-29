@@ -21,7 +21,9 @@ export default defineConfig({
       screenshotDirectory: resolve(import.meta.dirname, '../../test-results/components'),
       instances: [
         { browser: 'chromium', name: 'chromium' },
-        { browser: 'firefox', name: 'firefox' },
+        // Firefox 多页面并行存在输入焦点干扰，保持真实键盘测试并串行执行文件。
+        // 上游跟踪：https://github.com/vitest-dev/vitest/issues/7916
+        { browser: 'firefox', name: 'firefox', fileParallelism: false },
         { browser: 'webkit', name: 'webkit' },
       ],
     },

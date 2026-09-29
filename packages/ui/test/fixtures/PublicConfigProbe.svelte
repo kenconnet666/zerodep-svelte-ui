@@ -1,14 +1,15 @@
 <script lang="ts">
   import { untrack } from 'svelte';
   import { css, type Css } from 'zerodep-css-svelte';
-  import { useCss, useConfig } from 'zerodep-svelte-ui';
+  import { useCss, useTheme, useLocale, useLang } from 'zerodep-svelte-ui';
   let { onRead }: { onRead: (author: Css) => void } = $props();
   const author = useCss();
-  const config = useConfig();
+  const theme = useTheme();
+  const locale = useLocale();
+  const lang = useLang();
   untrack(() => onRead(author));
 </script>
 
 <span class={css(author.color.primary)}
-  >{config.theme.themeName}/{config.lang.code}/{config.locale.timeZone}/{config.lang.messages
-    .loading}</span
+  >{theme.themeName}/{lang.code}/{locale.timeZone}/{lang.messages.loading}</span
 >
