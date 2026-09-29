@@ -139,6 +139,15 @@
       >
     </tbody>
   </table>
+  <h2>样式与 token 的职责</h2>
+  <p>
+    通用 token 由 UiCss 提供，各组件直接复用。组件专用值和默认样式写在组件内部，统一通过 CSS
+    工具生成声明。外部定制使用组件的 class，外部声明在默认声明之后组合。
+  </p>
+  <p>
+    Provider 的 theme 用于调整通用主题；组件专用样式不另设 token 对象或覆盖层。 Provider 不提供组件
+    token 注册、注入和合并配置。
+  </p>
   <h2>消费配置</h2>
   <pre class={code}><code
       >{`css(s.height._md, s.paddingInline._sm, s.borderRadius._md);

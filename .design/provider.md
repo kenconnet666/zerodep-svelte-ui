@@ -41,4 +41,4 @@ Provider 使用 Svelte context 注入三个普通 JS 对象；主题、地区、
 
 主题声明统一使用下划线：s.color._primary 与 s.color.raw('_primary') 等价；背景色与字号同理。只解析完整的已知主题标识，原生 CSS 值继续由基础 raw() 处理。主题数据对象中的 color._primary、fontSize._md 与声明同名，不再剥离下划线；Icon 的主题参数同样带下划线，如 color="_primary"、size="_md"。
 
-Icon 的四个外观 props 直接交给 UiCss 对应的 raw()，默认值就近写在 $props()。Provider 不再提供 components，Icon 不再维护独立的 token 覆盖。详见 [主题设计](theme-tokens.md)。
+Provider 负责通用主题、语言、地区以及 CSS 作者的作用域，不承担组件 token 配置。通用 token 由 UiCss 提供，各组件直接消费；组件专用值和默认 CSS 声明写在组件内部，外部定制通过 class: CssInput 完成。Icon 的四个外观 props 直接交给对应 raw()，默认值写在 $props()。不建立组件 token 注册表、context、覆盖合并器或 Provider.components。详见 [主题设计](theme-tokens.md)。

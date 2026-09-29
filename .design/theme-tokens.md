@@ -4,6 +4,26 @@
 
 系统 token 的叶子键统一以 `_` 开头，分类名与 themeName 保持原名。数据、类型、作者 getter 和 raw 参数使用同一标识，例如 `theme.space._2xs`、`s.gap._2xs`、`s.gap.raw('_2xs')`。尺寸统一为 `_2xs/_xs/_sm/_md/_lg/_xl/_2xl/_3xl`，各分类按需选取；对象键不混用数字开头的字符串键。旧的无下划线 token 不保留别名。
 
+## token 的归属与使用
+
+系统 token 和组件专用样式都通过已有 CSS 工具生成声明。统一的是 CSS 写法，组件专用值仍就近写在组件内部，不集中登记到全局主题中。
+
+| 范围       | 定义位置                               | 组件使用方式                                                     | 外部定制                    |
+| ---------- | -------------------------------------- | ---------------------------------------------------------------- | --------------------------- |
+| 通用 token | provider/theme 的主题对象与 UiCss 属性 | 直接使用 s.color._primary、s.fontSize._md 等声明                 | Provider.theme 调整通用主题 |
+| 组件专用值 | 组件内部的默认值和 CSS 声明            | 直接使用 s.strokeWidth.raw(strokeWidth) 等属性，默认值由组件确定 | class 传入 CSS 声明覆盖     |
+
+组件级 token 在这里指组件自身确定的样式值，不代表一套公开、可注入的 token 对象。以 Icon 为例，strokeWidth 默认 2、verticalAlign 默认 -0.125em，直接写在 $props()；宽高 1em、线帽 round 等结构样式直接写在模板的 css() 中。无需另建 IconTokens、默认值工厂或覆盖合并器。
+
+class 是统一的样式定制入口，组件把调用方的声明放在默认声明之后组合。同等层叠条件下，外部声明覆盖默认值：
+
+```svelte
+<!-- s 来自当前 Provider 的 useCss()，css 从 zerodep-css-svelte 导入。 -->
+<Icon icon={Search} class={css(s.fontSize.px(22), s.color._primary, s.strokeWidth.raw(1.5))} />
+```
+
+class 定制只改变样式，不修改 Provider 的主题数据。已有直接外观 props 保留，供常用值设置；不为每个内部样式值增加独立 prop。原生 style 的既有行为保持不变。
+
 ## 系统层
 
 参考 Naive UI 的显式状态和尺寸、daisyUI 的前景/背景配对、MUI 的分类主题。具体默认数值是本库的设计选择，并非完整复制任何一家：
@@ -64,4 +84,4 @@ Icon 的四个外观属性都直接通过对应 raw() 生成声明。描边是�
 
 ## 后续边界
 
-Button/Input 尚未实现。后续先讨论系统 token 与直接 CSS props 能覆盖的需求，再决定是否存在真正需要组件专属配置的行为。不预设通用组件 token 覆盖体系、variants、递归 peers 或 DeepPartial 合并器。
+Button/Input 尚未实现。后续组件直接复用系统 token；专用 padding、图标与状态样式在组件内部通过 CSS 工具定义，外部定制使用 class。组件 token 的注册、注入、覆盖和合并不再列为后续建设项。交互状态、键盘或子部件协作需要的 context 按具体行为设计，不承载样式 token 覆盖。

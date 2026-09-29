@@ -9,7 +9,8 @@
 - theme、locale、lang 使用独立 context 注入，通过 useTheme()、useLocale()、useLang() 返回各自只读对象；不再提供聚合的 UiConfig/useConfig。
 - 组件必须在 Provider 后代中使用，缺失时直接报错，不在组件内创建默认作者。Provider 将主题读取函数传给 UiCss；组件优先使用 s.color._primary、s.fontSize._md 等语义属性。每个 Provider 创建独立作者，css prop 接收创建函数，嵌套继承创建函数而不是共享主题作者实例。
 - 系统 token 的叶子键、主题声明及组件主题参数统一带下划线；分类名和普通 props 保持原名。主题数据也使用 color._primary、space._2xs，不保留无下划线别名。尺寸键统一使用 _2xs/_xs/_sm/_md/_lg/_xl/_2xl/_3xl，不混用数字开头的字符串键。声明示例如 s.color._primary、s.color.raw('_primary')、color="_primary"、size="_md"；原生 CSS 关键字如 inherit 保持原名。Icon 的外观 props 从 UiCss 对应 raw() 提取输入类型，不自行维护另一套主题标识。
-- 系统 token 按颜色、排版、控件高度、间距、圆角、边框、透明度、阴影、动效和层级分类。Icon 的 size/color/strokeWidth/verticalAlign 直接使用系统 CSS 属性，默认值在 Svelte $props() 就近声明。普通外观配置不预先使用 bx；只有实际需要高频连续更新时才引入，不由演示方式推断需求；不提供 IconTokens、tokens 或 Provider.components 覆盖体系。后续组件按实际需求设计，不提前开放未实现配置。
+- token 统一通过 CSS 工具生成声明：通用 token 由 UiCss 提供，各组件直接复用；组件专用值和默认样式直接写在组件内部，props 默认值在 Svelte $props() 中就近声明，不建立独立的组件 token 对象、注册表、context、Provider.components、tokens prop 或覆盖合并器。外部样式定制使用 class: CssInput，外部声明在默认声明之后组合；不再为组件 token 覆盖预留基础设施。
+- 系统 token 按颜色、排版、控件高度、间距、圆角、边框、透明度、阴影、动效和层级分类。Icon 的 size/color/strokeWidth/verticalAlign 直接使用对应 CSS 属性。普通外观配置不预先使用 bx；只有实际需要高频连续更新时才引入，不由演示方式推断需求。组件交互状态需要的 context 与样式 token 配置分开。
 - `C:\Users\lionheart\WebstormProjects\zerodep-css` 同样是持续维护的核心项目，当前通常位于本仓库的相邻目录 `../zerodep-css`。有需要时可以继续完善，不能为了绕开问题而在 UI 内复制一套 CSS 框架。
 - 改动应落在真正拥有该职责的仓库和文件：CSS 作者 API、生成器、绑定编译器及框架适配属于 zerodep-css；组件行为、组件 API、可访问性属于本仓库的 packages/ui；展示、示例、站点导航属于 apps/docs。先读目标仓库的 AGENTS.md，再修改并分别验证、提交和推送。
 - 跨仓库使用已发布版本或可复现的工作区接入。不要把绝对路径、临时 link 或只在本机存在的补丁留成正式依赖。修复 CSS 包后，发布及升级消费版本需按当次授权范围执行。

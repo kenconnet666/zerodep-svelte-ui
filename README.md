@@ -81,7 +81,7 @@ packages/ui 已显式声明以下 npm 依赖；根目录的 Zod 仍单独用于 
 | decimal.js              | 为精确十进制输入和计算预备；尚未确定组件绑定值类型       |
 | @internationalized/date | 为日期、日历与时区能力预备；尚未确定日期组件 API         |
 
-安装这些依赖不会自动导出它们，也没有提前实现浮层、表单、数字或日期组件。主题与组件上下文仍优先复用 zerodep-css 和 Svelte 原生能力，具体契约在首个组件设计时确定。
+安装这些依赖不会自动导出它们，也没有提前实现浮层、表单、数字或日期组件。样式统一使用 zerodep-css；通用 token 直接复用，组件专用值就近定义，通过 class 定制。交互行为优先使用 Svelte 原生能力。
 
 ## 图标资源依赖
 
@@ -99,6 +99,12 @@ packages/ui 已显式声明以下 npm 依赖；根目录的 Zod 仍单独用于 
 - 根布局使用组件库 Provider；src/lib/css.ts 转导出组件库 useCss。页面和组件读取同一个作者实例，首页链接使用 npm CSS 包生成样式。
 
 CSS 作者实例和 SSR 宿主按作用域/请求隔离，没有使用本地兄弟仓库 link。所有消费者都必须启用 zerodep-css-svelte/vite，放在 Svelte/SvelteKit 插件之前。
+
+## 样式与 token
+
+通用 token 和组件专用样式统一通过 CSS 工具生成声明。通用 token 由 UiCss 提供，各组件直接使用 s.color._primary、s.fontSize._md 等属性；组件专用值直接写在组件内部，例如 Icon 的描边默认 2、垂直对齐默认 -0.125em。props 默认值用 Svelte $props() 声明，固定结构样式直接写在 css() 中。
+
+外部样式定制使用 class: CssInput，组件将外部声明放在默认声明之后组合。无需额外的组件 token 注册表、context、tokens prop、Provider.components 或覆盖合并器，也不为后续组件预留这些设施。Provider.theme 用于调整通用主题，class 用于定制具体组件的样式，两者各自负责明确的范围。
 
 ## Provider
 
@@ -187,10 +193,10 @@ GitHub Actions 分组并行：
 
 zerodep-css（通常位于 ../zerodep-css）仍是核心项目。CSS 框架与绑定插件的通用修复回到该仓库，组件和站点改动留在这里，具体分工见 AGENTS.md。
 
-Provider 的作者、继承、编译和 SSR 契约见 [Provider 设计记录](.design/provider.md)。基础站点不是最终视觉设计，Provider 与 Icon 的通过不能代表整个组件库已完成生产验收。后续组件继续沿用相同的作者和配置体系。
+Provider 的作者、继承、编译和 SSR 契约见 [Provider 设计记录](.design/provider.md)。基础站点不是最终视觉设计，Provider 与 Icon 的通过不能代表整个组件库已完成生产验收。后续组件复用同一 CSS 作者和通用 token，专用样式在组件内部定义，外部定制通过 class 完成。
 
 发布前仍需确定许可证、首发组件范围、npm 元数据和站点部署目标。这些是尚未开展的发布工作，当前 private 用于防止提前发布。
 
 Firefox 组件测试暂时串行执行文件，避免多页面并行时真实键盘输入受到焦点干扰；跟踪 https://github.com/vitest-dev/vitest/issues/7916 ，待所用版本在 CI 的并行键盘测试稳定后恢复。
 
-系统 token 分类与默认值见 [主题设计](.design/theme-tokens.md)。Icon 位于 packages/ui/src/lib/display/gene/Icon.svelte，公开导入仍是 import { Icon } from 'zerodep-svelte-ui'。后续组件按实际需求设计，不提前增加组件覆盖框架。
+系统 token 分类与默认值见 [主题设计](.design/theme-tokens.md)。Icon 位于 packages/ui/src/lib/display/gene/Icon.svelte，公开导入仍是 import { Icon } from 'zerodep-svelte-ui'。组件专用样式就近定义，不建设组件 token 覆盖框架。

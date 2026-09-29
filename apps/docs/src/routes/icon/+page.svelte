@@ -156,8 +156,13 @@ import { Provider, Icon } from 'zerodep-svelte-ui';`}</code
     默认作为装饰图标隐藏，提供 aria-label 或 aria-labelledby 时自动赋予 img 角色。显式 aria-hidden
     优先。仅图标按钮把名称放在按钮上，图标本身不增加 Tab 停靠点。
   </p>
-  <h2>主题与扩展</h2>
-  <pre class={code}><code>{`<Icon icon={Search} class={css(s.width.px(30), s.color.red)} />`}</code
+  <h2>主题与 class 定制</h2>
+  <p>
+    通用颜色与字号直接使用 UiCss 的系统 token。Icon 的描边、基线偏移和结构样式在组件内部定义，
+    默认值就近写在 Svelte props 中。更细的外观定制通过 class 完成，无需额外的组件 token 配置。
+  </p>
+  <pre class={code}><code
+      >{`<Icon icon={Search} class={css(s.fontSize.px(22), s.color._primary, s.strokeWidth.raw(1.5))} />`}</code
     ></pre>
   <p>
     class 优先传入同一宿主的 css() 结果，也接受 CSS 声明、嵌套数组和条件空项；
