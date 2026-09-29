@@ -24,6 +24,9 @@
     SVGAttributes<SVGSVGElement>,
     'children' | 'class' | 'color' | 'width' | 'height' | 'viewBox' | 'stroke-width'
   > & {
+    icon?: LucideIconData;
+    /** 官方名称字面量，需要 zerodep-svelte-ui/vite；动态选择用 icon。 */
+    lucide?: LucideIconName;
     /** 系统字号 token 或原始 font-size 值；图标宽高为 1em。 */
     size?: Parameters<UiCss['fontSize']['raw']>[0];
     color?: Parameters<UiCss['color']['raw']>[0];
@@ -31,13 +34,7 @@
     verticalAlign?: Parameters<UiCss['verticalAlign']['raw']>[0];
     /** 与默认声明合成；传入当前宿主的 css() 结果或 CSS 声明。 */
     class?: CssInput;
-  } & (
-      | { icon: LucideIconData; lucide?: never }
-      | {
-          icon?: never;
-          /** 官方图标名称字面量，需要 zerodep-svelte-ui/vite；动态选择用 icon。 */ lucide: LucideIconName;
-        }
-    ) = $props();
+  } = $props();
 
   const s = useCss();
   const data = $derived.by(() => {
