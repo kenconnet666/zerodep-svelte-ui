@@ -75,8 +75,11 @@ test(
       const manifest = JSON.parse(await readFile(join(installed, 'package.json'), 'utf8'));
       assert.equal(manifest.peerDependencies['@lucide/icons'], '^1.48.0');
       assert.equal(manifest.peerDependenciesMeta?.['@lucide/icons']?.optional, undefined);
-      const iconSource = await readFile(join(installed, 'dist/lib/Icon.svelte'), 'utf8');
-      assert.match(iconSource, /bx\(strokeWidth\)/);
+      const iconSource = await readFile(
+        join(installed, 'dist/lib/display/gene/Icon.svelte'),
+        'utf8',
+      );
+      assert.match(iconSource, /bx\(effectiveStrokeWidth\)/);
 
       await writeFile(
         join(directory, 'Consumer.svelte'),
@@ -84,7 +87,7 @@ test(
       import { Provider, Icon, darkTheme } from 'zerodep-svelte-ui';
       import { Search } from '@lucide/icons';
       </script>
-      <Provider theme={darkTheme}><Icon icon={Search} color="_primary" strokeWidth={1.25} aria-label="搜索" /></Provider>`,
+      <Provider theme={darkTheme} components={{Icon:{sizeMd:'20px'}}}><Icon icon={Search} color="_primary" tokens={{colorPrimary:'purple'}} strokeWidth={1.25} aria-label="搜索" /></Provider>`,
       );
       await writeFile(
         join(directory, 'entry.ts'),
@@ -102,7 +105,7 @@ test(
         `import type {ComponentProps} from 'svelte';
       import {Provider,Icon,UiCss,darkTheme,enUSLanguage,usLocale} from 'zerodep-svelte-ui';import {Search} from '@lucide/icons';
 
-      export const provider:ComponentProps<typeof Provider>={css:(readTheme)=>new UiCss(readTheme),theme:darkTheme,lang:enUSLanguage,locale:usLocale};
+      export const provider:ComponentProps<typeof Provider>={css:(readTheme)=>new UiCss(readTheme),theme:darkTheme,lang:enUSLanguage,locale:usLocale,components:{Icon:{sizeMd:'20px'}}};
       // @ts-expect-error 内部 context 设置器不进入公共导出。
       import {provideCss} from 'zerodep-svelte-ui';
       // @ts-expect-error 聚合配置入口已移除。
@@ -138,6 +141,7 @@ test(
         try{const entry=await server.ssrLoadModule('/entry.ts');
           if(enabled){
             const result=entry.run();assert(result.body.includes('<svg'));assert(result.body.includes('role="img"'));assert(result.body.includes('<circle'));
+            assert(result.css.includes('color:purple;'));assert(result.css.includes('font-size:20px;'));
             const variable=result.css.split('stroke-width:var(')[1]?.split(')')[0];assert(variable);
             assert(result.body.includes(variable+': 1.25;')||result.body.includes(variable+': 1.25"')||result.css.includes(variable+':1.25;'));
           }

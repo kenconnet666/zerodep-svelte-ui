@@ -7,8 +7,62 @@ import { Css, css, cssStats } from 'zerodep-css-svelte';
 import { lightTheme, darkTheme, UiCss } from '../src/lib/index.js';
 import IconHarness from './fixtures/IconHarness.svelte';
 import IconButtonHarness from './fixtures/IconButtonHarness.svelte';
+import IconThemeHarness from './fixtures/IconThemeHarness.svelte';
+import IconTokensMutable from './fixtures/IconTokensMutable.svelte';
 
 afterEach(cleanup);
+
+test('组件 token 按外层、内层和实例覆盖，undefined 恢复继承且不影响兄弟', async () => {
+  const screen = await render(IconThemeHarness, {
+    components: { Icon: { sizeMd: '20px', colorPrimary: 'purple', strokeWidth: 3 } },
+    nestedComponents: { Icon: { sizeMd: '24px', verticalAlign: '0px' } },
+    tokens: { sizeMd: '28px', colorPrimary: undefined, strokeWidth: 0 },
+  });
+  await expect
+    .element(screen.getByTestId('root-icon'))
+    .toHaveStyle({ width: '20px', color: 'rgb(128, 0, 128)' });
+  const nested = screen.getByTestId('nested-icon');
+  await expect.element(nested).toHaveStyle({
+    width: '28px',
+    color: 'rgb(128, 0, 128)',
+    verticalAlign: '0px',
+    strokeWidth: '0px',
+  });
+  await screen.rerender({ strokeWidth: 1.5 });
+  await expect.element(nested).toHaveStyle({ strokeWidth: '1.5px' });
+  await screen.rerender({ tokens: undefined, strokeWidth: undefined });
+  await expect.element(nested).toHaveStyle({ width: '24px', strokeWidth: '3px' });
+  await screen.rerender({ nestedComponents: { Icon: { sizeMd: undefined } } });
+  await expect.element(nested).toHaveStyle({ width: '20px' });
+  await expect.element(screen.getByTestId('sibling-icon')).toHaveStyle({ width: '20px' });
+  await screen.rerender({ components: undefined });
+  await expect.element(nested).toHaveStyle({ width: '16px', color: 'rgb(29, 78, 216)' });
+});
+
+test('内层系统主题重新派生默认 token，只继承父级显式覆盖', async () => {
+  const screen = await render(IconThemeHarness, {
+    theme: lightTheme,
+    nestedTheme: darkTheme,
+    components: { Icon: { sizeMd: '20px' } },
+  });
+  await expect.element(screen.getByTestId('root-icon')).toHaveStyle({ color: 'rgb(29, 78, 216)' });
+  const nested = screen.getByTestId('nested-icon');
+  await expect.element(nested).toHaveStyle({ width: '20px', color: 'rgb(147, 197, 253)' });
+  await screen.rerender({
+    theme: { ...lightTheme, color: { ...lightTheme.color, primary: 'purple' } },
+  });
+  await expect.element(nested).toHaveStyle({ color: 'rgb(147, 197, 253)' });
+  await screen.rerender({ nestedTheme: undefined });
+  await expect.element(nested).toHaveStyle({ color: 'rgb(128, 0, 128)' });
+});
+
+test('响应式组件覆盖和实例 token 的字段修改更新图标', async () => {
+  const screen = await render(IconTokensMutable, {});
+  await screen.getByRole('button', { name: '更新图标 token' }).click();
+  await expect
+    .element(screen.getByTestId('mutable-icon'))
+    .toHaveStyle({ width: '26px', color: 'rgb(0, 128, 0)' });
+});
 
 test('图标真实渲染为 SVG，切换数据和语义外观时更新', async () => {
   const source = JSON.stringify(Search);

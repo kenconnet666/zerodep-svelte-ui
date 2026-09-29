@@ -2,8 +2,10 @@
   import type { SVGAttributes } from 'svelte/elements';
   import type { LucideIconData, LucideIconNode } from '@lucide/icons';
   import { bx, css, type CssInput } from 'zerodep-css-svelte';
-  import { useCss } from './provider/context.js';
-  import type { UiColor, UiSize } from './provider/theme/types.js';
+  import { useCss, useTheme } from '../../provider/context.js';
+  import type { UiColor, UiSize } from '../../provider/theme/types.js';
+  import { createIconTokens, type IconTokens } from './icon-theme.js';
+  import { componentThemesContext, mergeTokens } from '../../../internal/provider-context.js';
 
   type Props = Omit<
     SVGAttributes<SVGSVGElement>,
@@ -13,16 +15,21 @@
     size?: UiSize;
     color?: UiColor;
     strokeWidth?: number;
+    /** 当前图标的组件 token，优先于 Provider 的 components.Icon。 */
+    tokens?: Partial<IconTokens>;
     /** 与默认声明合成；传入当前宿主的 css() 结果或 CSS 声明。 */
     class?: CssInput;
   };
 
   const s = useCss();
+  const theme = useTheme();
+  const components = componentThemesContext.use();
   let {
     icon,
     size = '_md',
     color = 'inherit',
-    strokeWidth = 2,
+    strokeWidth,
+    tokens,
     class: className,
     role,
     focusable = 'false',
@@ -31,6 +38,25 @@
     'aria-hidden': ariaHidden,
     ...rest
   }: Props = $props();
+
+  const resolvedTokens = $derived(mergeTokens(createIconTokens(theme), components.Icon, tokens));
+  const effectiveStrokeWidth = $derived(strokeWidth ?? resolvedTokens.strokeWidth);
+  const fontSize = $derived(
+    { _sm: resolvedTokens.sizeSm, _md: resolvedTokens.sizeMd, _lg: resolvedTokens.sizeLg }[size],
+  );
+  const textColor = $derived(
+    {
+      inherit: 'inherit',
+      _text: resolvedTokens.colorText,
+      _muted: resolvedTokens.colorMuted,
+      _textDisabled: resolvedTokens.colorTextDisabled,
+      _primary: resolvedTokens.colorPrimary,
+      _info: resolvedTokens.colorInfo,
+      _success: resolvedTokens.colorSuccess,
+      _warning: resolvedTokens.colorWarning,
+      _danger: resolvedTokens.colorDanger,
+    }[color],
+  );
 
   const named = $derived(Boolean(label?.trim() || labelledBy?.trim()));
   const hidden = $derived(ariaHidden ?? (named ? undefined : true));
@@ -48,16 +74,16 @@
   class={css(
     s.display.inlineBlock,
     s.flexShrink.raw(0),
-    s.verticalAlign.em(-0.125),
+    s.verticalAlign.raw(resolvedTokens.verticalAlign),
     s.width.em(1),
     s.height.em(1),
     s.fill.none,
     s.stroke.raw('currentColor'),
     s.strokeLinecap.round,
     s.strokeLinejoin.round,
-    s.fontSize.raw(size),
-    s.color.raw(color),
-    s.strokeWidth.raw(bx(strokeWidth)),
+    s.fontSize.raw(fontSize),
+    s.color.raw(textColor),
+    s.strokeWidth.raw(bx(effectiveStrokeWidth)),
     className,
   )}
 >

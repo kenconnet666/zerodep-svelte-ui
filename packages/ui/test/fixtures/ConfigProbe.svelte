@@ -32,3 +32,17 @@
   >主题 raw</span
 >
 <time data-testid={name + '-time'}>{time}</time>
+<span
+  data-testid={name + '-system'}
+  class={css(
+    s.display.inlineBlock,
+    s.height._md,
+    s.paddingInline._sm,
+    s.borderRadius._md,
+    s.opacity._disabled,
+    s.fontWeight._semibold,
+    s.lineHeight._normal,
+    s.zIndex._modal,
+    s.transitionDuration._fast,
+  )}>系统 token</span
+>

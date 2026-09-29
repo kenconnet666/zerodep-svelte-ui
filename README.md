@@ -140,7 +140,7 @@ Provider 和 Icon 的 class 使用 CssInput，优先传入同一 CSS 宿主的 c
 </Provider>
 ```
 
-icon 必须是 LucideIconData，只通过 `<Icon icon={Search} />` 传入，不接受子组件或 children snippet。size 为 _sm/_md/_lg（默认 _md），color 为 inherit/_text/_muted/_primary/_success/_warning/_danger（默认 inherit）。Icon 将参数直接交给 raw() 读取声明；inherit 保持原生 CSS 继承；Icon 只调用 useCss()，不自行创建作者。strokeWidth 为数值（默认 2），仍由 bx 管理动态 CSS 变量，与主题数据传递分开。精确宽高、原始颜色、动画等通过 class/style 设置。
+icon 必须是 LucideIconData，只通过 `<Icon icon={Search} />` 传入，不接受子组件或 children snippet。size 为 _sm/_md/_lg（默认 _md），color 为 inherit/_text/_muted/_textDisabled/_primary/_info/_success/_warning/_danger（默认 inherit）。Icon 从本级系统主题派生组件 token，叠加 Provider.components.Icon 和实例 tokens 后生成声明；inherit 保持原生 CSS 继承。Icon 复用 Provider 的作者，不自行创建。strokeWidth 为数值（默认 2），仍由 bx 管理动态 CSS 变量，与主题数据传递分开。精确宽高、原始颜色、动画等通过 class/style 设置。
 
 默认图标作为装饰内容隐藏；提供 aria-label 或 aria-labelledby 时自动设置 img 角色，显式 aria-hidden/role 保持优先。图标默认不增加 Tab 停靠点，按钮自身承担名称与交互。SVG 根属性可透传，但 children、width/height、viewBox 和原生 stroke-width 由组件管理。图形数据保持只读，递归子节点使用正确的 SVG 命名空间，内部 key 元数据不输出。网页交互示例位于 /icon。
 
@@ -190,3 +190,5 @@ Provider 的作者、继承、编译和 SSR 契约见 [Provider 设计记录](.d
 发布前仍需确定许可证、首发组件范围、npm 元数据和站点部署目标。这些是尚未开展的发布工作，当前 private 用于防止提前发布。
 
 Firefox 组件测试暂时串行执行文件，避免多页面并行时真实键盘输入受到焦点干扰；跟踪 https://github.com/vitest-dev/vitest/issues/7916 ，待所用版本在 CI 的并行键盘测试稳定后恢复。
+
+系统 token 分类、默认值与组件覆盖规则见 [主题设计](.design/theme-tokens.md)。Icon 已移至 packages/ui/src/lib/display/gene/Icon.svelte，公开导入仍是 import { Icon } from 'zerodep-svelte-ui'。Provider 的 components 当前只开放 Icon，实例通过 tokens 定制；未来组件按实际需求增加。

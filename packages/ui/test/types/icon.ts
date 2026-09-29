@@ -8,6 +8,7 @@ export const valid: Props = {
   size: '_sm',
   color: '_primary',
   strokeWidth: 1.5,
+  tokens: { sizeMd: '20px', colorPrimary: 'purple' },
   'aria-label': '搜索',
   class: ['width:24px;', [false, null, 'color:red;']],
 };
@@ -25,6 +26,10 @@ export const badColor: Props = { icon: Search, color: '#fff' };
 export const oldColor: Props = { icon: Search, color: 'primary' };
 // @ts-expect-error 主题字号必须带下划线。
 export const oldSize: Props = { icon: Search, size: 'md' };
+// @ts-expect-error 组件 token 拒绝拼写错误。
+export const badToken: Props = { icon: Search, tokens: { sizeMD: '20px' } };
+// @ts-expect-error 描边 token 为数字。
+export const badTokenValue: Props = { icon: Search, tokens: { strokeWidth: '2px' } };
 // @ts-expect-error viewBox 由图标数据决定。
 export const badGeometry: Props = { icon: Search, viewBox: '0 0 1 1' };
 declare const children: Snippet;

@@ -58,6 +58,22 @@ test('缺少 Provider 或 SSR 宿主时明确失败', () => {
   assert.throws(() => entry.renderWithoutHost(), /CSS server host is unavailable/);
 });
 
+test('组件覆盖与实例 token 在并发 SSR 中按层解析且请求隔离', async () => {
+  const [a, b] = await Promise.all([
+    entry.renderIconTokens(
+      { Icon: { sizeLg: '21px', colorPrimary: 'purple' } },
+      { colorPrimary: 'teal' },
+    ),
+    entry.renderIconTokens({ Icon: { sizeLg: '27px', colorPrimary: 'orange' } }),
+  ]);
+  assert.match(a.css, /font-size:21px/);
+  assert.match(a.css, /color:teal/);
+  assert.doesNotMatch(a.css, /color:purple|color:orange|font-size:27px/);
+  assert.match(b.css, /font-size:27px/);
+  assert.match(b.css, /color:orange/);
+  assert.doesNotMatch(b.css, /color:teal|font-size:21px/);
+});
+
 test('正式包产物的 Icon 在 SSR 输出 SVG、名称和 bx 初始样式', () => {
   const result = entry.renderIcon('查找 <内容>');
   assert.match(result.body, /<svg[^>]*role="img"/);

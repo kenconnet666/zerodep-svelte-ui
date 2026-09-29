@@ -16,6 +16,41 @@ import ProviderMutableHarness from './fixtures/ProviderMutableHarness.svelte';
 
 afterEach(cleanup);
 
+test('尺寸、排版、状态和动效 token 随作用域主题更新，原生声明保持可用', async () => {
+  const screen = await render(ProviderHarness, {});
+  const target = screen.getByTestId('nested-value-system');
+  await expect.element(target).toHaveStyle({
+    height: '34px',
+    paddingLeft: '8px',
+    borderRadius: '6px',
+    opacity: '0.5',
+    fontWeight: '600',
+    lineHeight: '24px',
+    zIndex: '1300',
+    transitionDuration: '0.15s',
+  });
+  await screen.rerender({
+    theme: {
+      ...darkTheme,
+      controlHeight: { ...darkTheme.controlHeight, md: '42px' },
+      space: { ...darkTheme.space, sm: '10px' },
+      opacity: { ...darkTheme.opacity, disabled: 0.25 },
+    },
+  });
+  await expect
+    .element(target)
+    .toHaveStyle({ height: '42px', paddingLeft: '10px', opacity: '0.25' });
+  const s = new UiCss(() => lightTheme);
+  expect(s.padding.raw('_md')).toBe('padding:12px;');
+  expect(s.borderColor.raw('_border')).toBe('border-color:#d1d5db;');
+  expect(s.transitionTimingFunction._enter).toBe(
+    'transition-timing-function:cubic-bezier(0, 0, 0.2, 1);',
+  );
+  expect(s.fontWeight.raw(650)).toBe('font-weight:650;');
+  expect(s.padding.rem(1, 2)).toBe('padding:1rem 2rem;');
+  expect(Object.isFrozen(lightTheme.motion.duration)).toBe(true);
+});
+
 test('主题 raw 与下划线属性一致，原生 CSS 值保持原样', () => {
   let theme = lightTheme;
   const s = new UiCss(() => theme);

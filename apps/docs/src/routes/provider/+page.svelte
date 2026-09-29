@@ -27,6 +27,22 @@
   let nested = $state<'inherit' | 'light' | 'dark' | 'brand'>('inherit');
   const theme = $derived(themes[choice]);
   const childTheme = $derived(nested === 'inherit' ? undefined : themes[nested]);
+  const tokenGroups = $derived([
+    { name: '颜色与状态', values: theme.color },
+    { name: '字体族', values: theme.fontFamily },
+    { name: '字号', values: theme.fontSize },
+    { name: '字重', values: theme.fontWeight },
+    { name: '行高', values: theme.lineHeight },
+    { name: '控件高度', values: theme.controlHeight },
+    { name: '间距', values: theme.space },
+    { name: '圆角', values: theme.radius },
+    { name: '边框宽度', values: theme.borderWidth },
+    { name: '透明度', values: theme.opacity },
+    { name: '阴影', values: theme.shadow },
+    { name: '动效时长', values: theme.motion.duration },
+    { name: '动效曲线', values: theme.motion.easing },
+    { name: '层级', values: theme.zIndex },
+  ]);
 </script>
 
 <svelte:head>
@@ -93,6 +109,11 @@
     恢复继承；不自动深合并。自定义配置可用对象展开从预设构建。
   </p>
   <h2>属性</h2>
+  <p>
+    components 用于配置当前子树的组件 token，例如 <code
+      >{"components={{ Icon: { sizeMd: '20px' } }}"}</code
+    >。它逐字段叠加父级覆盖，undefined 不覆盖；系统 theme 仍采用完整对象替换。
+  </p>
   <table>
     <thead><tr><th>属性</th><th>含义</th></tr></thead><tbody>
       <tr
@@ -125,6 +146,12 @@
   </table>
   <h2>消费配置</h2>
   <pre class={code}><code
+      >{`css(s.height._md, s.paddingInline._sm, s.borderRadius._md);
+css(s.color._primaryHover, s.borderColor._border);
+css(s.fontWeight._semibold, s.lineHeight._normal);
+css(s.transitionDuration._fast, s.zIndex._modal);`}</code
+    ></pre>
+  <pre class={code}><code
       >{`const theme = useTheme();
 const locale = useLocale();
 const lang = useLang();
@@ -156,4 +183,22 @@ const appearance = $derived(css(s.color._primary, s.fontSize._md));`}</code
     应用启用 zerodep-css-svelte/vite；SvelteKit 接入 zerodep-css-sveltekit 的服务端 handle 与客户端
     init。Provider 提供 context，不另建 SSR 样式宿主。默认配置冻结，用户传入的对象不会被组件修改。
   </p>
+</section>
+
+<section class="prose">
+  <h2>系统 token 参考</h2>
+  <p>
+    以下展示当前父主题的完整
+    token。名称参考成熟组件库的语义分类；数值由本库明确维护。尺寸、状态透明度、阴影、动效和层级相互独立，不把组件专属参数塞进全局。
+  </p>
+  {#each tokenGroups as group (group.name)}
+    <h3>{group.name}</h3>
+    <table>
+      <thead><tr><th>名称</th><th>值</th></tr></thead><tbody>
+        {#each Object.entries(group.values) as [name, value] (name)}
+          <tr><td>{name}</td><td style="overflow-wrap:anywhere">{value}</td></tr>
+        {/each}
+      </tbody>
+    </table>
+  {/each}
 </section>

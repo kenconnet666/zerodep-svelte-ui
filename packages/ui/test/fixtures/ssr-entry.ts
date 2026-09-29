@@ -10,6 +10,8 @@ import {
   chinaLocale,
   usLocale,
   Icon,
+  type UiComponentThemes,
+  type IconTokens,
 } from 'zerodep-svelte-ui';
 import ProviderSsr from './ProviderSsr.svelte';
 import PublicConfigProbe from './PublicConfigProbe.svelte';
@@ -64,4 +66,16 @@ export function renderIcon(label: string) {
   const host = createServerCssHost();
   const body = withCssHost(host, () => render(IconSsr, { props: { label } }).body);
   return { body, css: host.cssText(), rules: host.rules() };
+}
+
+export async function renderIconTokens(
+  components: UiComponentThemes,
+  tokens?: Partial<IconTokens>,
+) {
+  const host = createServerCssHost();
+  return withCssHost(host, async () => {
+    await Promise.resolve();
+    const body = render(IconSsr, { props: { components, tokens } }).body;
+    return { body, css: host.cssText() };
+  });
 }

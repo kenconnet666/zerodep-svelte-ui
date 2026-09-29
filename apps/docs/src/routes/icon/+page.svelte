@@ -14,11 +14,14 @@
   const s = useCss();
   const panel = css(s.padding.rem(1.5), s.borderRadius.px(12));
   const row = css(s.display.flex, s.alignItems.center, s.gap.rem(1.5), s.flexWrap.wrap);
+  const code = css(s.whiteSpace.preWrap, s.overflowWrap.anywhere);
   const colors: UiColor[] = [
     'inherit',
     '_text',
     '_muted',
+    '_textDisabled',
     '_primary',
+    '_info',
     '_success',
     '_warning',
     '_danger',
@@ -30,6 +33,7 @@
   const selectedTheme = $derived(theme === 'light' ? lightTheme : darkTheme);
   let strokeWidth = $state(2);
   let searches = $state(0);
+  let customTokens = $state(false);
   const selected = $derived(choice === 'Search' ? Search : Check);
 </script>
 
@@ -44,6 +48,37 @@
 <p class="eyebrow">基础组件</p>
 <h1>Icon</h1>
 <p class="lead">传入图标数据，统一使用组件库的尺寸、颜色和主题。</p>
+
+<section class="prose">
+  <h2>组件 token</h2>
+  <label><input type="checkbox" bind:checked={customTokens} /> 启用作用域尺寸覆盖（28px）</label>
+  <Provider components={{ Icon: { sizeMd: customTokens ? '28px' : undefined } }}>
+    <Icon icon={Search} color="_primary" aria-label="作用域 token 图标" data-icon-token-scope />
+    <Icon
+      icon={Check}
+      color="_success"
+      tokens={{ sizeMd: '32px' }}
+      aria-label="实例 token 图标"
+      data-icon-token-local
+    />
+  </Provider>
+  <p>
+    覆盖顺序：当前系统主题派生默认值 → 外层 Provider → 内层 Provider → 当前 Icon 的
+    tokens。undefined 恢复继承；显式 strokeWidth prop 优先于描边 token。
+  </p>
+  <pre class={code}><code
+      >{`<Provider components={{ Icon: { sizeMd: '28px' } }}>
+  <Icon icon={Search} />
+  <Icon icon={Check} tokens={{ sizeMd: '32px' }} />
+</Provider>`}</code
+    ></pre>
+  <p>
+    IconTokens 包含
+    sizeSm/Md/Lg、colorText、colorMuted、colorTextDisabled、colorPrimary、colorInfo、colorSuccess、colorWarning、colorDanger、strokeWidth
+    和 verticalAlign。尺寸默认保持 14/16/24px（根字号 16px）；large 使用系统字号 xl，与正文 lg
+    分开。
+  </p>
+</section>
 
 <div class="demo-controls">
   <label
@@ -81,11 +116,11 @@
 
 <section class="prose">
   <h2>使用</h2>
-  <pre><code
+  <pre class={code}><code
       >{`import { Search } from '@lucide/icons';
 import { Provider, Icon } from 'zerodep-svelte-ui';`}</code
     ></pre>
-  <pre><code
+  <pre class={code}><code
       >{`<Provider>
   <Icon icon={Search} />
   <Icon icon={Search} size="_lg" color="_primary" aria-label="搜索" />
@@ -99,10 +134,12 @@ import { Provider, Icon } from 'zerodep-svelte-ui';`}</code
           >必填，LucideIconData 图形数据，支持响应式替换，不接受子组件或 children。</td
         ></tr
       >
-      <tr><td>size</td><td>_sm / _md / _lg，默认 _md，读取主题对象的 fontSize。</td></tr>
+      <tr><td>size</td><td>_sm / _md / _lg，默认 _md，选择组件尺寸 token，默认 14/16/24px。</td></tr
+      >
       <tr
         ><td>color</td><td
-          >inherit / _text / _muted / _primary / _success / _warning / _danger，默认 inherit。</td
+          >inherit / _text / _muted / _textDisabled / _primary / _info / _success / _warning /
+          _danger，默认 inherit。</td
         ></tr
       >
       <tr><td>strokeWidth</td><td>数值，默认 2；编译为 CSS 变量，连续更新不重新登记样式类。</td></tr
@@ -117,7 +154,8 @@ import { Provider, Icon } from 'zerodep-svelte-ui';`}</code
     优先。仅图标按钮把名称放在按钮上，图标本身不增加 Tab 停靠点。
   </p>
   <h2>主题与扩展</h2>
-  <pre><code>{`<Icon icon={Search} class={css(s.width.px(30), s.color.red)} />`}</code></pre>
+  <pre class={code}><code>{`<Icon icon={Search} class={css(s.width.px(30), s.color.red)} />`}</code
+    ></pre>
   <p>
     class 优先传入同一宿主的 css() 结果，也接受 CSS 声明、嵌套数组和条件空项；
     不透传普通类名、多类名字符串或条件对象。同等层叠条件下，外部声明覆盖默认值。

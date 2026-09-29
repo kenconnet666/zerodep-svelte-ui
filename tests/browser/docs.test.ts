@@ -108,6 +108,12 @@ test('Icon 文档通过真实组件演示语义外观、主题、bx 与键盘行
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/icon/');
   await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+  await expect(page.locator('[data-icon-token-scope]')).toHaveCSS('width', '16px');
+  await page.getByRole('checkbox', { name: '启用作用域尺寸覆盖（28px）' }).check();
+  await expect(page.locator('[data-icon-token-scope]')).toHaveCSS('width', '28px');
+  await expect(page.locator('[data-icon-token-local]')).toHaveCSS('width', '32px');
+  await page.getByRole('checkbox', { name: '启用作用域尺寸覆盖（28px）' }).uncheck();
+  await expect(page.locator('[data-icon-token-scope]')).toHaveCSS('width', '16px');
   const icon = page.getByRole('img', { name: '预览图标' });
   await expect(icon).toHaveCSS('width', '16px');
   expect(await icon.locator('circle').evaluate((el) => el.namespaceURI)).toBe(
