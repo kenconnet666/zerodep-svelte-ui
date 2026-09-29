@@ -10,58 +10,58 @@ export type UiColor =
   | '_warning'
   | '_danger';
 
-/** 主题是普通 JS 数据；组件读取对象生成声明，不依赖主题 CSS 变量。 */
+/** 主题是普通 JS 数据；叶子 token 键统一带下划线，分类名保持原名。组件读取对象生成声明，不依赖主题 CSS 变量。 */
 export interface UiTheme {
   readonly themeName: 'light' | 'dark';
   readonly color: {
-    readonly background: string;
-    readonly surface: string;
-    readonly surfaceHover: string;
-    readonly text: string;
-    readonly muted: string;
-    readonly textDisabled: string;
-    readonly border: string;
-    readonly divider: string;
-    readonly focusRing: string;
-    readonly primary: string;
-    readonly primaryHover: string;
-    readonly primaryPressed: string;
-    readonly onPrimary: string;
-    readonly info: string;
-    readonly infoHover: string;
-    readonly infoPressed: string;
-    readonly onInfo: string;
-    readonly success: string;
-    readonly successHover: string;
-    readonly successPressed: string;
-    readonly onSuccess: string;
-    readonly warning: string;
-    readonly warningHover: string;
-    readonly warningPressed: string;
-    readonly onWarning: string;
-    readonly danger: string;
-    readonly dangerHover: string;
-    readonly dangerPressed: string;
-    readonly onDanger: string;
+    readonly _background: string;
+    readonly _surface: string;
+    readonly _surfaceHover: string;
+    readonly _text: string;
+    readonly _muted: string;
+    readonly _textDisabled: string;
+    readonly _border: string;
+    readonly _divider: string;
+    readonly _focusRing: string;
+    readonly _primary: string;
+    readonly _primaryHover: string;
+    readonly _primaryPressed: string;
+    readonly _onPrimary: string;
+    readonly _info: string;
+    readonly _infoHover: string;
+    readonly _infoPressed: string;
+    readonly _onInfo: string;
+    readonly _success: string;
+    readonly _successHover: string;
+    readonly _successPressed: string;
+    readonly _onSuccess: string;
+    readonly _warning: string;
+    readonly _warningHover: string;
+    readonly _warningPressed: string;
+    readonly _onWarning: string;
+    readonly _danger: string;
+    readonly _dangerHover: string;
+    readonly _dangerPressed: string;
+    readonly _onDanger: string;
   };
-  readonly fontFamily: Readonly<Record<'sans' | 'mono', string>>;
-  readonly fontSize: Readonly<Record<'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl', string>>;
-  readonly fontWeight: Readonly<Record<'normal' | 'medium' | 'semibold' | 'bold', number>>;
-  readonly lineHeight: Readonly<Record<'tight' | 'normal' | 'relaxed', number>>;
+  readonly fontFamily: Readonly<Record<'_sans' | '_mono', string>>;
+  readonly fontSize: Readonly<Record<'_xs' | '_sm' | '_md' | '_lg' | '_xl' | '_2xl', string>>;
+  readonly fontWeight: Readonly<Record<'_normal' | '_medium' | '_semibold' | '_bold', number>>;
+  readonly lineHeight: Readonly<Record<'_tight' | '_normal' | '_relaxed', number>>;
   /** 控件高度与字号分开；组件选择相同档位时可以复用高度。 */
-  readonly controlHeight: Readonly<Record<'xs' | 'sm' | 'md' | 'lg' | 'xl', string>>;
+  readonly controlHeight: Readonly<Record<'_xs' | '_sm' | '_md' | '_lg' | '_xl', string>>;
   readonly space: Readonly<
-    Record<'2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl', string>
+    Record<'_2xs' | '_xs' | '_sm' | '_md' | '_lg' | '_xl' | '_2xl' | '_3xl', string>
   >;
-  readonly radius: Readonly<Record<'sm' | 'md' | 'lg' | 'full', string>>;
-  readonly borderWidth: Readonly<Record<'thin' | 'thick', string>>;
-  readonly opacity: Readonly<Record<'disabled' | 'hover' | 'pressed', number>>;
-  readonly shadow: Readonly<Record<'sm' | 'md' | 'lg', string>>;
+  readonly radius: Readonly<Record<'_sm' | '_md' | '_lg' | '_full', string>>;
+  readonly borderWidth: Readonly<Record<'_thin' | '_thick', string>>;
+  readonly opacity: Readonly<Record<'_disabled' | '_hover' | '_pressed', number>>;
+  readonly shadow: Readonly<Record<'_sm' | '_md' | '_lg', string>>;
   readonly motion: {
-    readonly duration: Readonly<Record<'fast' | 'normal' | 'slow', string>>;
-    readonly easing: Readonly<Record<'standard' | 'enter' | 'exit', string>>;
+    readonly duration: Readonly<Record<'_fast' | '_normal' | '_slow', string>>;
+    readonly easing: Readonly<Record<'_standard' | '_enter' | '_exit', string>>;
   };
   readonly zIndex: Readonly<
-    Record<'dropdown' | 'sticky' | 'modal' | 'popover' | 'tooltip' | 'toast', number>
+    Record<'_dropdown' | '_sticky' | '_modal' | '_popover' | '_tooltip' | '_toast', number>
   >;
 }

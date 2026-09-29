@@ -26,20 +26,20 @@ import {
 } from 'zerodep-css-svelte';
 import type { UiTheme } from './theme/types.js';
 
-export type UiThemeColor = `_${keyof UiTheme['color']}`;
-export type UiThemeFontFamily = `_${keyof UiTheme['fontFamily']}`;
-export type UiThemeFontSize = `_${keyof UiTheme['fontSize']}`;
-export type UiThemeFontWeight = `_${keyof UiTheme['fontWeight']}`;
-export type UiThemeLineHeight = `_${keyof UiTheme['lineHeight']}`;
-export type UiThemeControlHeight = `_${keyof UiTheme['controlHeight']}`;
-export type UiThemeSpace = `_${keyof UiTheme['space']}`;
-export type UiThemeRadius = `_${keyof UiTheme['radius']}`;
-export type UiThemeBorderWidth = `_${keyof UiTheme['borderWidth']}`;
-export type UiThemeOpacity = `_${keyof UiTheme['opacity']}`;
-export type UiThemeShadow = `_${keyof UiTheme['shadow']}`;
-export type UiThemeDuration = `_${keyof UiTheme['motion']['duration']}`;
-export type UiThemeEasing = `_${keyof UiTheme['motion']['easing']}`;
-export type UiThemeZIndex = `_${keyof UiTheme['zIndex']}`;
+export type UiThemeColor = keyof UiTheme['color'];
+export type UiThemeFontFamily = keyof UiTheme['fontFamily'];
+export type UiThemeFontSize = keyof UiTheme['fontSize'];
+export type UiThemeFontWeight = keyof UiTheme['fontWeight'];
+export type UiThemeLineHeight = keyof UiTheme['lineHeight'];
+export type UiThemeControlHeight = keyof UiTheme['controlHeight'];
+export type UiThemeSpace = keyof UiTheme['space'];
+export type UiThemeRadius = keyof UiTheme['radius'];
+export type UiThemeBorderWidth = keyof UiTheme['borderWidth'];
+export type UiThemeOpacity = keyof UiTheme['opacity'];
+export type UiThemeShadow = keyof UiTheme['shadow'];
+export type UiThemeDuration = keyof UiTheme['motion']['duration'];
+export type UiThemeEasing = keyof UiTheme['motion']['easing'];
+export type UiThemeZIndex = keyof UiTheme['zIndex'];
 
 /** 只解析完整主题标识；原生 CSS 值保持原样，数字仍保留原生参数类型。 */
 function themeValue<V extends string | number, T extends string | number>(
@@ -47,8 +47,7 @@ function themeValue<V extends string | number, T extends string | number>(
   values: Readonly<Record<string, T>>,
 ): V | T {
   if (typeof value === 'string' && value.startsWith('_')) {
-    const key = value.slice(1);
-    if (Object.hasOwn(values, key)) return values[key];
+    if (Object.hasOwn(values, value)) return values[value];
   }
   return value;
 }

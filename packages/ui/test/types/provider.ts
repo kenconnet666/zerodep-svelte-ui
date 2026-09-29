@@ -14,10 +14,10 @@ import {
 type Props = ComponentProps<typeof Provider>;
 export const valid: Props = {
   css: (readTheme) => new UiCss(readTheme),
-  theme: { ...lightTheme, color: { ...lightTheme.color, primary: 'purple' } },
+  theme: { ...lightTheme, color: { ...lightTheme.color, _primary: 'purple' } },
   lang: enUSLanguage,
   locale: usLocale,
-  components: { Icon: { sizeMd: '20px' } },
+  components: { Icon: { _sizeMd: '20px' } },
   class: ['color:red;', [false, undefined, 'padding:4px;']],
 };
 // @ts-expect-error class 接受 CssInput，不接受条件对象。
@@ -41,7 +41,7 @@ export function readonlyObjects() {
   const locale = useLocale();
   const lang = useLang();
   // @ts-expect-error 主题通过只读对象提供。
-  theme.color.primary = 'red';
+  theme.color._primary = 'red';
   // @ts-expect-error 地区通过只读对象提供。
   locale.timeZone = 'UTC';
   // @ts-expect-error 语言通过只读对象提供。
@@ -67,3 +67,12 @@ export function themeAuthor(s: UiCss) {
   void s.fontSize.md;
   return declarations;
 }
+
+export const oldThemeKey: Props = {
+  // @ts-expect-error 主题数据键也必须带下划线，不保留旧名称。
+  theme: { ...lightTheme, color: { ...lightTheme.color, primary: 'purple' } },
+};
+export const oldSpaceKey: Props = {
+  // @ts-expect-error 数字尺寸键统一带下划线。
+  theme: { ...lightTheme, space: { ...lightTheme.space, '2xs': '2px' } },
+};

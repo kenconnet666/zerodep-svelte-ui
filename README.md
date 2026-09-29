@@ -117,7 +117,7 @@ Provider 位于 src/lib/provider/Provider.svelte，三个子目录分别提供 J
 
 必须在消费组件外包裹 Provider；组件、useCss()、useTheme()、useLocale() 和 useLang() 缺少 Provider 时直接报错，不创建隐式默认作者。同一个组件的初始化代码不能读取自己模板中 Provider 提供的 context。每个 Provider 创建独立 UiCss，传入当前主题的读取函数；useCss() 返回带主题语义属性的工具，useTheme()、useLocale()、useLang() 分别返回对应的只读对象。可选 css prop 为 (readTheme) => new AppCss(readTheme)，创建函数向下继承，但实例不共享；只用于初始化，更换函数需用 key 块重建。
 
-主题通过 Svelte context 向下传递，并注入 UiCss。组件在模板或 $derived 中使用 s.color._primary、s.backgroundColor._surface、s.fontSize._md；s.theme 提供原始主题对象。语义属性由 getter 读取当前主题，不使用主题 CSS 变量。UiCss、UiColorCss、UiBackgroundColorCss、UiFontSizeCss 可通过继承扩展，原生属性和 raw() 仍可使用。自定义主题使用普通对象，例如 `{ ...lightTheme, color: { ...lightTheme.color, primary: 'purple' } }`。默认预设冻结，用户对象不会被 Provider 修改。容器提供 color-scheme 与文字颜色，背景和布局由调用者设置；class/style 不会改变后代读取的配置数据。网页示例位于 /provider。
+主题通过 Svelte context 向下传递，并注入 UiCss。组件在模板或 $derived 中使用 s.color._primary、s.backgroundColor._surface、s.fontSize._md；s.theme 提供原始主题对象。语义属性由 getter 读取当前主题，不使用主题 CSS 变量。UiCss、UiColorCss、UiBackgroundColorCss、UiFontSizeCss 可通过继承扩展，原生属性和 raw() 仍可使用。系统与组件 token 的叶子键统一带下划线，分类名保持原名；例如 theme.color._primary、theme.space._2xs 和 tokens._sizeMd。不保留无下划线别名。自定义主题使用普通对象，例如 `{ ...lightTheme, color: { ...lightTheme.color, _primary: 'purple' } }`。默认预设冻结，用户对象不会被 Provider 修改。容器提供 color-scheme 与文字颜色，背景和布局由调用者设置；class/style 不会改变后代读取的配置数据。网页示例位于 /provider。
 
 Provider 和 Icon 的 class 使用 CssInput，优先传入同一 CSS 宿主的 css(...) 结果；也接受声明字符串、嵌套数组及 false/null/undefined 条件空项。组件最终使用一个组合类，同等层叠条件下外部声明覆盖默认值。普通类名、多类名字符串和条件对象不作为原生 class 透传；style 仍是原生内联样式。SSR 中先在当前请求宿主登记外部类，客户端沿用同一宿主的水合清单。
 

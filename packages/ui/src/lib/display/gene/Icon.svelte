@@ -40,21 +40,21 @@
   }: Props = $props();
 
   const resolvedTokens = $derived(mergeTokens(createIconTokens(theme), components.Icon, tokens));
-  const effectiveStrokeWidth = $derived(strokeWidth ?? resolvedTokens.strokeWidth);
+  const effectiveStrokeWidth = $derived(strokeWidth ?? resolvedTokens._strokeWidth);
   const fontSize = $derived(
-    { _sm: resolvedTokens.sizeSm, _md: resolvedTokens.sizeMd, _lg: resolvedTokens.sizeLg }[size],
+    { _sm: resolvedTokens._sizeSm, _md: resolvedTokens._sizeMd, _lg: resolvedTokens._sizeLg }[size],
   );
   const textColor = $derived(
     {
       inherit: 'inherit',
-      _text: resolvedTokens.colorText,
-      _muted: resolvedTokens.colorMuted,
-      _textDisabled: resolvedTokens.colorTextDisabled,
-      _primary: resolvedTokens.colorPrimary,
-      _info: resolvedTokens.colorInfo,
-      _success: resolvedTokens.colorSuccess,
-      _warning: resolvedTokens.colorWarning,
-      _danger: resolvedTokens.colorDanger,
+      _text: resolvedTokens._colorText,
+      _muted: resolvedTokens._colorMuted,
+      _textDisabled: resolvedTokens._colorTextDisabled,
+      _primary: resolvedTokens._colorPrimary,
+      _info: resolvedTokens._colorInfo,
+      _success: resolvedTokens._colorSuccess,
+      _warning: resolvedTokens._colorWarning,
+      _danger: resolvedTokens._colorDanger,
     }[color],
   );
 
@@ -74,7 +74,7 @@
   class={css(
     s.display.inlineBlock,
     s.flexShrink.raw(0),
-    s.verticalAlign.raw(resolvedTokens.verticalAlign),
+    s.verticalAlign.raw(resolvedTokens._verticalAlign),
     s.width.em(1),
     s.height.em(1),
     s.fill.none,

@@ -32,9 +32,9 @@ test('尺寸、排版、状态和动效 token 随作用域主题更新，原生�
   await screen.rerender({
     theme: {
       ...darkTheme,
-      controlHeight: { ...darkTheme.controlHeight, md: '42px' },
-      space: { ...darkTheme.space, sm: '10px' },
-      opacity: { ...darkTheme.opacity, disabled: 0.25 },
+      controlHeight: { ...darkTheme.controlHeight, _md: '42px' },
+      space: { ...darkTheme.space, _sm: '10px' },
+      opacity: { ...darkTheme.opacity, _disabled: 0.25 },
     },
   });
   await expect
@@ -42,6 +42,10 @@ test('尺寸、排版、状态和动效 token 随作用域主题更新，原生�
     .toHaveStyle({ height: '42px', paddingLeft: '10px', opacity: '0.25' });
   const s = new UiCss(() => lightTheme);
   expect(s.padding.raw('_md')).toBe('padding:12px;');
+  expect(s.gap._2xs).toBe(`gap:${lightTheme.space._2xs};`);
+  expect(s.gap.raw('_2xl')).toBe(`gap:${lightTheme.space._2xl};`);
+  expect(s.gap._3xl).toBe(`gap:${lightTheme.space._3xl};`);
+  expect(s.fontSize._2xl).toBe(`font-size:${lightTheme.fontSize._2xl};`);
   expect(s.borderColor.raw('_border')).toBe('border-color:#d1d5db;');
   expect(s.transitionTimingFunction._enter).toBe(
     'transition-timing-function:cubic-bezier(0, 0, 0.2, 1);',
@@ -77,7 +81,7 @@ test('调用方的 Svelte 响应式对象字段更新传递到嵌套后代', asy
   await expect.element(screen.getByTestId('value')).toHaveAttribute('data-primary', 'purple');
   await expect.element(screen.getByTestId('value-message')).toHaveTextContent('处理中');
   await expect.element(screen.getByTestId('value-time')).toHaveTextContent('07:00');
-  expect(lightTheme.color.primary).toBe('#1d4ed8');
+  expect(lightTheme.color._primary).toBe('#1d4ed8');
   expect(zhCNLanguage.messages.loading).toBe('加载中');
   expect(chinaLocale.timeZone).toBe('Asia/Shanghai');
 });
@@ -150,8 +154,8 @@ test('子级独立覆盖，父级替换不越界，undefined 恢复继承', asyn
 test('自定义主题对象直接驱动后代，切换语言和作者不丢失主题', async () => {
   const theme: UiTheme = {
     ...lightTheme,
-    color: { ...lightTheme.color, primary: 'purple' },
-    fontSize: { ...lightTheme.fontSize, md: '21px' },
+    color: { ...lightTheme.color, _primary: 'purple' },
+    fontSize: { ...lightTheme.fontSize, _md: '21px' },
   };
   class AppCss extends UiCss {}
   const authors: Css[] = [];
@@ -187,7 +191,7 @@ test('自定义主题对象直接驱动后代，切换语言和作者不丢失�
   await expect
     .element(screen.getByTestId('sibling-value'))
     .toHaveStyle({ color: 'rgb(128, 0, 128)' });
-  expect(lightTheme.color.primary).toBe('#1d4ed8');
+  expect(lightTheme.color._primary).toBe('#1d4ed8');
 });
 
 test('已使用过的主题组合复用规则，卸载子树不影响兄弟', async () => {
@@ -227,7 +231,7 @@ test('主题传给自定义作者，创建函数向下继承，替换主题不�
   expect(instances).toHaveLength(3);
   expect(instances[0].brandBackground).toBe('background-color:#1d4ed8;');
   expect(instances[1].brandBackground).toBe('background-color:#93c5fd;');
-  const theme = { ...lightTheme, color: { ...lightTheme.color, primary: 'purple' } };
+  const theme = { ...lightTheme, color: { ...lightTheme.color, _primary: 'purple' } };
   await screen.rerender({ theme });
   expect(instances[0].theme).toBe(theme);
   expect(instances[0].brandBackground).toBe('background-color:purple;');

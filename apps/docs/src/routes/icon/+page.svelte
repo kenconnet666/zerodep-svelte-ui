@@ -52,12 +52,12 @@
 <section class="prose">
   <h2>组件 token</h2>
   <label><input type="checkbox" bind:checked={customTokens} /> 启用作用域尺寸覆盖（28px）</label>
-  <Provider components={{ Icon: { sizeMd: customTokens ? '28px' : undefined } }}>
+  <Provider components={{ Icon: { _sizeMd: customTokens ? '28px' : undefined } }}>
     <Icon icon={Search} color="_primary" aria-label="作用域 token 图标" data-icon-token-scope />
     <Icon
       icon={Check}
       color="_success"
-      tokens={{ sizeMd: '32px' }}
+      tokens={{ _sizeMd: '32px' }}
       aria-label="实例 token 图标"
       data-icon-token-local
     />
@@ -67,15 +67,15 @@
     tokens。undefined 恢复继承；显式 strokeWidth prop 优先于描边 token。
   </p>
   <pre class={code}><code
-      >{`<Provider components={{ Icon: { sizeMd: '28px' } }}>
+      >{`<Provider components={{ Icon: { _sizeMd: '28px' } }}>
   <Icon icon={Search} />
-  <Icon icon={Check} tokens={{ sizeMd: '32px' }} />
+  <Icon icon={Check} tokens={{ _sizeMd: '32px' }} />
 </Provider>`}</code
     ></pre>
   <p>
     IconTokens 包含
-    sizeSm/Md/Lg、colorText、colorMuted、colorTextDisabled、colorPrimary、colorInfo、colorSuccess、colorWarning、colorDanger、strokeWidth
-    和 verticalAlign。尺寸默认保持 14/16/24px（根字号 16px）；large 使用系统字号 xl，与正文 lg
+    _sizeSm/_sizeMd/_sizeLg、_colorText、_colorMuted、_colorTextDisabled、_colorPrimary、_colorInfo、_colorSuccess、_colorWarning、_colorDanger、_strokeWidth
+    和 _verticalAlign。尺寸默认保持 14/16/24px（根字号 16px）；large 使用系统字号 _xl，与正文 _lg
     分开。
   </p>
 </section>
@@ -102,7 +102,7 @@
 
 <Provider
   theme={selectedTheme}
-  class={css(panel, s.backgroundColor.raw(selectedTheme.color.background))}
+  class={css(panel, s.backgroundColor.raw(selectedTheme.color._background))}
 >
   <div class={row}>
     <Icon icon={selected} {size} {color} {strokeWidth} aria-label="预览图标" data-icon-preview />

@@ -21,7 +21,7 @@
     brand: string;
     onRead: (author: Css) => void;
   } = $props();
-  const requestTheme = $derived({ ...theme, color: { ...theme.color, primary: brand } });
+  const requestTheme = $derived({ ...theme, color: { ...theme.color, _primary: brand } });
 </script>
 
 <Provider theme={requestTheme} {lang} {locale} class={css('color:green;')}>

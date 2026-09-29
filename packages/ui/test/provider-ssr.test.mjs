@@ -61,10 +61,10 @@ test('缺少 Provider 或 SSR 宿主时明确失败', () => {
 test('组件覆盖与实例 token 在并发 SSR 中按层解析且请求隔离', async () => {
   const [a, b] = await Promise.all([
     entry.renderIconTokens(
-      { Icon: { sizeLg: '21px', colorPrimary: 'purple' } },
-      { colorPrimary: 'teal' },
+      { Icon: { _sizeLg: '21px', _colorPrimary: 'purple' } },
+      { _colorPrimary: 'teal' },
     ),
-    entry.renderIconTokens({ Icon: { sizeLg: '27px', colorPrimary: 'orange' } }),
+    entry.renderIconTokens({ Icon: { _sizeLg: '27px', _colorPrimary: 'orange' } }),
   ]);
   assert.match(a.css, /font-size:21px/);
   assert.match(a.css, /color:teal/);

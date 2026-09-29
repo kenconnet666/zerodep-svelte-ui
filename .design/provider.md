@@ -39,6 +39,6 @@ Provider 使用 Svelte context 注入三个普通 JS 对象；主题、地区、
 
 所有消费组件及 useCss()/useTheme()/useLocale()/useLang() 必须位于 Provider 后代中；缺失时统一抛出明确错误，不做默认作者回退。根 Provider 可以没有父级，并提供默认主题、语言与地区；只有 Provider 处理默认值。SSR 与浏览器使用相同约束。
 
-主题声明统一使用下划线：s.color._primary 与 s.color.raw('_primary') 等价；背景色与字号同理。只解析完整的已知主题标识，原生 CSS 值继续由基础 raw() 处理。主题数据对象中的 color.primary、fontSize.md 保持原名；Icon 的主题参数同样带下划线，如 color="_primary"、size="_md"。
+主题声明统一使用下划线：s.color._primary 与 s.color.raw('_primary') 等价；背景色与字号同理。只解析完整的已知主题标识，原生 CSS 值继续由基础 raw() 处理。主题数据对象中的 color._primary、fontSize._md 与声明同名，不再剥离下划线；Icon 的主题参数同样带下划线，如 color="_primary"、size="_md"。
 
 组件层：Provider.components 按组件名称向下注入覆盖项，当前支持 Icon；只合并非 undefined 的扁平字段。Icon 先从本级系统主题派生默认值，再叠加外层、内层和实例 tokens。详细 token、目录及迁移说明见 [主题设计](theme-tokens.md)。

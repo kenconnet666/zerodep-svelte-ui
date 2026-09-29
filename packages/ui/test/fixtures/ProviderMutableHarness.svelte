@@ -8,7 +8,7 @@
 
 <button
   onclick={() => {
-    theme.color.primary = 'purple';
+    theme.color._primary = 'purple';
     lang.messages.loading = '处理中';
     locale.timeZone = 'America/New_York';
   }}>更新对象字段</button

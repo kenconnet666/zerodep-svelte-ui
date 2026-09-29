@@ -16,7 +16,7 @@
   const themes = {
     light: lightTheme,
     dark: darkTheme,
-    brand: { ...lightTheme, color: { ...lightTheme.color, primary: '#7e22ce' } },
+    brand: { ...lightTheme, color: { ...lightTheme.color, _primary: '#7e22ce' } },
   };
   const panel = css(author.padding.rem(1.5), author.borderRadius.px(12));
   // 长代码自动换行，避免产生无法通过键盘操作的横向滚动区。
@@ -81,12 +81,12 @@
   {theme}
   lang={language === 'zh-CN' ? zhCNLanguage : enUSLanguage}
   locale={region === 'china' ? chinaLocale : usLocale}
-  class={css(panel, author.backgroundColor.raw(theme.color.background))}
+  class={css(panel, author.backgroundColor.raw(theme.color._background))}
 >
   <ProviderState label="父级" />
   <Provider
     theme={childTheme}
-    class={css(panel, author.backgroundColor.raw((childTheme ?? theme).color.background))}
+    class={css(panel, author.backgroundColor.raw((childTheme ?? theme).color._background))}
   >
     <ProviderState label="子级" />
   </Provider>
@@ -111,7 +111,7 @@
   <h2>属性</h2>
   <p>
     components 用于配置当前子树的组件 token，例如 <code
-      >{"components={{ Icon: { sizeMd: '20px' } }}"}</code
+      >{"components={{ Icon: { _sizeMd: '20px' } }}"}</code
     >。它逐字段叠加父级覆盖，undefined 不覆盖；系统 theme 仍采用完整对象替换。
   </p>
   <table>
@@ -166,8 +166,10 @@ const appearance = $derived(css(s.color._primary, s.fontSize._md));`}</code
     样式，不修改传给后代的主题数据。
   </p>
   <p>
-    主题声明统一带下划线：s.color._primary 与 s.color.raw('_primary')
-    等价，s.backgroundColor._surface 与 s.fontSize._md 同理。原生关键字和 CSS 值仍可直接传给 raw()。
+    主题数据键与声明统一带下划线，例如
+    theme.color._primary、theme.space._2xs；分类名保持不变。s.color._primary 与
+    s.color.raw('_primary') 等价，s.backgroundColor._surface 与 s.fontSize._md 同理。原生关键字和
+    CSS 值仍可直接传给 raw()。
   </p>
   <p>
     语言与地区独立：英文文案可以配合上海时区。上面的时间示例固定为 2026-01-15 12:00

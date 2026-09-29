@@ -21,8 +21,8 @@
 
 <span
   data-testid={name}
-  data-primary={theme.color.primary}
-  data-font-size={theme.fontSize.md}
+  data-primary={theme.color._primary}
+  data-font-size={theme.fontSize._md}
   class={appearance}>{theme.themeName} / {lang.languageName} / {locale.timeZone}</span
 >
 <span data-testid={name + '-message'}>{lang.messages.loading}</span>

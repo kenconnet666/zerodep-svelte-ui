@@ -8,7 +8,7 @@ export const valid: Props = {
   size: '_sm',
   color: '_primary',
   strokeWidth: 1.5,
-  tokens: { sizeMd: '20px', colorPrimary: 'purple' },
+  tokens: { _sizeMd: '20px', _colorPrimary: 'purple' },
   'aria-label': '搜索',
   class: ['width:24px;', [false, null, 'color:red;']],
 };
@@ -29,7 +29,7 @@ export const oldSize: Props = { icon: Search, size: 'md' };
 // @ts-expect-error 组件 token 拒绝拼写错误。
 export const badToken: Props = { icon: Search, tokens: { sizeMD: '20px' } };
 // @ts-expect-error 描边 token 为数字。
-export const badTokenValue: Props = { icon: Search, tokens: { strokeWidth: '2px' } };
+export const badTokenValue: Props = { icon: Search, tokens: { _strokeWidth: '2px' } };
 // @ts-expect-error viewBox 由图标数据决定。
 export const badGeometry: Props = { icon: Search, viewBox: '0 0 1 1' };
 declare const children: Snippet;
@@ -37,3 +37,6 @@ declare const children: Snippet;
 export const badChildren: Props = { icon: Search, children };
 // @ts-expect-error icon 接收 SVG 数据，不接受 Svelte 组件。
 export const badComponent: Props = { icon: Icon };
+
+// @ts-expect-error 组件 token 统一带下划线，普通 strokeWidth prop 不受影响。
+export const oldComponentToken: Props = { icon: Search, tokens: { strokeWidth: 2 } };
