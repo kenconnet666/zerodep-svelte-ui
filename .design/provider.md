@@ -13,8 +13,8 @@ Provider 使用 Svelte context 注入三个普通 JS 对象；主题、地区、
 ## 配置对象与继承
 
 - theme: UiTheme，包含 themeName、color、fontSize。themeName 为 light/dark，默认 lightTheme，同时提供 darkTheme；应用可用对象展开创建其他主题。品牌主题的展示名称由应用管理。
-- lang: UiLanguage，包含 languageName 和通用 messages。默认 zhCNLanguage，另有 enUSLanguage。Provider 容器的 lang 来自该对象。
-- locale: UiLocale，包含 localeName 和显式 IANA timeZone。默认 chinaLocale，另有 usLocale。通过 Intl 格式化日期/数值；不读取服务器或浏览器的默认时区。
+- lang: UiLanguage，languageName 明确限定为 'zh-CN' | 'en-US'，另含通用 messages。默认 zhCNLanguage，另有 enUSLanguage。Provider 容器的 lang 来自该对象。
+- locale: UiLocale，localeName 明确限定为 'zh-CN' | 'en-US'，另含显式 IANA timeZone。默认 chinaLocale，另有 usLocale。通过 Intl 格式化日期/数值；不读取服务器或浏览器的默认时区。
 - 三个维度独立继承。显式对象整体覆盖，不做隐式深合并；undefined 恢复最近父级，根部恢复默认值。
 - 三个 context 对象引用分别固定，字段 getter 读取当前 props 和对应父对象；子组件保留 theme、locale、lang 引用，在模板或 $derived 中读取属性，支持替换和 Svelte 响应式对象更新。初始化时解构字段会形成快照。
 - 默认预设及其子对象冻结；Provider 不修改用户对象。context 随组件树和 SSR 请求隔离，无全局可变配置。

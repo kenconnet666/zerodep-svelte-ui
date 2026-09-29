@@ -25,6 +25,10 @@ export const badClass: Props = { class: { ready: true } };
 export const badTheme: Props = { theme: 'dark' };
 // @ts-expect-error lang 是语言对象。
 export const badLanguage: Props = { lang: 'en' };
+// @ts-expect-error 语言名称只能使用明确支持的 zh-CN / en-US。
+export const badLanguageName: Props = { lang: { ...enUSLanguage, languageName: 'en-GB' } };
+// @ts-expect-error 地区名称只能使用明确支持的 zh-CN / en-US。
+export const badLocaleName: Props = { locale: { ...usLocale, localeName: 'fr-FR' } };
 // @ts-expect-error 地区配置必须有显式时区。
 export const badLocale: Props = { locale: { localeName: 'en-US' } };
 // @ts-expect-error 作者应实现 Css。

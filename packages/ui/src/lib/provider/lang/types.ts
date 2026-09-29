@@ -1,5 +1,5 @@
 export interface UiLanguage {
-  readonly languageName: string;
+  readonly languageName: 'zh-CN' | 'en-US';
   readonly messages: {
     readonly confirm: string;
     readonly cancel: string;

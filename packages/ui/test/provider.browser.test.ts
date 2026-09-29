@@ -56,7 +56,10 @@ test('同一 Provider 后代共享作者，嵌套作用域独立，配置响应�
 });
 
 test('子级独立覆盖，父级替换不越界，undefined 恢复继承', async () => {
-  const customLanguage = { ...enUSLanguage, languageName: 'en-GB' };
+  const customLanguage = {
+    ...zhCNLanguage,
+    messages: { ...zhCNLanguage.messages, loading: '子级加载中' },
+  };
   const screen = await render(ProviderHarness, {
     theme: darkTheme,
     lang: enUSLanguage,
@@ -65,18 +68,21 @@ test('子级独立覆盖，父级替换不越界，undefined 恢复继承', asyn
     nestedLang: customLanguage,
     nestedLocale: chinaLocale,
   });
-  await expect.element(screen.getByTestId('nested')).toHaveAttribute('lang', 'en-GB');
+  await expect.element(screen.getByTestId('nested')).toHaveAttribute('lang', 'zh-CN');
+  await expect.element(screen.getByTestId('nested-value-message')).toHaveTextContent('子级加载中');
   await expect
     .element(screen.getByTestId('nested-value'))
-    .toHaveTextContent('light / en-GB / Asia/Shanghai');
+    .toHaveTextContent('light / zh-CN / Asia/Shanghai');
   await expect
     .element(screen.getByTestId('sibling-value'))
     .toHaveTextContent('dark / en-US / America/New_York');
   await screen.rerender({ theme: lightTheme, lang: zhCNLanguage });
   await expect
     .element(screen.getByTestId('nested-value'))
-    .toHaveTextContent('light / en-GB / Asia/Shanghai');
+    .toHaveTextContent('light / zh-CN / Asia/Shanghai');
+  await expect.element(screen.getByTestId('nested-value-message')).toHaveTextContent('子级加载中');
   await screen.rerender({ nestedTheme: undefined, nestedLang: undefined, nestedLocale: undefined });
+  await expect.element(screen.getByTestId('nested-value-message')).toHaveTextContent('加载中');
   await expect
     .element(screen.getByTestId('nested-value'))
     .toHaveTextContent('light / zh-CN / America/New_York');
