@@ -34,8 +34,10 @@
   const initialCss = untrack(() => css);
   const createCss: UiCssFactory =
     initialCss ?? parentFactory ?? ((readTheme) => new UiCss(readTheme));
+  // 显式主题优先，未提供时继承父级；根 Provider 回退到亮色主题。
+  const resolvedTheme = $derived(theme ?? parentTheme ?? lightTheme);
   // 传读取函数而不是主题快照；嵌套 Provider 使用独立作者，避免主题串到兄弟子树。
-  const s = createCss(() => theme ?? parentTheme ?? lightTheme);
+  const s = createCss(() => resolvedTheme);
   // 各对象引用稳定，字段 getter 跟踪当前 props；整体替换不会让后代持有旧快照。
   themeContext.provide(
     Object.freeze({
