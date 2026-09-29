@@ -15,7 +15,7 @@
   const themes = {
     light: lightTheme,
     dark: darkTheme,
-    brand: { ...lightTheme, name: 'brand', color: { ...lightTheme.color, primary: '#7e22ce' } },
+    brand: { ...lightTheme, color: { ...lightTheme.color, primary: '#7e22ce' } },
   };
   const panel = css(author.padding.rem(1.5), author.borderRadius.px(12));
   // 长代码自动换行，避免产生无法通过键盘操作的横向滚动区。

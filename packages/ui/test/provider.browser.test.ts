@@ -81,7 +81,6 @@ test('子级独立覆盖，父级替换不越界，undefined 恢复继承', asyn
 test('自定义主题对象直接驱动后代，切换语言和作者不丢失主题', async () => {
   const theme: UiTheme = {
     ...lightTheme,
-    name: 'brand',
     color: { ...lightTheme.color, primary: 'purple' },
     fontSize: { ...lightTheme.fontSize, md: '21px' },
   };
@@ -122,7 +121,7 @@ test('已使用过的主题组合复用规则，卸载子树不影响兄弟', as
     await screen.rerender({ theme });
     await expect
       .element(screen.getByTestId('root-value'))
-      .toHaveTextContent(theme.name + ' / zh-CN / Asia/Shanghai');
+      .toHaveTextContent(theme.colorScheme + ' / zh-CN / Asia/Shanghai');
   }
   expect(cssStats().rules).toBe(rules);
   await screen.rerender({ showNested: false });

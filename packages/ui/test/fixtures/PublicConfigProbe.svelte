@@ -9,6 +9,6 @@
 </script>
 
 <span class={css(author.color.raw(config.theme.color.primary))}
-  >{config.theme.name}/{config.lang.code}/{config.locale.timeZone}/{config.lang.messages
+  >{config.theme.colorScheme}/{config.lang.code}/{config.locale.timeZone}/{config.lang.messages
     .loading}</span
 >

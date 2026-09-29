@@ -18,7 +18,7 @@
 </script>
 
 <p class={appearance} data-provider-value={label}>
-  {label}：{config.theme.name} / {config.lang.code}
+  {label}：{config.theme.colorScheme} / {config.lang.code}
 </p>
 <p data-provider-language={label}>{config.lang.messages.loading}</p>
 <p>

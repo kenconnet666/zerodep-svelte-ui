@@ -11,7 +11,7 @@ import {
 type Props = ComponentProps<typeof Provider>;
 export const valid: Props = {
   css: new Css(),
-  theme: { ...lightTheme, name: 'brand', color: { ...lightTheme.color, primary: 'purple' } },
+  theme: { ...lightTheme, color: { ...lightTheme.color, primary: 'purple' } },
   lang: enUSLanguage,
   locale: usLocale,
   class: ['color:red;', [false, undefined, 'padding:4px;']],
