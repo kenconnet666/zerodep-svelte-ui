@@ -3,6 +3,7 @@ export type UiColor = 'inherit' | 'text' | 'muted' | 'primary' | 'success' | 'wa
 
 /** 主题是普通 JS 数据；组件读取对象生成声明，不依赖主题 CSS 变量。 */
 export interface UiTheme {
+  [x: string]: any;
   readonly themeName: 'light' | 'dark';
   readonly color: {
     readonly background: string;
