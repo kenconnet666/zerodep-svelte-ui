@@ -55,7 +55,7 @@ ESLint 使用 Flat Config，按组件库、文档站和 Node 脚本分别配置�
 
 ## 组件测试与包检查
 
-组件浏览器测试使用 Vitest Browser Mode、Playwright provider 和 vitest-browser-svelte，配置在 packages/ui/vitest.config.ts。测试使用与消费端一致的 CSS 绑定插件顺序，不依赖文档站路由。
+组件浏览器测试命令先构建组件库，确保全新环境具有公开包和 /vite 入口。测试使用 Vitest Browser Mode、Playwright provider 和 vitest-browser-svelte，配置在 packages/ui/vitest.config.ts。测试使用与消费端一致的 CSS 绑定插件顺序，不依赖文档站路由。
 
 ```sh
 pnpm exec playwright install chromium
@@ -89,7 +89,9 @@ packages/ui 已显式声明以下 npm 依赖；根目录的 Zod 仍单独用于 
 
 组件库将 @lucide/icons 声明为必需的 peer dependency（兼容范围 ^1.48.0），开发时通过 devDependencies 使用 catalog 固定版本。文档站作为消费端，在 dependencies 中显式安装同一版本。未来使用组件库的应用也应显式安装兼容的 @lucide/icons；本仓库的 autoInstallPeers: false 不会强制改变外部应用的包管理器设置。
 
-图标可直接传数据，例如 `import { Search } from '@lucide/icons'` 配合 `<Icon icon={Search} />`；也支持编译时名称 `<Icon lucide="search" />`。名称类型复用官方 LucideIconName，提供小写连字符字面量补全；加号使用 plus，官方没有 add。两种入口必须二选一。组件库不加载全量图标注册表。
+图标可直接传数据，例如 `import { Search } from '@lucide/icons'` 配合 `<Icon icon={Search} />`；也支持编译时名称 `<Icon lucide="search" />`。名称类型由脚本从官方名称列表生成本地显式字符串联合 LucideIconName，减少编辑器跨包类型解析，提供小写连字符字面量补全；加号使用 plus，官方没有 add。两种入口必须二选一。组件库不加载全量图标注册表。
+
+运行 pnpm lucide:generate 可重新生成名称类型，pnpm lucide:check 验证它与已安装版本一致；后者已纳入 pnpm check。构建及开发启动自动生成，升级 @lucide/icons 后提交更新的类型文件。名称类型也从包根入口导出。WebStorm 的补全显示仍需在实际编辑器中确认。
 
 名称入口需要 UI 编译插件，按实际使用名称导入 SVG 数据，SSR 同步输出图形：
 

@@ -24,11 +24,11 @@
   },
   "scripts": {
     "dev": "node ../../scripts/dev-ui.mjs",
-    "build": "node ../../scripts/generate-ui-exports.mjs && svelte-package -i src",
+    "build": "node ../../scripts/generate-lucide-types.mjs && node ../../scripts/generate-ui-exports.mjs && svelte-package -i src",
     "check": "svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
     "test": "node --test test/*.test.mjs",
     "test:consumer": "node --test test/consumer/*.test.mjs",
-    "test:component": "vitest run"
+    "test:component": "pnpm build && vitest run"
   },
   "peerDependencies": {
     "@lucide/icons": "^1.48.0",
