@@ -6,9 +6,7 @@
   const s = useCss();
   const config = useConfig();
   untrack(() => onRead?.(s));
-  const appearance = $derived(
-    css(s.color.raw(config.theme.color.primary), s.fontSize.raw(config.theme.fontSize.md)),
-  );
+  const appearance = $derived(css(s.color.primary, s.fontSize.md));
   const time = $derived(
     new Intl.DateTimeFormat(config.locale.code, {
       timeZone: config.locale.timeZone,

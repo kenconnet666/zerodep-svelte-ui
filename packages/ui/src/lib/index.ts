@@ -2,6 +2,7 @@
 export { default as Icon } from './Icon.svelte';
 export { default as Provider } from './provider/Provider.svelte';
 export * from './provider/context.js';
+export * from './provider/css.js';
 export * from './provider/lang/en-US.js';
 export * from './provider/lang/types.js';
 export * from './provider/lang/zh-CN.js';

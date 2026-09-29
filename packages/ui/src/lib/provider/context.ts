@@ -1,4 +1,4 @@
-import type { Css } from 'zerodep-css-svelte';
+import type { UiCss } from './css.js';
 import { parentConfig } from '../../internal/provider-context.js';
 import type { UiConfig } from './types.js';
 
@@ -8,6 +8,6 @@ export function useConfig(): UiConfig {
   return config;
 }
 
-export function useCss(): Css {
+export function useCss(): UiCss {
   return useConfig().css;
 }

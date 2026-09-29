@@ -100,9 +100,9 @@ test(
       await writeFile(
         join(directory, 'types.ts'),
         `import type {ComponentProps} from 'svelte';
-      import {Provider,Icon,darkTheme,enUSLanguage,usLocale} from 'zerodep-svelte-ui';import {Search} from '@lucide/icons';
-      import {Css} from 'zerodep-css-svelte';
-      export const provider:ComponentProps<typeof Provider>={css:new Css(),theme:darkTheme,lang:enUSLanguage,locale:usLocale};
+      import {Provider,Icon,UiCss,darkTheme,enUSLanguage,usLocale} from 'zerodep-svelte-ui';import {Search} from '@lucide/icons';
+
+      export const provider:ComponentProps<typeof Provider>={css:(readTheme)=>new UiCss(readTheme),theme:darkTheme,lang:enUSLanguage,locale:usLocale};
       // @ts-expect-error 内部 context 设置器不进入公共导出。
       import {provideConfig} from 'zerodep-svelte-ui';
       export const icon:ComponentProps<typeof Icon>={icon:Search,size:'sm',color:'primary'};

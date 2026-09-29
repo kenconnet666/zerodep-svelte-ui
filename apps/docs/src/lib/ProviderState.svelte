@@ -4,9 +4,7 @@
   let { label }: { label: string } = $props();
   const config = useConfig();
   const s = useCss();
-  const appearance = $derived(
-    css(s.color.raw(config.theme.color.primary), s.fontSize.raw(config.theme.fontSize.md)),
-  );
+  const appearance = $derived(css(s.color.primary, s.fontSize.md));
   const time = $derived(
     new Intl.DateTimeFormat(config.locale.code, {
       timeZone: config.locale.timeZone,

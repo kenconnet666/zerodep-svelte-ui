@@ -4,7 +4,7 @@ import { cleanup, render } from 'vitest-browser-svelte';
 import { Search, Check } from '@lucide/icons';
 import type { LucideIconData } from '@lucide/icons';
 import { Css, css, cssStats } from 'zerodep-css-svelte';
-import { lightTheme, darkTheme } from '../src/lib/index.js';
+import { lightTheme, darkTheme, UiCss } from '../src/lib/index.js';
 import IconHarness from './fixtures/IconHarness.svelte';
 import IconButtonHarness from './fixtures/IconButtonHarness.svelte';
 
@@ -35,7 +35,7 @@ test('继承主题对象、外部 class 和文字颜色，不在 Icon 创建作�
   const theme = { ...lightTheme, fontSize: { ...lightTheme.fontSize, md: '21px' } };
   const override = css(author.width.px(30), author.height.px(30), author.color.green);
   const screen = await render(IconHarness, {
-    css: author,
+    css: (readTheme) => new UiCss(readTheme),
     theme,
     iconProps: { icon: Search },
     style: 'color:rgb(128, 0, 128)',
@@ -108,10 +108,8 @@ test('按钮拥有可访问名称和键盘交互，装饰图标不增加 Tab 停
   const screen = await render(IconButtonHarness, {});
   await page.getByRole('button', { name: '搜索', exact: true }).click();
   await expect.element(screen.getByRole('status', { name: '点击次数' })).toHaveTextContent('1');
-  // 鼠标点击是否聚焦由浏览器决定；键盘场景先明确聚焦，再发送真实按键。
-  screen.getByRole('button', { name: '搜索', exact: true }).element().focus();
-  await expect.element(screen.getByRole('button', { name: '搜索', exact: true })).toHaveFocus();
-  await userEvent.keyboard('{Enter}');
+  // 由 Playwright 在同一命令内聚焦 iframe 中的目标并发送真实按键，避免只设置 DOM 焦点。
+  await userEvent.type(screen.getByRole('button', { name: '搜索', exact: true }), '{Enter}');
   await expect.element(screen.getByRole('status', { name: '点击次数' })).toHaveTextContent('2');
   await userEvent.tab();
   await expect.element(screen.getByRole('button', { name: '下一项' })).toHaveFocus();

@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { ComponentProps } from 'svelte';
-  import type { Css } from 'zerodep-css-svelte';
-  import { Provider, Icon, type UiTheme } from '../../src/lib/index.js';
+
+  import { Provider, Icon, type UiCssFactory, type UiTheme } from '../../src/lib/index.js';
   let {
     iconProps,
     css,
@@ -10,7 +10,7 @@
     show = true,
   }: {
     iconProps: ComponentProps<typeof Icon>;
-    css?: Css;
+    css?: UiCssFactory;
     theme?: UiTheme;
     style?: string;
     show?: boolean;

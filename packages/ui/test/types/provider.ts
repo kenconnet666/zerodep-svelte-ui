@@ -2,6 +2,7 @@ import type { ComponentProps } from 'svelte';
 import { Css } from 'zerodep-css-svelte';
 import {
   Provider,
+  UiCss,
   lightTheme,
   enUSLanguage,
   usLocale,
@@ -10,7 +11,7 @@ import {
 
 type Props = ComponentProps<typeof Provider>;
 export const valid: Props = {
-  css: new Css(),
+  css: (readTheme) => new UiCss(readTheme),
   theme: { ...lightTheme, color: { ...lightTheme.color, primary: 'purple' } },
   lang: enUSLanguage,
   locale: usLocale,
@@ -32,3 +33,6 @@ export function readonlyConfig(config: UiConfig) {
   // @ts-expect-error 默认主题也以只读数据提供。
   config.theme.color.primary = 'red';
 }
+
+// @ts-expect-error 必须传创建函数，让 Provider 注入当前作用域的主题。
+export const badInstance: Props = { css: new Css() };

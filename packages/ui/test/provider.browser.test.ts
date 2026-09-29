@@ -9,6 +9,7 @@ import {
   chinaLocale,
   usLocale,
   type UiTheme,
+  UiCss,
 } from '../src/lib/index.js';
 import ProviderHarness from './fixtures/ProviderHarness.svelte';
 import ProviderMutableHarness from './fixtures/ProviderMutableHarness.svelte';
@@ -26,11 +27,12 @@ test('调用方的 Svelte 响应式对象字段更新传递到嵌套后代', asy
   expect(chinaLocale.timeZone).toBe('Asia/Shanghai');
 });
 
-test('后代共享作者，主题、语言和地区对象分别响应父级更新', async () => {
+test('同一 Provider 后代共享作者，嵌套作用域独立，配置响应父级更新', async () => {
   const authors: Css[] = [];
   const screen = await render(ProviderHarness, { onRead: (s) => authors.push(s) });
   expect(authors).toHaveLength(4);
-  expect(new Set(authors).size).toBe(1);
+  expect(new Set(authors).size).toBe(3);
+  expect(authors[0]).toBe(authors[3]);
   await expect.element(screen.getByTestId('root')).toHaveAttribute('lang', 'zh-CN');
   await expect
     .element(screen.getByTestId('nested-value'))
@@ -48,7 +50,8 @@ test('后代共享作者，主题、语言和地区对象分别响应父级更�
     .toHaveStyle({ color: 'rgb(147, 197, 253)' });
   await screen.rerender({ locale: usLocale });
   await expect.element(screen.getByTestId('nested-value-time')).toHaveTextContent('07:00');
-  expect(new Set(authors).size).toBe(1);
+  expect(authors).toHaveLength(4);
+  expect(new Set(authors).size).toBe(3);
 });
 
 test('子级独立覆盖，父级替换不越界，undefined 恢复继承', async () => {
@@ -84,15 +87,15 @@ test('自定义主题对象直接驱动后代，切换语言和作者不丢失�
     color: { ...lightTheme.color, primary: 'purple' },
     fontSize: { ...lightTheme.fontSize, md: '21px' },
   };
-  const author = new Css();
+  class AppCss extends UiCss {}
   const authors: Css[] = [];
   const screen = await render(ProviderHarness, {
     theme,
-    localCss: author,
+    localCss: (readTheme) => new AppCss(readTheme),
     nestedLang: enUSLanguage,
     onRead: (s) => authors.push(s),
   });
-  expect(authors.filter((s) => s === author)).toHaveLength(1);
+  expect(authors.filter((s) => s instanceof AppCss)).toHaveLength(1);
   await expect
     .element(screen.getByTestId('nested-value'))
     .toHaveStyle({ color: 'rgb(128, 0, 128)', fontSize: '21px' });
@@ -129,6 +132,35 @@ test('已使用过的主题组合复用规则，卸载子树不影响兄弟', as
   await expect
     .element(screen.getByTestId('sibling-value'))
     .toHaveStyle({ color: 'rgb(29, 78, 216)' });
+});
+
+test('主题传给自定义作者，创建函数向下继承，替换主题不重建作者', async () => {
+  class AppCss extends UiCss {
+    get brandBackground() {
+      return this.backgroundColor.primary;
+    }
+  }
+  const instances: AppCss[] = [];
+  const screen = await render(ProviderHarness, {
+    css: (readTheme) => {
+      const s = new AppCss(readTheme);
+      instances.push(s);
+      return s;
+    },
+    nestedTheme: darkTheme,
+  });
+  expect(instances).toHaveLength(3);
+  expect(instances[0].brandBackground).toBe('background-color:#1d4ed8;');
+  expect(instances[1].brandBackground).toBe('background-color:#93c5fd;');
+  const theme = { ...lightTheme, color: { ...lightTheme.color, primary: 'purple' } };
+  await screen.rerender({ theme });
+  expect(instances[0].theme).toBe(theme);
+  expect(instances[0].brandBackground).toBe('background-color:purple;');
+  expect(instances[1].brandBackground).toBe('background-color:#93c5fd;');
+  expect(instances[2].brandBackground).toBe('background-color:purple;');
+  await screen.rerender({ nestedTheme: undefined });
+  expect(instances[1].brandBackground).toBe('background-color:purple;');
+  expect(instances).toHaveLength(3);
 });
 
 test('外部 css 先登记也能覆盖容器默认声明，合成一个类并支持撤销', async () => {

@@ -7,11 +7,12 @@
     enUSLanguage,
     chinaLocale,
     usLocale,
+    useCss,
   } from 'zerodep-svelte-ui';
-  import { Css, css } from 'zerodep-css-svelte';
+  import { css } from 'zerodep-css-svelte';
   import ProviderState from '$lib/ProviderState.svelte';
 
-  const author = new Css();
+  const author = useCss();
   const themes = {
     light: lightTheme,
     dark: darkTheme,
@@ -61,7 +62,6 @@
   >
 </div>
 <Provider
-  css={author}
   {theme}
   lang={language === 'zh-CN' ? zhCNLanguage : enUSLanguage}
   locale={region === 'china' ? chinaLocale : usLocale}
@@ -112,7 +112,8 @@
       >
       <tr
         ><td>css</td><td
-          >可选 Css 作者，只用于初始化。默认根部创建，子级复用；换作者时用 key 重建。</td
+          >可选创建函数：(readTheme) =&gt; new AppCss(readTheme)。每个 Provider
+          创建独立作者；子级继承创建函数，更换函数时用 key 重建。</td
         ></tr
       >
       <tr
@@ -127,11 +128,12 @@
       >{`const config = useConfig();
 const s = useCss();
 // 在模板或 $derived 中读取，才能随配置替换更新。
-const appearance = $derived(css(s.color.raw(config.theme.color.primary)));`}</code
+const appearance = $derived(css(s.color.primary, s.fontSize.md));`}</code
     ></pre>
   <p>
-    主题数据通过 Svelte context 传递，不依赖主题 CSS 变量。保留 config
-    对象并在模板或派生表达式中读取属性，不要在初始化时解构成快照。容器的外部 class 只改变 DOM
+    Provider 将当前主题的读取函数传给 UiCss，不依赖主题 CSS 变量。在模板或派生表达式中读取
+    s.color.primary、s.backgroundColor.surface、s.fontSize.md，主题替换时自动更新；s.theme
+    可取得原始主题对象。不要在初始化时缓存这些声明。容器的外部 class 只改变 DOM
     样式，不修改传给后代的主题数据。
   </p>
   <p>
@@ -139,6 +141,11 @@ const appearance = $derived(css(s.color.raw(config.theme.color.primary)));`}</co
     UTC，切换地区可核对时区变化；Provider 不猜测服务器或浏览器的本地时区。
   </p>
   <h2>接入约定</h2>
+  <p>
+    所有库组件及 useCss()、useConfig() 必须在 Provider 后代中使用，缺少 Provider
+    会直接报错。Provider 应包裹消费组件；同一个组件的初始化代码不能读取自己模板中 Provider 提供的
+    context。
+  </p>
   <p>
     应用启用 zerodep-css-svelte/vite；SvelteKit 接入 zerodep-css-sveltekit 的服务端 handle 与客户端
     init。Provider 提供 context，不另建 SSR 样式宿主。默认配置冻结，用户传入的对象不会被组件修改。

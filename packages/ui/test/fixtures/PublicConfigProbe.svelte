@@ -8,7 +8,7 @@
   untrack(() => onRead(author));
 </script>
 
-<span class={css(author.color.raw(config.theme.color.primary))}
+<span class={css(author.color.primary)}
   >{config.theme.themeName}/{config.lang.code}/{config.locale.timeZone}/{config.lang.messages
     .loading}</span
 >

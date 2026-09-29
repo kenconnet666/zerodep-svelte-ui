@@ -21,16 +21,20 @@ Provider 使用 Svelte context 注入三个普通 JS 对象；公共消费入口
 
 ## 作者与样式
 
-- 根部创建一次 zerodep-css 的 Css 作者，后代复用。css prop 可传入自定义作者，只用于初始化；更换时用 key 重建 Provider。
-- 主题直接作为 JS 数据读取，例如 css(s.color.raw(config.theme.color.primary))。不生成 --ui-color/--ui-font-size 变量，不再导出 UiCss、UiColorCss 等旧语义作者。
+- 每个 Provider 创建独立 UiCss，同一 Provider 内的后代复用。css prop 接收 (readTheme) => new AppCss(readTheme)，创建函数通过 createCss 向下继承，但实例不共享；只用于初始化，更换时用 key 重建 Provider。创建函数必须返回新实例，不能复用单例。
+- 主题读取函数传入 UiCss，语义属性通过 getter 生成当前主题声明，例如 css(s.color.primary, s.fontSize.md)。s.theme 保留原始主题类型；UiCss 和三个主题属性类复用原生 Css 继承机制，可继续扩展。不生成 --ui-color/--ui-font-size 变量。
 - Provider 容器提供 color-scheme 与文字颜色。背景、间距等布局由使用者提供。
 - class 使用 CssInput。外部 css() 结果放在默认声明后合成一个类，不使用 @layer，不透传普通类名或条件对象。
 - 容器的 class/style 只改变 DOM 样式，不修改后代获取的配置对象。需要整个子树使用新的主题值时，传 theme 对象。
-- Icon 仍接收语义 size/color，但从主题对象读取实际值。bx 仍由 CSS 适配器管理动态变量，它与主题的数据传递分开。
+- Icon 通过 s.fontSize[size]、s.color[color] 消费主题声明，不再重复解析主题对象。bx 仍由 CSS 适配器管理动态变量，它与主题的数据传递分开。
 
 ## SSR 与验证
 
 - SvelteKit 每请求 CSS 宿主负责规则收集与 hydration，Provider 不另建或销毁整页宿主。
-- 浏览器验证三个配置对象的继承、覆盖、替换、恢复和时区格式化，以及共享作者、样式组合与规则复用。
+- 浏览器验证三个配置对象的继承、覆盖、替换、恢复和时区格式化，以及作用域作者隔离、创建函数继承、样式组合与规则复用。
 - Node SSR 验证并发请求隔离、公开包入口和 bx 初值；真实 tarball 消费验证内部依赖完整且内部设置器没有公开。
 - 文档站验证水合后切换、无 JS 首屏和可访问性。完整浏览器与跨平台矩阵由 CI 执行。
+
+## 必须提供上下文
+
+所有消费组件及 useCss()/useConfig() 必须位于 Provider 后代中；缺失时统一抛出明确错误，不做默认作者回退。根 Provider 可以没有父级，并提供默认主题、语言与地区；只有 Provider 处理默认值。SSR 与浏览器使用相同约束。

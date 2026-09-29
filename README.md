@@ -115,9 +115,9 @@ CSS 作者实例和 SSR 宿主按作用域/请求隔离，没有使用本地兄�
 
 Provider 位于 src/lib/provider/Provider.svelte，三个子目录分别提供 JS 配置对象：theme 包含 lightTheme/darkTheme，lang 包含 zhCNLanguage/enUSLanguage，locale 包含 chinaLocale/usLocale（地区代码及 IANA 时区）。theme/lang/locale 独立响应式继承，显式对象整体替换，undefined 撤销覆盖。容器 lang 取自语言对象，地区和时区交给 Intl 格式化，不依赖机器默认时区。
 
-根 Provider 创建一次 zerodep-css 的 Css 作者，子 Provider 默认复用父实例；可选 css prop 只用于初始化，更换实例需用 key 块重建。useCss() 取得作者，useConfig() 取得只读配置，均在后代初始化时调用。保留 config 引用，在模板或 $derived 中读取 config.theme 等属性，不解构成一次性快照。
+必须在消费组件外包裹 Provider；组件、useCss() 和 useConfig() 缺少 Provider 时直接报错，不创建隐式默认作者。同一个组件的初始化代码不能读取自己模板中 Provider 提供的 context。每个 Provider 创建独立 UiCss，传入当前主题的读取函数；useCss() 返回带主题语义属性的工具，useConfig() 返回配置。可选 css prop 为 (readTheme) => new AppCss(readTheme)，创建函数向下继承，但实例不共享；只用于初始化，更换函数需用 key 块重建。
 
-主题通过 Svelte context 向下传递，不使用主题 CSS 变量，也不再提供 UiCss/UiColorCss/UiFontSizeCss 等语义作者。自定义主题使用普通对象，例如 `{ ...lightTheme, color: { ...lightTheme.color, primary: 'purple' } }`。默认预设冻结，用户对象不会被 Provider 修改。容器提供 color-scheme 与文字颜色，背景和布局由调用者设置；class/style 不会改变后代读取的配置数据。网页示例位于 /provider。
+主题通过 Svelte context 向下传递，并注入 UiCss。组件在模板或 $derived 中使用 s.color.primary、s.backgroundColor.surface、s.fontSize.md；s.theme 提供原始主题对象。语义属性由 getter 读取当前主题，不使用主题 CSS 变量。UiCss、UiColorCss、UiBackgroundColorCss、UiFontSizeCss 可通过继承扩展，原生属性和 raw() 仍可使用。自定义主题使用普通对象，例如 `{ ...lightTheme, color: { ...lightTheme.color, primary: 'purple' } }`。默认预设冻结，用户对象不会被 Provider 修改。容器提供 color-scheme 与文字颜色，背景和布局由调用者设置；class/style 不会改变后代读取的配置数据。网页示例位于 /provider。
 
 Provider 和 Icon 的 class 使用 CssInput，优先传入同一 CSS 宿主的 css(...) 结果；也接受声明字符串、嵌套数组及 false/null/undefined 条件空项。组件最终使用一个组合类，同等层叠条件下外部声明覆盖默认值。普通类名、多类名字符串和条件对象不作为原生 class 透传；style 仍是原生内联样式。SSR 中先在当前请求宿主登记外部类，客户端沿用同一宿主的水合清单。
 
@@ -140,7 +140,7 @@ Provider 和 Icon 的 class 使用 CssInput，优先传入同一 CSS 宿主的 c
 </Provider>
 ```
 
-icon 必须是 LucideIconData，只通过 `<Icon icon={Search} />` 传入，不接受子组件或 children snippet。size 为 sm/md/lg（默认 md），color 为 inherit/text/muted/primary/success/warning/danger（默认 inherit）。它们从 config.theme.fontSize/color 读取实际值；Icon 不自行创建作者。strokeWidth 为数值（默认 2），仍由 bx 管理动态 CSS 变量，与主题数据传递分开。精确宽高、原始颜色、动画等通过 class/style 设置。
+icon 必须是 LucideIconData，只通过 `<Icon icon={Search} />` 传入，不接受子组件或 children snippet。size 为 sm/md/lg（默认 md），color 为 inherit/text/muted/primary/success/warning/danger（默认 inherit）。它们通过 s.fontSize[size] 和 s.color[color] 读取主题声明；Icon 只调用 useCss()，不自行创建作者。strokeWidth 为数值（默认 2），仍由 bx 管理动态 CSS 变量，与主题数据传递分开。精确宽高、原始颜色、动画等通过 class/style 设置。
 
 默认图标作为装饰内容隐藏；提供 aria-label 或 aria-labelledby 时自动设置 img 角色，显式 aria-hidden/role 保持优先。图标默认不增加 Tab 停靠点，按钮自身承担名称与交互。SVG 根属性可透传，但 children、width/height、viewBox 和原生 stroke-width 由组件管理。图形数据保持只读，递归子节点使用正确的 SVG 命名空间，内部 key 元数据不输出。网页交互示例位于 /icon。
 

@@ -1,4 +1,5 @@
 import { render } from 'svelte/server';
+import { Search } from '@lucide/icons';
 import { createServerCssHost, withCssHost } from 'zerodep-css-svelte/server';
 import type { Css } from 'zerodep-css-svelte';
 import {
@@ -8,6 +9,7 @@ import {
   enUSLanguage,
   chinaLocale,
   usLocale,
+  Icon,
 } from 'zerodep-svelte-ui';
 import ProviderSsr from './ProviderSsr.svelte';
 import PublicConfigProbe from './PublicConfigProbe.svelte';
@@ -47,6 +49,9 @@ export function renderWithoutHost() {
       onRead: () => {},
     },
   }).body;
+}
+export function renderIconWithoutProvider() {
+  return withCssHost(createServerCssHost(), () => render(Icon, { props: { icon: Search } }).body);
 }
 export function renderIcon(label: string) {
   const host = createServerCssHost();

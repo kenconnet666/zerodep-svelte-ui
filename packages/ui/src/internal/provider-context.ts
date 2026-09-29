@@ -1,9 +1,10 @@
 import { getContext, setContext } from 'svelte';
-import { createCssContext, type Css } from 'zerodep-css-svelte';
+import { createCssContext } from 'zerodep-css-svelte';
+import type { UiCss } from '../lib/provider/css.js';
 import type { UiConfig } from '../lib/provider/types.js';
 
 const configKey = Symbol('zerodep-svelte-ui');
-const cssContext = createCssContext<Css>();
+const cssContext = createCssContext<UiCss>();
 
 export function parentConfig(): UiConfig | undefined {
   return getContext<UiConfig | undefined>(configKey);

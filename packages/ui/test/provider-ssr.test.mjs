@@ -22,7 +22,7 @@ after(async () => {
   await server?.close();
 });
 
-test('正式包产物的 Provider 隔离并发 SSR，嵌套作用域共享请求作者', async () => {
+test('正式包产物的 Provider 隔离并发 SSR 和嵌套主题作者', async () => {
   const [a, b] = await Promise.all([
     entry.renderProvider(false, '#123456'),
     entry.renderProvider(true, '#abcdef'),
@@ -37,7 +37,7 @@ test('正式包产物的 Provider 隔离并发 SSR，嵌套作用域共享请求
   assert.match(b.css, /#abcdef/);
   assert.doesNotMatch(b.css, /#123456/);
   assert.equal(a.authors.length, 2);
-  assert.equal(a.authors[0], a.authors[1]);
+  assert.notEqual(a.authors[0], a.authors[1]);
   assert.notEqual(a.authors[0], b.authors[0]);
   for (const result of [a, b]) {
     const name = result.body.match(/<div[^>]*class="([^"]+)"/)?.[1];
@@ -51,6 +51,7 @@ test('正式包产物的 Provider 隔离并发 SSR，嵌套作用域共享请求
 
 test('缺少 Provider 或 SSR 宿主时明确失败', () => {
   assert.throws(() => entry.renderWithoutProvider(), /inside a Provider/);
+  assert.throws(() => entry.renderIconWithoutProvider(), /inside a Provider/);
   assert.throws(() => entry.renderWithoutHost(), /CSS server host is unavailable/);
 });
 

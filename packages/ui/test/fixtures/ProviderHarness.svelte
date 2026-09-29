@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Provider, type UiTheme, type UiLanguage, type UiLocale } from '../../src/lib/index.js';
+  import {
+    Provider,
+    type UiCssFactory,
+    type UiTheme,
+    type UiLanguage,
+    type UiLocale,
+  } from '../../src/lib/index.js';
   import type { Css, CssInput } from 'zerodep-css-svelte';
   import ConfigProbe from './ConfigProbe.svelte';
   let {
@@ -16,14 +22,14 @@
     className,
     showNested = true,
   }: {
-    css?: Css;
+    css?: UiCssFactory;
     theme?: UiTheme;
     lang?: UiLanguage;
     locale?: UiLocale;
     nestedTheme?: UiTheme;
     nestedLang?: UiLanguage;
     nestedLocale?: UiLocale;
-    localCss?: Css;
+    localCss?: UiCssFactory;
     onRead?: (css: Css) => void;
     style?: string;
     className?: CssInput;

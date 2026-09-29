@@ -1,7 +1,8 @@
 <script lang="ts">
   import { untrack, type Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
-  import { Css, css as styleClass, type CssInput } from 'zerodep-css-svelte';
+  import { css as styleClass, type CssInput } from 'zerodep-css-svelte';
+  import { UiCss, type UiCssFactory } from './css.js';
   import { parentConfig, provideConfig } from '../../internal/provider-context.js';
   import type { UiConfig } from './types.js';
   import type { UiTheme } from './theme/types.js';
@@ -12,7 +13,7 @@
   import { chinaLocale } from './locale/china.js';
 
   type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class' | 'lang'> & {
-    css?: Css;
+    css?: UiCssFactory;
     theme?: UiTheme;
     lang?: UiLanguage;
     locale?: UiLocale;
@@ -23,12 +24,16 @@
   let { css, theme, lang, locale, children, class: className, ...rest }: Props = $props();
   const parent = parentConfig();
   const initialCss = untrack(() => css);
-  const s = initialCss ?? parent?.css ?? new Css();
+  const createCss: UiCssFactory =
+    initialCss ?? parent?.createCss ?? ((readTheme) => new UiCss(readTheme));
+  // 传读取函数而不是主题快照；嵌套 Provider 使用独立作者，避免主题串到兄弟子树。
+  const s = createCss(() => theme ?? parent?.theme ?? lightTheme);
   // context 的外层对象稳定；getter 读取当前 props，让替换与嵌套继承保持响应式。
   const config: UiConfig = {
     css: s,
+    createCss,
     get theme() {
-      return theme ?? parent?.theme ?? lightTheme;
+      return s.theme;
     },
     get lang() {
       return lang ?? parent?.lang ?? zhCNLanguage;
@@ -52,11 +57,7 @@
 <div
   {...rest}
   lang={config.lang.code}
-  class={styleClass(
-    s.colorScheme.raw(config.theme.themeName),
-    s.color.raw(config.theme.color.text),
-    className,
-  )}
+  class={styleClass(s.colorScheme.raw(s.theme.themeName), s.color.text, className)}
 >
   {@render children?.()}
 </div>
