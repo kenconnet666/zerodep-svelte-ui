@@ -78,7 +78,7 @@
     s.width.em(1),
     s.height.em(1),
     s.fill.none,
-    s.stroke.raw('currentColor'),
+    s.stroke.currentColor,
     s.strokeLinecap.round,
     s.strokeLinejoin.round,
     s.fontSize.raw(fontSize),
