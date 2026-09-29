@@ -1,5 +1,6 @@
-export type UiSize = 'sm' | 'md' | 'lg';
-export type UiColor = 'inherit' | 'text' | 'muted' | 'primary' | 'success' | 'warning' | 'danger';
+export type UiSize = '_sm' | '_md' | '_lg';
+export type UiColor =
+  'inherit' | '_text' | '_muted' | '_primary' | '_success' | '_warning' | '_danger';
 
 /** 主题是普通 JS 数据；组件读取对象生成声明，不依赖主题 CSS 变量。 */
 export interface UiTheme {
@@ -14,5 +15,5 @@ export interface UiTheme {
     readonly warning: string;
     readonly danger: string;
   };
-  readonly fontSize: Readonly<Record<UiSize, string>>;
+  readonly fontSize: Readonly<Record<'sm' | 'md' | 'lg', string>>;
 }

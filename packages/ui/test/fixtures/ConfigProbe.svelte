@@ -8,7 +8,7 @@
   const locale = useLocale();
   const lang = useLang();
   untrack(() => onRead?.(s));
-  const appearance = $derived(css(s.color.primary, s.fontSize.md));
+  const appearance = $derived(css(s.color._primary, s.fontSize._md));
   const time = $derived(
     new Intl.DateTimeFormat(locale.localeName, {
       timeZone: locale.timeZone,
@@ -26,4 +26,9 @@
   class={appearance}>{theme.themeName} / {lang.languageName} / {locale.timeZone}</span
 >
 <span data-testid={name + '-message'}>{lang.messages.loading}</span>
+<span
+  data-testid={name + '-raw'}
+  class={css(s.color.raw('_primary'), s.backgroundColor.raw('_surface'), s.fontSize.raw('_md'))}
+  >主题 raw</span
+>
 <time data-testid={name + '-time'}>{time}</time>

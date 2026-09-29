@@ -5,8 +5,8 @@ import { Icon } from '../../src/lib/index.js';
 type Props = ComponentProps<typeof Icon>;
 export const valid: Props = {
   icon: Search,
-  size: 'sm',
-  color: 'primary',
+  size: '_sm',
+  color: '_primary',
   strokeWidth: 1.5,
   'aria-label': '搜索',
   class: ['width:24px;', [false, null, 'color:red;']],
@@ -21,6 +21,10 @@ export const badIcon: Props = { icon: 'Search' };
 export const badSize: Props = { icon: Search, size: 24 };
 // @ts-expect-error 颜色是语义名称。
 export const badColor: Props = { icon: Search, color: '#fff' };
+// @ts-expect-error 主题颜色必须带下划线。
+export const oldColor: Props = { icon: Search, color: 'primary' };
+// @ts-expect-error 主题字号必须带下划线。
+export const oldSize: Props = { icon: Search, size: 'md' };
 // @ts-expect-error viewBox 由图标数据决定。
 export const badGeometry: Props = { icon: Search, viewBox: '0 0 1 1' };
 declare const children: Snippet;

@@ -47,3 +47,20 @@ export function readonlyObjects() {
 
 // @ts-expect-error 必须传创建函数，让 Provider 注入当前作用域的主题。
 export const badInstance: Props = { css: new Css() };
+
+export function themeAuthor(s: UiCss) {
+  const declarations: string[] = [
+    s.color._primary,
+    s.color.raw('_primary'),
+    s.backgroundColor._surface,
+    s.backgroundColor.raw('_surface'),
+    s.fontSize._md,
+    s.fontSize.raw('_md'),
+    s.fontSize.raw(0),
+  ];
+  // @ts-expect-error 主题语义属性必须带下划线。
+  void s.color.primary;
+  // @ts-expect-error 主题字号属性必须带下划线。
+  void s.fontSize.md;
+  return declarations;
+}

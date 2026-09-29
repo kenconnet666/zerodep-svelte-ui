@@ -14,10 +14,18 @@
   const s = useCss();
   const panel = css(s.padding.rem(1.5), s.borderRadius.px(12));
   const row = css(s.display.flex, s.alignItems.center, s.gap.rem(1.5), s.flexWrap.wrap);
-  const colors: UiColor[] = ['inherit', 'text', 'muted', 'primary', 'success', 'warning', 'danger'];
+  const colors: UiColor[] = [
+    'inherit',
+    '_text',
+    '_muted',
+    '_primary',
+    '_success',
+    '_warning',
+    '_danger',
+  ];
   let choice = $state<'Search' | 'Check'>('Search');
-  let size = $state<UiSize>('md');
-  let color = $state<UiColor>('primary');
+  let size = $state<UiSize>('_md');
+  let color = $state<UiColor>('_primary');
   let theme = $state<'light' | 'dark'>('light');
   const selectedTheme = $derived(theme === 'light' ? lightTheme : darkTheme);
   let strokeWidth = $state(2);
@@ -43,7 +51,7 @@
   >
   <label
     >尺寸 <select bind:value={size}
-      ><option>sm</option><option>md</option><option>lg</option></select
+      ><option>_sm</option><option>_md</option><option>_lg</option></select
     ></label
   >
   <label
@@ -80,7 +88,7 @@ import { Provider, Icon } from 'zerodep-svelte-ui';`}</code
   <pre><code
       >{`<Provider>
   <Icon icon={Search} />
-  <Icon icon={Search} size="lg" color="primary" aria-label="搜索" />
+  <Icon icon={Search} size="_lg" color="_primary" aria-label="搜索" />
 </Provider>`}</code
     ></pre>
   <h2>属性</h2>
@@ -91,10 +99,10 @@ import { Provider, Icon } from 'zerodep-svelte-ui';`}</code
           >必填，LucideIconData 图形数据，支持响应式替换，不接受子组件或 children。</td
         ></tr
       >
-      <tr><td>size</td><td>sm / md / lg，默认 md，读取主题对象的 fontSize。</td></tr>
+      <tr><td>size</td><td>_sm / _md / _lg，默认 _md，读取主题对象的 fontSize。</td></tr>
       <tr
         ><td>color</td><td
-          >inherit / text / muted / primary / success / warning / danger，默认 inherit。</td
+          >inherit / _text / _muted / _primary / _success / _warning / _danger，默认 inherit。</td
         ></tr
       >
       <tr><td>strokeWidth</td><td>数值，默认 2；编译为 CSS 变量，连续更新不重新登记样式类。</td></tr

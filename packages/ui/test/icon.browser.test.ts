@@ -12,7 +12,7 @@ afterEach(cleanup);
 
 test('图标真实渲染为 SVG，切换数据和语义外观时更新', async () => {
   const source = JSON.stringify(Search);
-  const screen = await render(IconHarness, { iconProps: { icon: Search, color: 'primary' } });
+  const screen = await render(IconHarness, { iconProps: { icon: Search, color: '_primary' } });
   const icon = screen.getByTestId('icon');
   await expect.element(icon).toHaveStyle({ width: '16px', color: 'rgb(29, 78, 216)' });
   const element = icon.element();
@@ -22,7 +22,7 @@ test('图标真实渲染为 SVG，切换数据和语义外观时更新', async (
   await expect.element(icon).toHaveAttribute('focusable', 'false');
 
   await screen.rerender({
-    iconProps: { icon: Check, size: 'lg', color: 'primary' },
+    iconProps: { icon: Check, size: '_lg', color: '_primary' },
     theme: darkTheme,
   });
   await expect.element(icon).toHaveStyle({ width: '24px', color: 'rgb(147, 197, 253)' });
@@ -49,7 +49,7 @@ test('继承主题对象、外部 class 和文字颜色，不在 Icon 创建作�
     .toHaveStyle({ width: '30px', height: '30px', color: 'rgb(0, 128, 0)' });
   expect(screen.getByTestId('icon').element().classList).toHaveLength(1);
   await screen.rerender({
-    iconProps: { icon: Search, size: 'sm', color: 'danger', class: override },
+    iconProps: { icon: Search, size: '_sm', color: '_danger', class: override },
     theme: darkTheme,
   });
   await expect

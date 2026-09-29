@@ -84,7 +84,7 @@ test(
       import { Provider, Icon, darkTheme } from 'zerodep-svelte-ui';
       import { Search } from '@lucide/icons';
       </script>
-      <Provider theme={darkTheme}><Icon icon={Search} color="primary" strokeWidth={1.25} aria-label="搜索" /></Provider>`,
+      <Provider theme={darkTheme}><Icon icon={Search} color="_primary" strokeWidth={1.25} aria-label="搜索" /></Provider>`,
       );
       await writeFile(
         join(directory, 'entry.ts'),
@@ -109,7 +109,7 @@ test(
       import {useConfig} from 'zerodep-svelte-ui';
       // @ts-expect-error 聚合配置类型已移除。
       import type {UiConfig} from 'zerodep-svelte-ui';
-      export const icon:ComponentProps<typeof Icon>={icon:Search,size:'sm',color:'primary'};
+      export const icon:ComponentProps<typeof Icon>={icon:Search,size:'_sm',color:'_primary'};
       // @ts-expect-error 不接受任意颜色名称
       export const bad:ComponentProps<typeof Icon>={icon:Search,color:'blue'};`,
       );

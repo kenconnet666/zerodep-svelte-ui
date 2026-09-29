@@ -86,7 +86,7 @@
 <div
   {...rest}
   lang={language.languageName}
-  class={styleClass(s.colorScheme.raw(s.theme.themeName), s.color.text, className)}
+  class={styleClass(s.colorScheme.raw(s.theme.themeName), s.color._text, className)}
 >
   {@render children?.()}
 </div>

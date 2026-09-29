@@ -22,11 +22,11 @@ Provider 使用 Svelte context 注入三个普通 JS 对象；主题、地区、
 ## 作者与样式
 
 - 每个 Provider 创建独立 UiCss，同一 Provider 内的后代复用。css prop 接收 (readTheme) => new AppCss(readTheme)，创建函数通过 createCss 向下继承，但实例不共享；只用于初始化，更换时用 key 重建 Provider。创建函数必须返回新实例，不能复用单例。
-- 主题读取函数传入 UiCss，语义属性通过 getter 生成当前主题声明，例如 css(s.color.primary, s.fontSize.md)。s.theme 保留原始主题类型；UiCss 和三个主题属性类复用原生 Css 继承机制，可继续扩展。不生成 --ui-color/--ui-font-size 变量。
+- 主题读取函数传入 UiCss，语义属性通过 getter 生成当前主题声明，例如 css(s.color._primary, s.fontSize._md)。s.theme 保留原始主题类型；UiCss 和三个主题属性类复用原生 Css 继承机制，可继续扩展。不生成 --ui-color/--ui-font-size 变量。
 - Provider 容器提供 color-scheme 与文字颜色。背景、间距等布局由使用者提供。
 - class 使用 CssInput。外部 css() 结果放在默认声明后合成一个类，不使用 @layer，不透传普通类名或条件对象。
 - 容器的 class/style 只改变 DOM 样式，不修改后代获取的配置对象。需要整个子树使用新的主题值时，传 theme 对象。
-- Icon 通过 s.fontSize[size]、s.color[color] 消费主题声明，不再重复解析主题对象。bx 仍由 CSS 适配器管理动态变量，它与主题的数据传递分开。
+- Icon 的主题 size/color 参数直接使用下划线标识，通过 raw() 消费主题声明；inherit 保持原生 CSS 继承。bx 仍由 CSS 适配器管理动态变量，它与主题的数据传递分开。
 
 ## SSR 与验证
 
@@ -38,3 +38,5 @@ Provider 使用 Svelte context 注入三个普通 JS 对象；主题、地区、
 ## 必须提供上下文
 
 所有消费组件及 useCss()/useTheme()/useLocale()/useLang() 必须位于 Provider 后代中；缺失时统一抛出明确错误，不做默认作者回退。根 Provider 可以没有父级，并提供默认主题、语言与地区；只有 Provider 处理默认值。SSR 与浏览器使用相同约束。
+
+主题声明统一使用下划线：s.color._primary 与 s.color.raw('_primary') 等价；背景色与字号同理。只解析完整的已知主题标识，原生 CSS 值继续由基础 raw() 处理。主题数据对象中的 color.primary、fontSize.md 保持原名；Icon 的主题参数同样带下划线，如 color="_primary"、size="_md"。

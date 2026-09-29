@@ -16,10 +16,29 @@ import ProviderMutableHarness from './fixtures/ProviderMutableHarness.svelte';
 
 afterEach(cleanup);
 
+test('主题 raw 与下划线属性一致，原生 CSS 值保持原样', () => {
+  let theme = lightTheme;
+  const s = new UiCss(() => theme);
+  expect(s.color.raw('_primary')).toBe(s.color._primary);
+  expect(s.backgroundColor.raw('_surface')).toBe(s.backgroundColor._surface);
+  expect(s.fontSize.raw('_md')).toBe(s.fontSize._md);
+  theme = darkTheme;
+  expect(s.color.raw('_primary')).toBe('color:#93c5fd;');
+  expect(s.color._primary).toBe('color:#93c5fd;');
+  expect(s.backgroundColor.raw('_surface')).toBe('background-color:#1f2937;');
+  expect(s.color.raw('red')).toBe('color:red;');
+  expect(s.color.inherit).toBe('color:inherit;');
+  expect(s.color.raw('var(--_primary)')).toBe('color:var(--_primary);');
+  expect(s.fontSize.raw('16px')).toBe('font-size:16px;');
+  expect(s.fontSize.raw(0)).toBe('font-size:0;');
+  expect(s.fontSize.raw('calc(1rem + 2px)')).toBe('font-size:calc(1rem + 2px);');
+});
+
 test('调用方的 Svelte 响应式对象字段更新传递到嵌套后代', async () => {
   const screen = await render(ProviderMutableHarness, {});
   await screen.getByRole('button', { name: '更新对象字段' }).click();
   await expect.element(screen.getByTestId('value')).toHaveStyle({ color: 'rgb(128, 0, 128)' });
+  await expect.element(screen.getByTestId('value-raw')).toHaveStyle({ color: 'rgb(128, 0, 128)' });
   await expect.element(screen.getByTestId('value')).toHaveAttribute('data-primary', 'purple');
   await expect.element(screen.getByTestId('value-message')).toHaveTextContent('处理中');
   await expect.element(screen.getByTestId('value-time')).toHaveTextContent('07:00');
@@ -50,6 +69,11 @@ test('同一 Provider 后代共享作者，嵌套作用域独立，配置响应�
     .element(screen.getByTestId('nested-value'))
     .toHaveStyle({ color: 'rgb(147, 197, 253)' });
   await screen.rerender({ locale: usLocale });
+  await expect.element(screen.getByTestId('nested-value-raw')).toHaveStyle({
+    color: 'rgb(147, 197, 253)',
+    backgroundColor: 'rgb(31, 41, 55)',
+    fontSize: '16px',
+  });
   await expect.element(screen.getByTestId('nested-value-time')).toHaveTextContent('07:00');
   expect(authors).toHaveLength(4);
   expect(new Set(authors).size).toBe(3);
@@ -104,6 +128,9 @@ test('自定义主题对象直接驱动后代，切换语言和作者不丢失�
   });
   expect(authors.filter((s) => s instanceof AppCss)).toHaveLength(1);
   await expect
+    .element(screen.getByTestId('nested-value-raw'))
+    .toHaveStyle({ color: 'rgb(128, 0, 128)', fontSize: '21px' });
+  await expect
     .element(screen.getByTestId('nested-value'))
     .toHaveStyle({ color: 'rgb(128, 0, 128)', fontSize: '21px' });
   await expect
@@ -150,7 +177,7 @@ test('已使用过的主题组合复用规则，卸载子树不影响兄弟', as
 test('主题传给自定义作者，创建函数向下继承，替换主题不重建作者', async () => {
   class AppCss extends UiCss {
     get brandBackground() {
-      return this.backgroundColor.primary;
+      return this.backgroundColor._primary;
     }
   }
   const instances: AppCss[] = [];

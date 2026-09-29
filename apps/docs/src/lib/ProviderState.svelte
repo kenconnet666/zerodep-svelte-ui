@@ -6,7 +6,7 @@
   const locale = useLocale();
   const lang = useLang();
   const s = useCss();
-  const appearance = $derived(css(s.color.primary, s.fontSize.md));
+  const appearance = $derived(css(s.color._primary, s.fontSize._md));
   const time = $derived(
     new Intl.DateTimeFormat(locale.localeName, {
       timeZone: locale.timeZone,

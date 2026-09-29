@@ -10,6 +10,6 @@
   untrack(() => onRead(author));
 </script>
 
-<span class={css(author.color.primary)}
+<span class={css(author.color._primary)}
   >{theme.themeName}/{lang.languageName}/{locale.timeZone}/{lang.messages.loading}</span
 >

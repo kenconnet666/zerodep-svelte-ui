@@ -8,8 +8,8 @@
 <Provider theme={darkTheme}>
   <Icon
     icon={Search}
-    size="lg"
-    color="primary"
+    size="_lg"
+    color="_primary"
     strokeWidth={1.5}
     aria-label={label}
     class={css('width:30px;')}

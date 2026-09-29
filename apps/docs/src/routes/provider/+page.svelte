@@ -130,13 +130,17 @@ const locale = useLocale();
 const lang = useLang();
 const s = useCss();
 // 在模板或 $derived 中读取，才能随配置替换更新。
-const appearance = $derived(css(s.color.primary, s.fontSize.md));`}</code
+const appearance = $derived(css(s.color._primary, s.fontSize._md));`}</code
     ></pre>
   <p>
     Provider 将当前主题的读取函数传给 UiCss，不依赖主题 CSS 变量。在模板或派生表达式中读取
-    s.color.primary、s.backgroundColor.surface、s.fontSize.md，主题替换时自动更新；s.theme
+    s.color._primary、s.backgroundColor._surface、s.fontSize._md，主题替换时自动更新；s.theme
     可取得原始主题对象。不要在初始化时缓存这些声明。容器的外部 class 只改变 DOM
     样式，不修改传给后代的主题数据。
+  </p>
+  <p>
+    主题声明统一带下划线：s.color._primary 与 s.color.raw('_primary')
+    等价，s.backgroundColor._surface 与 s.fontSize._md 同理。原生关键字和 CSS 值仍可直接传给 raw()。
   </p>
   <p>
     语言与地区独立：英文文案可以配合上海时区。上面的时间示例固定为 2026-01-15 12:00

@@ -1,34 +1,51 @@
 import { BackgroundColorCss, ColorCss, Css, FontSizeCss } from 'zerodep-css-svelte';
-import type { UiTheme } from './theme/types.js';
+import type { UiSize, UiTheme } from './theme/types.js';
+
+export type UiThemeColor = `_${keyof UiTheme['color']}`;
+
+// 只解析完整的主题标识；原生关键字、长度、var()/calc() 等交回基础工具处理。
+function themeValue<T extends string | number>(
+  value: T,
+  values: Readonly<Record<string, string>>,
+): T | string {
+  if (typeof value === 'string' && value.startsWith('_')) {
+    const key = value.slice(1);
+    if (Object.hasOwn(values, key)) return values[key];
+  }
+  return value;
+}
 
 /** 每次读取语义属性时取当前主题，避免缓存初始化时的颜色。 */
 export class UiColorCss extends ColorCss {
   constructor(private readonly readTheme: () => UiTheme) {
     super();
   }
-  get background(): string {
-    return this.raw(this.readTheme().color.background);
+  override raw(value: UiThemeColor | Parameters<ColorCss['raw']>[0]): string {
+    return super.raw(themeValue(value, this.readTheme().color));
   }
-  get surface(): string {
-    return this.raw(this.readTheme().color.surface);
+  get _background(): string {
+    return this.raw('_background');
   }
-  get text(): string {
-    return this.raw(this.readTheme().color.text);
+  get _surface(): string {
+    return this.raw('_surface');
   }
-  get muted(): string {
-    return this.raw(this.readTheme().color.muted);
+  get _text(): string {
+    return this.raw('_text');
   }
-  get primary(): string {
-    return this.raw(this.readTheme().color.primary);
+  get _muted(): string {
+    return this.raw('_muted');
   }
-  get success(): string {
-    return this.raw(this.readTheme().color.success);
+  get _primary(): string {
+    return this.raw('_primary');
   }
-  get warning(): string {
-    return this.raw(this.readTheme().color.warning);
+  get _success(): string {
+    return this.raw('_success');
   }
-  get danger(): string {
-    return this.raw(this.readTheme().color.danger);
+  get _warning(): string {
+    return this.raw('_warning');
+  }
+  get _danger(): string {
+    return this.raw('_danger');
   }
 }
 
@@ -36,29 +53,32 @@ export class UiBackgroundColorCss extends BackgroundColorCss {
   constructor(private readonly readTheme: () => UiTheme) {
     super();
   }
-  get background(): string {
-    return this.raw(this.readTheme().color.background);
+  override raw(value: UiThemeColor | Parameters<BackgroundColorCss['raw']>[0]): string {
+    return super.raw(themeValue(value, this.readTheme().color));
   }
-  get surface(): string {
-    return this.raw(this.readTheme().color.surface);
+  get _background(): string {
+    return this.raw('_background');
   }
-  get text(): string {
-    return this.raw(this.readTheme().color.text);
+  get _surface(): string {
+    return this.raw('_surface');
   }
-  get muted(): string {
-    return this.raw(this.readTheme().color.muted);
+  get _text(): string {
+    return this.raw('_text');
   }
-  get primary(): string {
-    return this.raw(this.readTheme().color.primary);
+  get _muted(): string {
+    return this.raw('_muted');
   }
-  get success(): string {
-    return this.raw(this.readTheme().color.success);
+  get _primary(): string {
+    return this.raw('_primary');
   }
-  get warning(): string {
-    return this.raw(this.readTheme().color.warning);
+  get _success(): string {
+    return this.raw('_success');
   }
-  get danger(): string {
-    return this.raw(this.readTheme().color.danger);
+  get _warning(): string {
+    return this.raw('_warning');
+  }
+  get _danger(): string {
+    return this.raw('_danger');
   }
 }
 
@@ -66,14 +86,17 @@ export class UiFontSizeCss extends FontSizeCss {
   constructor(private readonly readTheme: () => UiTheme) {
     super();
   }
-  get sm(): string {
-    return this.raw(this.readTheme().fontSize.sm);
+  override raw(value: UiSize | Parameters<FontSizeCss['raw']>[0]): string {
+    return super.raw(themeValue(value, this.readTheme().fontSize));
   }
-  get md(): string {
-    return this.raw(this.readTheme().fontSize.md);
+  get _sm(): string {
+    return this.raw('_sm');
   }
-  get lg(): string {
-    return this.raw(this.readTheme().fontSize.lg);
+  get _md(): string {
+    return this.raw('_md');
+  }
+  get _lg(): string {
+    return this.raw('_lg');
   }
 }
 

@@ -113,8 +113,8 @@ test('Icon 文档通过真实组件演示语义外观、主题、bx 与键盘行
   expect(await icon.locator('circle').evaluate((el) => el.namespaceURI)).toBe(
     'http://www.w3.org/2000/svg',
   );
-  await page.getByRole('combobox', { name: '尺寸', exact: true }).selectOption('lg');
-  await page.getByRole('combobox', { name: '颜色', exact: true }).selectOption('success');
+  await page.getByRole('combobox', { name: '尺寸', exact: true }).selectOption('_lg');
+  await page.getByRole('combobox', { name: '颜色', exact: true }).selectOption('_success');
   await page.getByRole('combobox', { name: '主题', exact: true }).selectOption('dark');
   await expect(icon).toHaveCSS('width', '24px');
   await expect(icon).toHaveCSS('color', 'rgb(134, 239, 172)');

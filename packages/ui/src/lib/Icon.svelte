@@ -20,7 +20,7 @@
   const s = useCss();
   let {
     icon,
-    size = 'md',
+    size = '_md',
     color = 'inherit',
     strokeWidth = 2,
     class: className,
@@ -55,8 +55,8 @@
     s.stroke.raw('currentColor'),
     s.strokeLinecap.round,
     s.strokeLinejoin.round,
-    s.fontSize[size],
-    s.color[color],
+    s.fontSize.raw(size),
+    s.color.raw(color),
     s.strokeWidth.raw(bx(strokeWidth)),
     className,
   )}
