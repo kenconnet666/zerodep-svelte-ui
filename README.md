@@ -55,7 +55,7 @@ ESLint 使用 Flat Config，按组件库、文档站和 Node 脚本分别配置�
 
 ## 组件测试与包检查
 
-组件浏览器测试命令先构建组件库，确保全新环境具有公开包和 /vite 入口。测试使用 Vitest Browser Mode、Playwright provider 和 vitest-browser-svelte，配置在 packages/ui/vitest.config.ts。测试使用与消费端一致的 CSS 绑定插件顺序，不依赖文档站路由。
+组件浏览器测试使用 Vitest Browser Mode、Playwright provider 和 vitest-browser-svelte，配置在 packages/ui/vitest.config.ts。测试使用与消费端一致的 CSS 绑定插件顺序，不依赖文档站路由。
 
 ```sh
 pnpm exec playwright install chromium
@@ -89,24 +89,7 @@ packages/ui 已显式声明以下 npm 依赖；根目录的 Zod 仍单独用于 
 
 组件库将 @lucide/icons 声明为必需的 peer dependency（兼容范围 ^1.48.0），开发时通过 devDependencies 使用 catalog 固定版本。文档站作为消费端，在 dependencies 中显式安装同一版本。未来使用组件库的应用也应显式安装兼容的 @lucide/icons；本仓库的 autoInstallPeers: false 不会强制改变外部应用的包管理器设置。
 
-图标可直接传数据，例如 `import { Search } from '@lucide/icons'` 配合 `<Icon icon={Search} />`；也支持编译时选择 `<Icon lucide={i => i.search} />` 和名称 `<Icon lucide="search" />`。名称类型由脚本从官方名称列表生成本地显式字符串联合 LucideIconName，减少编辑器跨包类型解析，提供小写连字符字面量补全；加号使用 plus，官方没有 add。两种入口必须二选一。组件库不加载全量图标注册表。
-
-运行 pnpm lucide:generate 可重新生成名称类型，pnpm lucide:check 验证它与已安装版本一致；后者已纳入 pnpm check。构建及开发启动自动生成，升级 @lucide/icons 后提交更新的类型文件。名称类型也从包根入口导出。WebStorm 的补全显示仍需在实际编辑器中确认。
-
-回调参数 LucideIcons 是生成的显式成员接口，方便编辑器在 i. 后显示候选，例如 i.search、i.circlePlus。编译插件只读取直接成员选择，不执行回调、不创建运行时图标对象；成员类型与名称类型一起由生成命令维护。
-
-选择入口需要 UI 编译插件，按实际使用名称导入 SVG 数据，SSR 同步输出图形：
-
-```ts
-import uiIcons from 'zerodep-svelte-ui/vite';
-import cssBindings from 'zerodep-css-svelte/vite';
-// 使用 SvelteKit；普通 Svelte 项目最后一项替换为 svelte()。
-plugins: [uiIcons(), cssBindings(), sveltekit()];
-```
-
-支持实例脚本从 zerodep-svelte-ui 导入的 Icon、导入别名与命名空间成员；lucide 接受引号字符串、字符串字面量表达式，或 i => i.search 这种单参数直接成员回调；不接受函数调用、计算属性和语句块。动态名称、属性 spread 使用 icon={数据}。不推断跨文件再导出和动态组件；绕过 UI 插件的 lucide 用法会明确报错。详见 [lucide 编译入口](.design/lucide-prop.md)。
-
-插件通过 /vite 子路径加载，依赖 magic-string 生成定位映射；Vite 是可选 peer，仅构建时使用。浏览器根入口不加载编译器、图标名称表或插件依赖。
+图标直接使用官方名称，例如 `import { Search } from '@lucide/icons'`，使用写法为 `<Icon icon={Search} />`。不引入框架图标组件包，也不维护全量图标注册表。
 
 ## CSS 框架接入
 
@@ -159,11 +142,11 @@ Provider 和 Icon 的 class 使用 CssInput，优先传入同一 CSS 宿主的 c
 
 <Provider>
   <Icon icon={Search} />
-  <Icon lucide="search" size="_lg" color="_primary" aria-label="搜索" />
+  <Icon icon={Search} size="_lg" color="_primary" aria-label="搜索" />
 </Provider>
 ```
 
-icon 接收 LucideIconData，也可以改用 lucide 名称字面量，两者二选一；不接受子组件或 children snippet。size、color、strokeWidth、verticalAlign 直接使用 UiCss 对应 raw() 的输入类型，默认值在 $props() 中分别为 _md、inherit、2、-0.125em。支持全部系统字号/颜色 token 和原始 CSS 值，如 size="18px"、color="#7e22ce"、strokeWidth="3px"、verticalAlign="middle"。size 对应 font-size，图标宽高为 1em；_lg 是 20px，_xl 是 24px，不再做 Icon 专属尺寸映射。原始字符串沿用 raw() 契约，不进行 token 拼写校验，非零尺寸数字不自动补 px。
+icon 必须是 LucideIconData，只通过 `<Icon icon={Search} />` 传入，不接受子组件或 children snippet。size、color、strokeWidth、verticalAlign 直接使用 UiCss 对应 raw() 的输入类型，默认值在 $props() 中分别为 _md、inherit、2、-0.125em。支持全部系统字号/颜色 token 和原始 CSS 值，如 size="18px"、color="#7e22ce"、strokeWidth="3px"、verticalAlign="middle"。size 对应 font-size，图标宽高为 1em；_lg 是 20px，_xl 是 24px，不再做 Icon 专属尺寸映射。原始字符串沿用 raw() 契约，不进行 token 拼写校验，非零尺寸数字不自动补 px。
 
 Icon 复用最近 Provider 的作者，主题更新直接由 UiCss 响应。没有 IconTokens、tokens prop 或 Provider.components。四个外观属性均直接生成 CSS 声明，描边按普通外观配置处理，不使用 bx 或关键字判断分支。class/style 继续提供最终样式定制。
 

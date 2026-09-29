@@ -108,9 +108,6 @@ test('Icon 文档通过真实组件演示语义外观、主题、描边与键盘
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/icon/');
   await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
-  await expect(page.getByRole('img', { name: '按名称搜索', exact: true })).toBeVisible();
-  await expect(page.locator('[data-lucide-search] circle')).toHaveCount(1);
-  await expect(page.getByRole('img', { name: '按名称添加', exact: true })).toBeVisible();
   const custom = page.locator('[data-icon-custom]');
   await expect(custom).toHaveCSS('width', '16px');
   await page.getByRole('checkbox', { name: '使用自定义外观' }).check();
@@ -155,7 +152,6 @@ test('Icon 无 JavaScript 首屏包含可访问 SVG 和正确初始样式', asyn
     await page.goto('/icon/');
     const icon = page.getByRole('img', { name: '预览图标' });
     await expect(icon).toBeVisible();
-    await expect(page.locator('[data-lucide-search] circle')).toHaveCount(1);
     await expect(icon).toHaveCSS('width', '16px');
     await expect(icon).toHaveCSS('color', 'rgb(29, 78, 216)');
     expect(await icon.locator('path').evaluate((el) => el.namespaceURI)).toBe(

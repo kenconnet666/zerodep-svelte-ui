@@ -7,7 +7,7 @@ Provider 使用 Svelte context 注入三个普通 JS 对象；主题、地区、
 - src/lib 是公开 API 目录。TS、JS 模块的具名导出、默认导出，以及 Svelte 组件和 module script 导出，递归汇总到 src/lib/index.ts。
 - index.ts 由 pnpm exports:generate 生成。构建前自动更新，开发 watch 跟随文件新增、删除和改名更新；pnpm exports:check / pnpm check 验证提交中的入口没有遗漏。
 - 默认导出按文件名转为 PascalCase；index 模块使用所在目录名。导出重名、无导出模块和非模块文件会报错，不静默跳过。公开类型写在 .ts 文件中。
-- 内部 context 设置器和键放在 src/internal。svelte-package 的输入为 src，产物保留 lib/internal 的相对路径；package.json 的组件入口为 dist/lib/index.js，构建插件单独从 /vite 导出；不开放内部子路径。
+- 内部 context 设置器和键放在 src/internal。svelte-package 的输入为 src，产物保留 lib/internal 的相对路径；package.json 只公开 dist/lib/index.js，不开放内部子路径。
 - Provider 位于 lib/provider/Provider.svelte；lang、locale、theme 分别放语言、地区时区、主题预设与类型。
 
 ## 配置对象与继承

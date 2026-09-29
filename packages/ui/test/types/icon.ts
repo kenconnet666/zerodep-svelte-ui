@@ -14,7 +14,7 @@ export const valid: Props = {
 };
 // @ts-expect-error class 使用 CssInput，不接受原生 class 条件对象。
 export const badClass: Props = { icon: Search, class: { active: true } };
-// 普通可选属性；缺少图标由运行时检查。
+// @ts-expect-error 必须传入图标数据。
 export const missing: Props = {};
 // @ts-expect-error 图标名字符串不是 SVG 资源。
 export const badIcon: Props = { icon: 'Search' };
@@ -51,15 +51,3 @@ export const badComponent: Props = { icon: Icon };
 
 // @ts-expect-error Icon 不再接收组件 tokens。
 export const oldComponentToken: Props = { icon: Search, tokens: { strokeWidth: 2 } };
-
-export const named: Props = { lucide: 'search' };
-export const hyphenName: Props = { lucide: 'circle-plus' };
-// 属性类型保持简单，二选一由编译插件和运行时检查。
-export const both: Props = { icon: Search, lucide: 'search' };
-// @ts-expect-error 官方加号名称为 plus，不添加 add 别名。
-export const unknownLucide: Props = { lucide: 'add' };
-
-export const selected: Props = { lucide: (i) => i.search };
-export const camelCase: Props = { lucide: (i) => i.circlePlus };
-// @ts-expect-error 图标选择器只提供官方名称对应的成员。
-export const badMember: Props = { lucide: (i) => i.notAnIcon };

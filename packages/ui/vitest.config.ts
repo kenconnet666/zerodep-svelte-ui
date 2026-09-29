@@ -3,12 +3,11 @@ import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { playwright } from '@vitest/browser-playwright';
 import { defineConfig } from 'vitest/config';
 import cssBindings from 'zerodep-css-svelte/vite';
-import uiIcons from 'zerodep-svelte-ui/vite';
 
 export default defineConfig({
   root: import.meta.dirname,
   // 与消费端保持一致：先处理显式 CSS 绑定，再编译 Svelte。
-  plugins: [uiIcons(), cssBindings(), svelte()],
+  plugins: [cssBindings(), svelte()],
   // 图标数据提前优化；编译器注入的绑定运行时由 CSS 插件声明。
   optimizeDeps: { include: ['@lucide/icons'] },
   test: {

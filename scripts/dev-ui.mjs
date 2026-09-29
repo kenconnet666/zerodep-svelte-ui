@@ -3,12 +3,9 @@ import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { generatePublicIndex } from './generate-ui-exports.mjs';
-import { generateLucideTypes, generateLucideIcons } from './generate-lucide-types.mjs';
 
 const root = fileURLToPath(new URL('../packages/ui/', import.meta.url));
 const require = createRequire(join(root, 'package.json'));
-await generateLucideTypes();
-await generateLucideIcons();
 await generatePublicIndex();
 const commands = [
   [fileURLToPath(new URL('./generate-ui-exports.mjs', import.meta.url)), '--watch'],

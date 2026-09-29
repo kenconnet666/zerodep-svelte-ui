@@ -1,15 +1,12 @@
 <script lang="ts">
   import type { SVGAttributes } from 'svelte/elements';
   import type { LucideIconData, LucideIconNode } from '@lucide/icons';
-  import type { LucideIconName } from './lucide-names.js';
-  import type { LucideIcons } from './lucide-icons.js';
   import { css, type CssInput } from 'zerodep-css-svelte';
   import { useCss } from '../../provider/context.js';
   import type { UiCss } from '../../provider/css.js';
 
   let {
     icon,
-    lucide,
     size = '_md',
     color = 'inherit',
     strokeWidth = 2,
@@ -25,9 +22,7 @@
     SVGAttributes<SVGSVGElement>,
     'children' | 'class' | 'color' | 'width' | 'height' | 'viewBox' | 'stroke-width'
   > & {
-    icon?: LucideIconData;
-    /** 编译时选择图标，如 i => i.search；也接受官方名称字面量。 */
-    lucide?: LucideIconName | ((icons: LucideIcons) => LucideIconName);
+    icon: LucideIconData;
     /** 系统字号 token 或原始 font-size 值；图标宽高为 1em。 */
     size?: Parameters<UiCss['fontSize']['raw']>[0];
     color?: Parameters<UiCss['color']['raw']>[0];
@@ -38,14 +33,6 @@
   } = $props();
 
   const s = useCss();
-  const data = $derived.by(() => {
-    if (lucide !== undefined)
-      throw new Error(
-        'zerodep-svelte-ui: lucide 是编译时图标选择，请启用 zerodep-svelte-ui/vite；动态选择请使用 icon={数据}。',
-      );
-    if (!icon) throw new Error('zerodep-svelte-ui: Icon 必须提供 icon 或 lucide。');
-    return icon;
-  });
   const named = $derived(Boolean(label?.trim() || labelledBy?.trim()));
   const hidden = $derived(ariaHidden ?? (named ? undefined : true));
 </script>
@@ -53,7 +40,7 @@
 <svg
   {...rest}
   xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 {data.size ?? data.width ?? 24} {data.size ?? data.height ?? 24}"
+  viewBox="0 0 {icon.size ?? icon.width ?? 24} {icon.size ?? icon.height ?? 24}"
   {focusable}
   role={role ?? (named && hidden !== true && hidden !== 'true' ? 'img' : undefined)}
   aria-label={label}
@@ -83,5 +70,5 @@
       </svelte:element>
     {/each}
   {/snippet}
-  {@render nodes(data.node)}
+  {@render nodes(icon.node)}
 </svg>

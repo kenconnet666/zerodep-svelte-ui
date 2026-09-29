@@ -83,7 +83,7 @@ test(
       import { Search } from '@lucide/icons';
       import BindingProbe from './BindingProbe.svelte';
       </script>
-      <Provider theme={darkTheme}><Icon icon={Search} size="20px" color="purple" strokeWidth={1.25} verticalAlign="middle" aria-label="搜索" /><Icon lucide={i => i.circlePlus} aria-label="添加" /><BindingProbe /></Provider>`,
+      <Provider theme={darkTheme}><Icon icon={Search} size="20px" color="purple" strokeWidth={1.25} verticalAlign="middle" aria-label="搜索" /><BindingProbe /></Provider>`,
       );
       // 编译插件契约由明确的动态绑定场景验证，不要求 Icon 为测试而使用 bx。
       await writeFile(
@@ -120,10 +120,6 @@ test(
       // @ts-expect-error 聚合配置类型已移除。
       import type {UiConfig} from 'zerodep-svelte-ui';
       export const icon:ComponentProps<typeof Icon>={icon:Search,size:'_sm',color:'_primary'};
-      export const named:ComponentProps<typeof Icon>={lucide:'search'};
-      export const selected:ComponentProps<typeof Icon>={lucide:i=>i.search};
-      // @ts-expect-error 未知图标名称不能通过类型检查
-      export const unknown:ComponentProps<typeof Icon>={lucide:'not-a-lucide-icon'};
       export const raw:ComponentProps<typeof Icon>={icon:Search,size:'18px',color:'blue',strokeWidth:'2px',verticalAlign:'middle'};
       // @ts-expect-error 不再支持组件 token 覆盖
       export const bad:ComponentProps<typeof Icon>={icon:Search,tokens:{_sizeMd:'20px'}};`,
@@ -147,21 +143,21 @@ test(
       await writeFile(
         join(directory, 'verify.mjs'),
         `import assert from 'node:assert/strict';
-      import {createServer,build} from 'vite';import {svelte} from '@sveltejs/vite-plugin-svelte';import bindings from 'zerodep-css-svelte/vite';import uiIcons from 'zerodep-svelte-ui/vite';
-      for(const [enabled,iconsEnabled] of [[true,true],[false,true],[true,false]]){
-        const server=await createServer({configFile:false,root:process.cwd(),logLevel:'error',plugins:[...(iconsEnabled?[uiIcons()]:[]),...(enabled?[bindings()]:[]),svelte({configFile:false})],server:{middlewareMode:true},ssr:{noExternal:['zerodep-svelte-ui','zerodep-css','zerodep-css-svelte']}});
+      import {createServer,build} from 'vite';import {svelte} from '@sveltejs/vite-plugin-svelte';import bindings from 'zerodep-css-svelte/vite';
+      for(const enabled of [true,false]){
+        const server=await createServer({configFile:false,root:process.cwd(),logLevel:'error',plugins:[...(enabled?[bindings()]:[]),svelte({configFile:false})],server:{middlewareMode:true},ssr:{noExternal:['zerodep-svelte-ui','zerodep-css','zerodep-css-svelte']}});
         try{const entry=await server.ssrLoadModule('/entry.ts');
-          if(enabled && iconsEnabled){
-            const result=entry.run();assert(result.body.includes('<svg'));assert(result.body.includes('role="img"'));assert(result.body.includes('<circle'));assert(result.body.includes('aria-label="添加"'));
+          if(enabled){
+            const result=entry.run();assert(result.body.includes('<svg'));assert(result.body.includes('role="img"'));assert(result.body.includes('<circle'));
             assert(result.css.includes('color:purple;'));assert(result.css.includes('font-size:20px;'));
             assert(result.css.includes('stroke-width:1.25;'));
             const variable=result.css.split('width:var(')[1]?.split(')')[0];assert(variable);
             assert(result.body.includes(variable+': 20px;')||result.body.includes(variable+': 20px"')||result.css.includes(variable+':20px;'));
           }
-          else assert.throws(()=>entry.run(),iconsEnabled?/bx/:/zerodep-svelte-ui/);
+          else assert.throws(()=>entry.run(),/bx/);
         }finally{await server.close();}
       }
-      await build({configFile:false,root:process.cwd(),logLevel:'error',plugins:[uiIcons(),bindings(),svelte({configFile:false})],build:{lib:{entry:'client.ts',formats:['es']}}});
+      await build({configFile:false,root:process.cwd(),logLevel:'error',plugins:[bindings(),svelte({configFile:false})],build:{lib:{entry:'client.ts',formats:['es']}}});
       console.log('tarball public types, SSR, required binding plugin and client build passed');`,
       );
       const output = run(['exec', 'node', 'verify.mjs']);

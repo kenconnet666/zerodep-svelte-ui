@@ -12,7 +12,7 @@
     "sync": "pnpm --filter @zerodep-ui/docs sync",
     "exports:generate": "node scripts/generate-ui-exports.mjs",
     "exports:check": "node scripts/generate-ui-exports.mjs --check",
-    "check": "pnpm lucide:check && pnpm exports:check && pnpm --filter zerodep-svelte-ui build && pnpm sync && pnpm -r check && tsc -p tsconfig.json",
+    "check": "pnpm exports:check && pnpm --filter zerodep-svelte-ui build && pnpm sync && pnpm -r check && tsc -p tsconfig.json",
     "lint": "eslint . --max-warnings 0",
     "check:package": "pnpm --filter zerodep-svelte-ui build && pnpm pack:ui && publint artifacts/zerodep-svelte-ui.tgz --strict",
     "build": "pnpm -r build",
@@ -25,9 +25,7 @@
     "lsp:setup": "node scripts/language-services/setup.mjs",
     "lsp:verify": "pnpm sync && node scripts/language-services/verify.mjs",
     "lsp:inspect": "node scripts/language-services/inspect.mjs .",
-    "pack:ui": "pnpm --filter zerodep-svelte-ui pack --out artifacts/zerodep-svelte-ui.tgz",
-    "lucide:generate": "node scripts/generate-lucide-types.mjs",
-    "lucide:check": "node scripts/generate-lucide-types.mjs --check"
+    "pack:ui": "pnpm --filter zerodep-svelte-ui pack --out artifacts/zerodep-svelte-ui.tgz"
   },
   "devDependencies": {
     "@axe-core/playwright": "catalog:",

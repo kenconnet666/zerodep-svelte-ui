@@ -15,7 +15,6 @@ import {
 import ProviderSsr from './ProviderSsr.svelte';
 import PublicConfigProbe from './PublicConfigProbe.svelte';
 import IconSsr from './IconSsr.svelte';
-import LucideHarness from './LucideHarness.svelte';
 import ContextWithoutProvider from './ContextWithoutProvider.svelte';
 
 export async function renderProvider(dark: boolean, brand: string) {
@@ -53,17 +52,6 @@ export function renderWithoutHost() {
     },
   }).body;
 }
-export function renderLucide(plus = false) {
-  const host = createServerCssHost();
-  const body = withCssHost(host, () => render(LucideHarness, { props: { plus } }).body);
-  return { body, css: host.cssText() };
-}
-export function renderUncompiledLucide() {
-  return withCssHost(
-    createServerCssHost(),
-    () => render(IconSsr, { props: { appearance: { lucide: 'search' } as never } }).body,
-  );
-}
 export function renderIconWithoutProvider() {
   return withCssHost(createServerCssHost(), () => render(Icon, { props: { icon: Search } }).body);
 }
@@ -79,9 +67,7 @@ export function renderIcon(label: string) {
   return { body, css: host.cssText(), rules: host.rules() };
 }
 
-export async function renderIconAppearance(
-  appearance: Partial<Omit<ComponentProps<typeof Icon>, 'icon' | 'lucide'>>,
-) {
+export async function renderIconAppearance(appearance: Partial<ComponentProps<typeof Icon>>) {
   const host = createServerCssHost();
   return withCssHost(host, async () => {
     await Promise.resolve();

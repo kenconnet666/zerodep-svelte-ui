@@ -1,7 +1,5 @@
 // 此文件由 pnpm exports:generate 自动维护，请将公开模块放在 src/lib。
 export { default as Icon } from './display/gene/Icon.svelte';
-export * from './display/gene/lucide-icons.js';
-export * from './display/gene/lucide-names.js';
 export { default as Provider } from './provider/Provider.svelte';
 export * from './provider/context.js';
 export * from './provider/css.js';

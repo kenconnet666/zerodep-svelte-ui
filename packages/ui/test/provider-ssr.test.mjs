@@ -4,7 +4,6 @@ import { fileURLToPath } from 'node:url';
 import { createServer } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import cssBindings from 'zerodep-css-svelte/vite';
-import uiIcons from '../dist/vite.js';
 
 let server;
 let entry;
@@ -12,7 +11,7 @@ before(async () => {
   server = await createServer({
     configFile: false,
     root: fileURLToPath(new URL('..', import.meta.url)),
-    plugins: [uiIcons(), cssBindings(), svelte()],
+    plugins: [cssBindings(), svelte()],
     server: { middlewareMode: true },
     ssr: { noExternal: ['zerodep-svelte-ui', 'zerodep-css', 'zerodep-css-svelte'] },
     logLevel: 'error',
@@ -102,13 +101,4 @@ test('正式包产物的 Icon 在 SSR 输出 SVG、名称和直接 CSS 声明', 
   assert.match(body, /width:30px;$/);
   assert.doesNotMatch(body, /@layer/);
   assert.doesNotMatch(result.css, /--ui-color|--ui-font-size/);
-});
-
-test('lucide 在 SSR 同步输出图形，绕过编译时明确报错', () => {
-  const result = entry.renderLucide();
-  assert.match(result.body, /<circle/);
-  assert.match(result.body, /aria-label="搜索"/);
-  assert.doesNotMatch(result.body, /\slucide=/);
-  assert.doesNotMatch(entry.renderLucide(true).body, /<circle/);
-  assert.throws(() => entry.renderUncompiledLucide(), /zerodep-svelte-ui\/vite/);
 });
