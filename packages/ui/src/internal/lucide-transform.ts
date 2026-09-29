@@ -7,6 +7,11 @@ import {
 } from '@lucide/icons/dynamic';
 
 const names = new Set<string>(lucideIconNames);
+const members = new Map<string, string>();
+for (const name of [...lucideIconNames].sort()) {
+  const member = name.replace(/-([a-z0-9])/g, (_, letter: string) => letter.toUpperCase());
+  if (!members.has(member)) members.set(member, name);
+}
 type Node = { type: string; start?: number; end?: number; [key: string]: unknown };
 const isNode = (value: unknown): value is Node =>
   typeof value === 'object' && value !== null && 'type' in value;
@@ -33,6 +38,26 @@ function literal(value: unknown): string | undefined {
     const expression = value.expression;
     if (expression.type === 'Literal' && typeof expression.value === 'string')
       return expression.value;
+    if (expression.type === 'ArrowFunctionExpression' && !expression.async) {
+      const parameters = expression.params as Node[];
+      const body = expression.body;
+      if (
+        parameters.length === 1 &&
+        parameters[0].type === 'Identifier' &&
+        isNode(body) &&
+        body.type === 'MemberExpression' &&
+        !body.computed &&
+        !body.optional &&
+        isNode(body.object) &&
+        body.object.type === 'Identifier' &&
+        body.object.name === parameters[0].name &&
+        isNode(body.property) &&
+        body.property.type === 'Identifier'
+      ) {
+        const member = body.property.name as string;
+        return members.get(member) ?? `成员 ${member}`;
+      }
+    }
   }
 }
 
@@ -124,7 +149,10 @@ export async function transformLucide(source: string, filename: string) {
             fail('icon 与 lucide 必须二选一。', lucide);
           const name = literal(lucide.value);
           if (name === undefined)
-            fail('lucide 只接受字符串字面量；动态选择请使用 icon={数据}。', lucide);
+            fail(
+              'lucide 只接受字符串字面量或 i => i.search 这样的直接成员选择；动态选择请使用 icon={数据}。',
+              lucide,
+            );
           if (!names.has(name))
             fail(`未知 Lucide 名称 ${JSON.stringify(name)}；加号的官方名称为 plus。`, lucide);
           let identifier = used.get(name);

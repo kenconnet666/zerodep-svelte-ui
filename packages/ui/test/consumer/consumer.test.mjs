@@ -83,7 +83,7 @@ test(
       import { Search } from '@lucide/icons';
       import BindingProbe from './BindingProbe.svelte';
       </script>
-      <Provider theme={darkTheme}><Icon icon={Search} size="20px" color="purple" strokeWidth={1.25} verticalAlign="middle" aria-label="搜索" /><Icon lucide="circle-plus" aria-label="添加" /><BindingProbe /></Provider>`,
+      <Provider theme={darkTheme}><Icon icon={Search} size="20px" color="purple" strokeWidth={1.25} verticalAlign="middle" aria-label="搜索" /><Icon lucide={i => i.circlePlus} aria-label="添加" /><BindingProbe /></Provider>`,
       );
       // 编译插件契约由明确的动态绑定场景验证，不要求 Icon 为测试而使用 bx。
       await writeFile(
@@ -121,6 +121,7 @@ test(
       import type {UiConfig} from 'zerodep-svelte-ui';
       export const icon:ComponentProps<typeof Icon>={icon:Search,size:'_sm',color:'_primary'};
       export const named:ComponentProps<typeof Icon>={lucide:'search'};
+      export const selected:ComponentProps<typeof Icon>={lucide:i=>i.search};
       // @ts-expect-error 未知图标名称不能通过类型检查
       export const unknown:ComponentProps<typeof Icon>={lucide:'not-a-lucide-icon'};
       export const raw:ComponentProps<typeof Icon>={icon:Search,size:'18px',color:'blue',strokeWidth:'2px',verticalAlign:'middle'};

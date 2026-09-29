@@ -2,6 +2,7 @@
   import type { SVGAttributes } from 'svelte/elements';
   import type { LucideIconData, LucideIconNode } from '@lucide/icons';
   import type { LucideIconName } from './lucide-names.js';
+  import type { LucideIcons } from './lucide-icons.js';
   import { css, type CssInput } from 'zerodep-css-svelte';
   import { useCss } from '../../provider/context.js';
   import type { UiCss } from '../../provider/css.js';
@@ -25,8 +26,8 @@
     'children' | 'class' | 'color' | 'width' | 'height' | 'viewBox' | 'stroke-width'
   > & {
     icon?: LucideIconData;
-    /** 官方名称字面量，需要 zerodep-svelte-ui/vite；动态选择用 icon。 */
-    lucide?: LucideIconName;
+    /** 编译时选择图标，如 i => i.search；也接受官方名称字面量。 */
+    lucide?: LucideIconName | ((icons: LucideIcons) => LucideIconName);
     /** 系统字号 token 或原始 font-size 值；图标宽高为 1em。 */
     size?: Parameters<UiCss['fontSize']['raw']>[0];
     color?: Parameters<UiCss['color']['raw']>[0];
@@ -40,7 +41,7 @@
   const data = $derived.by(() => {
     if (lucide !== undefined)
       throw new Error(
-        'zerodep-svelte-ui: lucide 仅支持静态字面量，请启用 zerodep-svelte-ui/vite；动态选择请使用 icon={数据}。',
+        'zerodep-svelte-ui: lucide 是编译时图标选择，请启用 zerodep-svelte-ui/vite；动态选择请使用 icon={数据}。',
       );
     if (!icon) throw new Error('zerodep-svelte-ui: Icon 必须提供 icon 或 lucide。');
     return icon;

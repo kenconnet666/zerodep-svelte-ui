@@ -58,3 +58,8 @@ export const hyphenName: Props = { lucide: 'circle-plus' };
 export const both: Props = { icon: Search, lucide: 'search' };
 // @ts-expect-error 官方加号名称为 plus，不添加 add 别名。
 export const unknownLucide: Props = { lucide: 'add' };
+
+export const selected: Props = { lucide: (i) => i.search };
+export const camelCase: Props = { lucide: (i) => i.circlePlus };
+// @ts-expect-error 图标选择器只提供官方名称对应的成员。
+export const badMember: Props = { lucide: (i) => i.notAnIcon };

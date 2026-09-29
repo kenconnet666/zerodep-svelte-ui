@@ -26,6 +26,34 @@ test('静态名称、表达式字面量与官方别名转换，重复名称复�
   );
 });
 
+test('成员回调转换为按需导入，连字符图标使用 camelCase', async () => {
+  const result = await transform(
+    source('<Icon lucide={i => i.search}/><Icon lucide={icons => icons.circlePlus}/>'),
+  );
+  assert.match(result.code, /@lucide\/icons\/icons\/search/);
+  assert.match(result.code, /@lucide\/icons\/icons\/circle-plus/);
+  assert.doesNotMatch(result.code, /i =>|icons =>/);
+  assert.doesNotThrow(() =>
+    compile(result.code, { filename: 'Example.svelte', generate: 'server' }),
+  );
+});
+
+test('选择器不执行代码，不接受计算属性、语句块或外部对象', async () => {
+  for (const selector of [
+    'i => i[name]',
+    'i => i.search()',
+    'i => { return i.search; }',
+    'i => other.search',
+    'async i => i.search',
+    'i => i.notAnIcon',
+  ]) {
+    await assert.rejects(
+      transform(source('<Icon lucide={' + selector + '}/>')),
+      /zerodep-ui-lucide/,
+    );
+  }
+});
+
 test('具名别名、命名空间与注入名称冲突', async () => {
   const result = await transform(
     `<script>import {Icon as Glyph} from 'zerodep-svelte-ui';import * as UI from 'zerodep-svelte-ui';const __zerodepLucide0 = 1;</script><Glyph lucide="search"/><UI.Icon lucide="plus"/>`,
@@ -83,7 +111,7 @@ test('插件跳过非 Svelte 与 style/raw 子请求', async () => {
 });
 
 test('单名称构建只包含所选图标数据，不引入全量或动态加载器', async () => {
-  const transformed = await transform(source('<Icon lucide="search"/>'));
+  const transformed = await transform(source('<Icon lucide={i => i.search}/>'));
   const declaration = transformed.code.match(/import (__zerodepLucide\d+) from ([^;]+);/);
   assert.ok(declaration);
   const result = await build({

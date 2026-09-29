@@ -45,9 +45,53 @@ export async function generateLucideTypes({ check = false } = {}) {
   return names.length;
 }
 
+/** 回调参数使用显式成员，供编辑器在 i. 后直接枚举。 */
+export async function generateLucideIcons({ check = false } = {}) {
+  const { lucideIconNames, lucideDynamicIconImports } = await import(
+    pathToFileURL(require.resolve('@lucide/icons/dynamic')).href
+  );
+  const members = new Map();
+  for (const name of [...new Set(lucideIconNames)].sort()) {
+    const member = name.replace(/-([a-z0-9])/g, (_, letter) => letter.toUpperCase());
+    if (!/^[a-zA-Z_$][\w$]*$/.test(member)) {
+      throw new Error(`Lucide 成员名称无效或冲突：${name}`);
+    }
+    if (members.has(member)) {
+      // arrow-down-0-1 / arrow-down-01 等官方别名可折叠到同一个成员。
+      const previous = (await lucideDynamicIconImports[members.get(member)]()).default;
+      const current = (await lucideDynamicIconImports[name]()).default;
+      if (!previous.name || previous.name !== current.name)
+        throw new Error(`Lucide 成员冲突：${member}`);
+      continue;
+    }
+    members.set(member, name);
+  }
+  const file = fileURLToPath(
+    new URL('../packages/ui/src/lib/display/gene/lucide-icons.ts', import.meta.url),
+  );
+  const source = await format(
+    '// 由 pnpm lucide:generate 生成；不要手工编辑。\n' +
+      '/** 编译时图标选择器；只提供成员类型，不创建运行时图标对象。 */\n' +
+      `export interface LucideIcons {\n${[...members].map(([member, name]) => `  readonly ${member}: ${JSON.stringify(name)};`).join('\n')}\n}\n`,
+    { ...(await resolveConfig(file)), filepath: file },
+  );
+  let current;
+  try {
+    current = await readFile(file, 'utf8');
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
+  if (check) {
+    if (current?.replaceAll('\r\n', '\n') !== source)
+      throw new Error('Lucide 成员类型未同步，请运行 pnpm lucide:generate。');
+  } else if (current !== source) await writeFile(file, source);
+  return members.size;
+}
+
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
   const check = process.argv.includes('--check');
+  const members = await generateLucideIcons({ check });
   console.log(
-    `Lucide 字面量类型${check ? '检查' : '生成'}完成：${await generateLucideTypes({ check })} 个名称。`,
+    `Lucide 类型${check ? '检查' : '生成'}完成：${await generateLucideTypes({ check })} 个名称，${members} 个成员。`,
   );
 }
