@@ -121,7 +121,7 @@ test('已使用过的主题组合复用规则，卸载子树不影响兄弟', as
     await screen.rerender({ theme });
     await expect
       .element(screen.getByTestId('root-value'))
-      .toHaveTextContent(theme.colorScheme + ' / zh-CN / Asia/Shanghai');
+      .toHaveTextContent(theme.themeName + ' / zh-CN / Asia/Shanghai');
   }
   expect(cssStats().rules).toBe(rules);
   await screen.rerender({ showNested: false });

@@ -12,7 +12,7 @@ Provider 使用 Svelte context 注入三个普通 JS 对象；公共消费入口
 
 ## 配置对象与继承
 
-- theme: UiTheme，包含 colorScheme、color、fontSize。默认 lightTheme，同时提供 darkTheme；应用可用对象展开创建其他主题。主题展示名称由应用管理，不放入主题对象。
+- theme: UiTheme，包含 themeName、color、fontSize。themeName 为 light/dark，默认 lightTheme，同时提供 darkTheme；应用可用对象展开创建其他主题。品牌主题的展示名称由应用管理。
 - lang: UiLanguage，包含 code 和通用 messages。默认 zhCNLanguage，另有 enUSLanguage。Provider 容器的 lang 来自该对象。
 - locale: UiLocale，包含 code 和显式 IANA timeZone。默认 chinaLocale，另有 usLocale。通过 Intl 格式化日期/数值；不读取服务器或浏览器的默认时区。
 - 三个维度独立继承。显式对象整体覆盖，不做隐式深合并；undefined 恢复最近父级，根部恢复默认值。

@@ -53,7 +53,7 @@
   {...rest}
   lang={config.lang.code}
   class={styleClass(
-    s.colorScheme.raw(config.theme.colorScheme),
+    s.colorScheme.raw(config.theme.themeName),
     s.color.raw(config.theme.color.text),
     className,
   )}

@@ -20,7 +20,7 @@
 </script>
 
 <span data-testid={name} class={appearance}
-  >{config.theme.colorScheme} / {config.lang.code} / {config.locale.timeZone}</span
+  >{config.theme.themeName} / {config.lang.code} / {config.locale.timeZone}</span
 >
 <span data-testid={name + '-message'}>{config.lang.messages.loading}</span>
 <time data-testid={name + '-time'}>{time}</time>

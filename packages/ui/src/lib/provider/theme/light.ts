@@ -1,7 +1,7 @@
 import type { UiTheme } from './types.js';
 
 export const lightTheme: UiTheme = Object.freeze({
-  colorScheme: 'light',
+  themeName: 'light',
   color: Object.freeze({
     background: '#ffffff',
     surface: '#f3f4f6',

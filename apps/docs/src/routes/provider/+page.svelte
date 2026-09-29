@@ -95,7 +95,11 @@
   <h2>属性</h2>
   <table>
     <thead><tr><th>属性</th><th>含义</th></tr></thead><tbody>
-      <tr><td>theme</td><td>UiTheme：颜色、字号和 colorScheme。根部默认 lightTheme。</td></tr>
+      <tr
+        ><td>theme</td><td
+          >UiTheme：颜色、字号和 themeName（light / dark）。根部默认 lightTheme。</td
+        ></tr
+      >
       <tr
         ><td>lang</td><td
           >UiLanguage：语言代码和通用文案。根部默认 zhCNLanguage，同时设置容器 lang。</td
