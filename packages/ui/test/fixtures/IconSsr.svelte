@@ -6,7 +6,10 @@
   let {
     label = '搜索',
     appearance = {},
-  }: { label?: string; appearance?: Partial<ComponentProps<typeof Icon>> } = $props();
+  }: {
+    label?: string;
+    appearance?: Partial<Omit<ComponentProps<typeof Icon>, 'icon' | 'lucide'>>;
+  } = $props();
 </script>
 
 <Provider theme={darkTheme}>

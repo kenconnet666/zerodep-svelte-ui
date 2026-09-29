@@ -6,11 +6,23 @@ import type { LucideIconData } from '@lucide/icons';
 import { Css, css } from 'zerodep-css-svelte';
 import { lightTheme, darkTheme, UiCss } from '../src/lib/index.js';
 import IconHarness from './fixtures/IconHarness.svelte';
+import LucideHarness from './fixtures/LucideHarness.svelte';
 import IconButtonHarness from './fixtures/IconButtonHarness.svelte';
 import IconThemeHarness from './fixtures/IconThemeHarness.svelte';
 import IconPropsMutable from './fixtures/IconPropsMutable.svelte';
 
 afterEach(cleanup);
+
+test('lucide 字面量按需渲染并随条件切换，名称不透传到 SVG', async () => {
+  const screen = await render(LucideHarness, {});
+  const icon = screen.getByTestId('lucide-icon');
+  await expect.element(screen.getByRole('img', { name: '搜索' })).toBeVisible();
+  expect(icon.element().querySelector('circle')).not.toBeNull();
+  expect(icon.element().hasAttribute('lucide')).toBe(false);
+  await screen.rerender({ plus: true });
+  await expect.element(screen.getByRole('img', { name: '添加' })).toBeVisible();
+  expect(icon.element().querySelector('circle')).toBeNull();
+});
 
 test('原始 CSS 输入直接生效，undefined 恢复 Svelte 默认值', async () => {
   const screen = await render(IconHarness, {

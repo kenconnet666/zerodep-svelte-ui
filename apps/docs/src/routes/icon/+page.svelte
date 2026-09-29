@@ -47,6 +47,28 @@
 <p class="lead">传入图标数据，统一使用组件库的尺寸、颜色和主题。</p>
 
 <section class="prose">
+  <h2>按名称使用</h2>
+  <div class={row}>
+    <Icon lucide="search" aria-label="按名称搜索" data-lucide-search />
+    <Icon lucide="plus" aria-label="按名称添加" data-lucide-plus />
+  </div>
+  <pre class={code}><code
+      >{`<Icon lucide="search" />
+<Icon lucide="plus" />
+<Icon lucide="circle-plus" color="_primary" />`}</code
+    ></pre>
+  <p>
+    lucide 提供官方名称的字面量补全；加号使用 plus。启用 zerodep-svelte-ui/vite
+    后，名称编译为单个图标导入，SSR 同步输出图形。 icon 与 lucide 二选一；动态选择继续使用 <code
+      >icon=&#123;数据&#125;</code
+    >。lucide 仅支持实例脚本从包入口显式导入的 Icon（含别名、命名空间），不支持属性 spread
+    或跨文件再导出。
+  </p>
+  <pre class={code}><code
+      >{`import uiIcons from 'zerodep-svelte-ui/vite';
+// 放在 Svelte/SvelteKit 插件之前，CSS 绑定插件仍需启用。
+plugins: [uiIcons(), cssBindings(), sveltekit()]`}</code
+    ></pre>
   <h2>直接设置外观</h2>
   <label><input type="checkbox" bind:checked={customAppearance} /> 使用自定义外观</label>
   <Icon
@@ -123,9 +145,10 @@ import { Provider, Icon } from 'zerodep-svelte-ui';`}</code
     <thead><tr><th>属性</th><th>说明</th></tr></thead><tbody>
       <tr
         ><td>icon</td><td
-          >必填，LucideIconData 图形数据，支持响应式替换，不接受子组件或 children。</td
+          >LucideIconData 图形数据，与 lucide 二选一，支持响应式替换，不接受子组件或 children。</td
         ></tr
       >
+      <tr><td>lucide</td><td>官方名称字符串字面量，需要 UI 编译插件；与 icon 二选一。</td></tr>
       <tr
         ><td>size</td><td
           >fontSize.raw() 的输入，默认 _md；支持全部系统字号、18px、1.25rem、inherit

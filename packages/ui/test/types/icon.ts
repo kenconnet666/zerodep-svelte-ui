@@ -51,3 +51,10 @@ export const badComponent: Props = { icon: Icon };
 
 // @ts-expect-error Icon 不再接收组件 tokens。
 export const oldComponentToken: Props = { icon: Search, tokens: { strokeWidth: 2 } };
+
+export const named: Props = { lucide: 'search' };
+export const hyphenName: Props = { lucide: 'circle-plus' };
+// @ts-expect-error icon 与 lucide 必须二选一。
+export const both: Props = { icon: Search, lucide: 'search' };
+// @ts-expect-error 官方加号名称为 plus，不添加 add 别名。
+export const unknownLucide: Props = { lucide: 'add' };
