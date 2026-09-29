@@ -1,15 +1,17 @@
 <script lang="ts">
   import { untrack, type Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
-  import { css as styleClass } from 'zerodep-css-svelte';
+  import { css as styleClass, type CssInput } from 'zerodep-css-svelte';
   import { UiCss, type UiTheme } from './css.js';
   import { parentConfig, provideConfig, type UiConfig } from './context.js';
 
-  type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'lang' | 'dir'> & {
+  type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class' | 'lang' | 'dir'> & {
     css?: UiCss;
     theme?: UiTheme;
     locale?: string;
     children?: Snippet;
+    /** 与默认声明合成；传入当前宿主的 css() 结果或 CSS 声明。 */
+    class?: CssInput;
   };
 
   let { css, theme, locale, children, class: className, ...rest }: Props = $props();
@@ -36,16 +38,14 @@
     }
   });
 
-  const themes = {
-    light: styleClass(s._selector('@layer zerodep-ui', s.theme('light'), s.color._text)),
-    dark: styleClass(s._selector('@layer zerodep-ui', s.theme('dark'), s.color._text)),
-  };
   // 仅改语言的内层容器不重置父级已覆盖的 CSS 变量或文字颜色。
-  const themeClass = $derived(
-    !parent || initialCss !== undefined || theme !== undefined ? themes[config.theme] : undefined,
-  );
+  const ownsTheme = $derived(!parent || initialCss !== undefined || theme !== undefined);
 </script>
 
-<div {...rest} lang={config.locale} class={[themeClass, className]}>
+<div
+  {...rest}
+  lang={config.locale}
+  class={styleClass(ownsTheme && [s.theme(config.theme), s.color._text], className)}
+>
   {@render children?.()}
 </div>

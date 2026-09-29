@@ -118,7 +118,14 @@ CSS 作者实例和 SSR 宿主按作用域/请求隔离，没有使用本地兄�
 
 useCss() 取得当前作者，useConfig() 取得只读的有效配置，均在后代组件初始化时调用。组件 props 默认值直接写在 $props()；size/color 等语义属性由组件映射到 UiCss 属性。自定义主题可继承 UiCss 并覆盖 theme(mode)，自定义作者属性可继承对应的 UiColorCss 等类型。
 
-Provider 提供真实 div 容器、主题变量、color-scheme 与文字颜色，背景和布局由使用者设置。默认规则在 @layer zerodep-ui 中，未分层的外部 CSS 可覆盖。只有显式 theme/css 的内层容器重建主题边界，语言覆盖不会抹掉父级局部 token。网页示例位于 /provider。
+Provider 提供真实 div 容器、主题变量、color-scheme 与文字颜色，背景和布局由使用者设置。默认声明与外部 class 在一次 css(...) 中按顺序合成，不使用 @layer；外部输入放在最后。只有显式 theme/css 的内层容器重建主题边界，语言覆盖不会抹掉父级局部 token。网页示例位于 /provider。
+
+Provider 和 Icon 的 class 使用 CssInput，优先传入同一 CSS 宿主的 css(...) 结果；也接受声明字符串、嵌套数组及 false/null/undefined 条件空项。组件最终使用一个组合类，同等层叠条件下外部声明覆盖默认值。普通类名、多类名字符串和条件对象不作为原生 class 透传；style 仍是原生内联样式。SSR 中先在当前请求宿主登记外部类，客户端沿用同一宿主的水合清单。
+
+```svelte
+<!-- s 来自所在 Provider 的 useCss()，css 从 zerodep-css-svelte 导入。 -->
+<Icon icon={Search} class={css(s.width.px(30), s.color.red)} />
+```
 
 ## Icon
 

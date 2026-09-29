@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from 'vitest';
 import { cleanup, render } from 'vitest-browser-svelte';
-import { cssStats } from 'zerodep-css-svelte';
+import { css, cssStats } from 'zerodep-css-svelte';
 import { UiCss, UiColorCss } from '../src/lib/index.js';
 import ProviderHarness from './fixtures/ProviderHarness.svelte';
 
@@ -12,7 +12,6 @@ test('后代共享作者，配置随父级更新，覆盖撤销后恢复继承',
   expect(authors).toHaveLength(4);
   expect(new Set(authors).size).toBe(1);
   await expect.element(screen.getByTestId('root')).toHaveAttribute('lang', 'zh-CN');
-  await expect.element(screen.getByTestId('root')).toHaveClass('custom', 'active');
   await expect.element(screen.getByTestId('nested-value')).toHaveTextContent('light / zh-CN');
 
   await screen.rerender({ theme: 'dark', locale: 'en-US' });
@@ -65,6 +64,9 @@ test('仅覆盖语言保留父变量，主题覆盖及自定义作者只影响�
 
 test('主题反复切换不累加规则，内层卸载保留兄弟样式', async () => {
   const screen = await render(ProviderHarness, {});
+  // 按实际使用登记主题；两种组合首次出现后，切换只命中缓存。
+  await screen.rerender({ theme: 'dark' });
+  await screen.rerender({ theme: 'light' });
   const rules = cssStats().rules;
   for (const theme of ['dark', 'light', 'dark', 'light'] as const) {
     await screen.rerender({ theme });
@@ -76,4 +78,31 @@ test('主题反复切换不累加规则，内层卸载保留兄弟样式', async
   await expect
     .element(screen.getByTestId('sibling-value'))
     .toHaveStyle({ color: 'rgb(29, 78, 216)' });
+});
+
+test('外部 css 先登记也能覆盖主题默认值，合成一个类并支持撤销', async () => {
+  const s = new UiCss();
+  const override = css(s.color.green, '--ui-color-primary:rgb(128, 0, 128);');
+  const screen = await render(ProviderHarness, { className: override, nestedLocale: 'en-US' });
+  const root = screen.getByTestId('root');
+  expect(root.element().classList).toHaveLength(1);
+  await expect.element(root).toHaveStyle({ color: 'rgb(0, 128, 0)' });
+  await expect
+    .element(screen.getByTestId('nested-value'))
+    .toHaveStyle({ color: 'rgb(128, 0, 128)' });
+
+  await screen.rerender({ theme: 'dark' });
+  await expect.element(root).toHaveStyle({ color: 'rgb(0, 128, 0)' });
+  await expect
+    .element(screen.getByTestId('nested-value'))
+    .toHaveStyle({ color: 'rgb(128, 0, 128)' });
+  expect(root.element().classList).toHaveLength(1);
+
+  await screen.rerender({ className: css(s.color.red) });
+  await expect.element(root).toHaveStyle({ color: 'rgb(255, 0, 0)' });
+  await expect
+    .element(screen.getByTestId('nested-value'))
+    .toHaveStyle({ color: 'rgb(147, 197, 253)' });
+  await screen.rerender({ className: undefined });
+  await expect.element(root).toHaveStyle({ color: 'rgb(249, 250, 251)' });
 });

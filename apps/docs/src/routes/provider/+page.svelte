@@ -69,7 +69,8 @@
       <tr><td>css</td><td>UiCss 实例；只用于作用域初始化，更换时用 key 重建 Provider。</td></tr>
       <tr><td>theme</td><td>light / dark；根部默认 light，子级默认继承。</td></tr>
       <tr><td>locale</td><td>语言与格式化区域，同时设置容器 lang；根部默认 zh-CN。</td></tr>
-      <tr><td>class / style</td><td>传给实际 div 容器，可覆盖主题变量与默认样式。</td></tr>
+      <tr><td>class</td><td>CssInput；外部 css() 结果放在默认声明之后，合成一个类。</td></tr>
+      <tr><td>style</td><td>原生 div 内联样式，可覆盖主题变量与默认样式。</td></tr>
     </tbody>
   </table>
   <h2>接入约定</h2>
@@ -84,6 +85,8 @@
   </p>
   <p>
     容器提供主题变量、文字颜色和 color-scheme，背景由调用方选择；示例显式使用了
-    backgroundColor._background。层外用户 class 可覆盖组件默认规则。
+    backgroundColor._background。class 优先传入同一宿主的 css() 结果，也接受 CSS
+    声明、嵌套数组和条件空项；
+    不透传普通类名、多类名字符串或条件对象。同等层叠条件下，外部声明覆盖默认值。
   </p>
 </section>

@@ -9,7 +9,10 @@ export const valid: Props = {
   color: 'primary',
   strokeWidth: 1.5,
   'aria-label': '搜索',
+  class: ['width:24px;', [false, null, 'color:red;']],
 };
+// @ts-expect-error class 使用 CssInput，不接受原生 class 条件对象。
+export const badClass: Props = { icon: Search, class: { active: true } };
 // @ts-expect-error 必须传入图标数据。
 export const missing: Props = {};
 // @ts-expect-error 图标名字符串不是 SVG 资源。

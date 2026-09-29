@@ -38,6 +38,13 @@ test('正式包产物的 Provider 隔离并发 SSR，嵌套作用域共享请求
   assert.equal(a.authors.length, 2);
   assert.equal(a.authors[0], a.authors[1]);
   assert.notEqual(a.authors[0], b.authors[0]);
+  for (const result of [a, b]) {
+    const name = result.body.match(/<div[^>]*class="([^"]+)"/)?.[1];
+    assert.match(name, /^z-[a-z0-9]+$/);
+    const body = result.rules.find((rule) => rule.className === name).body;
+    assert.match(body, /color:var\(--ui-color-text\);color:green;$/);
+    assert.doesNotMatch(body, /@layer/);
+  }
 });
 
 test('缺少 Provider 或 SSR 宿主时明确失败', () => {
@@ -52,6 +59,15 @@ test('正式包产物的 Icon 在 SSR 输出 SVG、名称和 bx 初始样式', (
   assert.match(result.body, /<path/);
   assert.match(result.body, /<circle/);
   assert.doesNotMatch(result.body, /\skey=/);
-  assert.match(result.css, /stroke-width:var\(--/);
-  assert.match(result.css, /:1\.5;/);
+  const variable = result.css.match(/stroke-width:var\((--[\w-]+)\)/)?.[1];
+  assert.ok(variable);
+  // 直接组合声明可使用元素绑定：SSR 初值在 SVG 上，规则引用同一个变量。
+  const svg = result.body.match(/<svg\b(?:[^>"']|"[^"]*"|'[^']*')*>/)?.[0];
+  assert.match(svg, new RegExp(`${variable}:\\s*1\\.5(?:;|")`));
+  const name = svg.match(/\bclass="([^"]+)"/)?.[1];
+  assert.match(name, /^z-[a-z0-9]+$/);
+  const body = result.rules.find((rule) => rule.className === name).body;
+  assert.match(body, /width:1em;/);
+  assert.match(body, /width:30px;$/);
+  assert.doesNotMatch(body, /@layer/);
 });

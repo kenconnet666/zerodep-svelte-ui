@@ -94,10 +94,8 @@ import { Provider, Icon } from 'zerodep-svelte-ui';`}</code
       >
       <tr><td>strokeWidth</td><td>数值，默认 2；编译为 CSS 变量，连续更新不重新登记样式类。</td></tr
       >
-      <tr
-        ><td>class / style</td><td>根 SVG 的外部样式；精确尺寸和自定义颜色可以通过它们设置。</td
-        ></tr
-      >
+      <tr><td>class</td><td>CssInput；外部 css() 结果放在默认声明之后，合成一个类。</td></tr>
+      <tr><td>style</td><td>根 SVG 的原生内联样式。</td></tr>
     </tbody>
   </table>
   <h2>可访问性</h2>
@@ -106,6 +104,11 @@ import { Provider, Icon } from 'zerodep-svelte-ui';`}</code
     优先。仅图标按钮把名称放在按钮上，图标本身不增加 Tab 停靠点。
   </p>
   <h2>主题与扩展</h2>
+  <pre><code>{`<Icon icon={Search} class={css(s.width.px(30), s.color.red)} />`}</code></pre>
+  <p>
+    class 优先传入同一宿主的 css() 结果，也接受 CSS 声明、嵌套数组和条件空项；
+    不透传普通类名、多类名字符串或条件对象。同等层叠条件下，外部声明覆盖默认值。
+  </p>
   <p>
     Icon 不创建 Css 实例，读取最近 Provider 注入的 UiCss。应用可覆盖 UiFontSizeCss、UiColorCss 或
     UiCss.theme。viewBox 来自图标数据；图形节点保留 SVG 命名空间，不修改共享资源。

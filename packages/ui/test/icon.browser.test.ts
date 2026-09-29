@@ -47,11 +47,22 @@ test('继承作者扩展、外部 class 和文字颜色，不在 Icon 创建作�
   await expect
     .element(screen.getByTestId('icon'))
     .toHaveStyle({ width: '21px', color: 'rgb(128, 0, 128)' });
-  await screen.rerender({ iconProps: { icon: Search, class: [override, { custom: true }] } });
+  await screen.rerender({ iconProps: { icon: Search, class: override } });
   await expect
     .element(screen.getByTestId('icon'))
     .toHaveStyle({ width: '30px', height: '30px', color: 'rgb(0, 128, 0)' });
-  await expect.element(screen.getByTestId('icon')).toHaveClass('custom');
+  expect(screen.getByTestId('icon').element().classList).toHaveLength(1);
+  await screen.rerender({
+    iconProps: { icon: Search, size: 'sm', color: 'danger', class: override },
+    theme: 'dark',
+  });
+  await expect
+    .element(screen.getByTestId('icon'))
+    .toHaveStyle({ width: '30px', color: 'rgb(0, 128, 0)' });
+  await screen.rerender({ iconProps: { icon: Search } });
+  await expect
+    .element(screen.getByTestId('icon'))
+    .toHaveStyle({ width: '21px', color: 'rgb(128, 0, 128)' });
 });
 
 test('名称和装饰性状态可切换，显式 aria-hidden 保持优先', async () => {
@@ -66,7 +77,8 @@ test('名称和装饰性状态可切换，显式 aria-hidden 保持优先', asyn
   await expect.element(screen.getByTestId('icon')).toHaveAttribute('aria-hidden', 'true');
 });
 
-test('bx 连续更新保持类和规则稳定，卸载回收绑定', async () => {
+test('bx 连续更新保持类和规则稳定，卸载不遗留绑定', async () => {
+  const bindingsBefore = cssStats().bindings;
   const screen = await render(IconHarness, { iconProps: { icon: Search } });
   const icon = screen.getByTestId('icon');
   const initial = cssStats();
@@ -81,7 +93,7 @@ test('bx 连续更新保持类和规则稳定，卸载回收绑定', async () =>
   expect(icon.element().getAttribute('class')).toBe(initialClass);
   await screen.rerender({ show: false });
   await expect.element(icon).not.toBeInTheDocument();
-  await expect.poll(() => cssStats().bindings).toBeLessThan(initial.bindings);
+  await expect.poll(() => cssStats().bindings).toBe(bindingsBefore);
 });
 
 test('嵌套 SVG 节点和非正方形 viewBox 保持结构', async () => {

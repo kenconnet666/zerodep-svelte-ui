@@ -129,7 +129,11 @@ test(
       for(const enabled of [true,false]){
         const server=await createServer({configFile:false,root:process.cwd(),logLevel:'error',plugins:[...(enabled?[bindings()]:[]),svelte({configFile:false})],server:{middlewareMode:true},ssr:{noExternal:['zerodep-svelte-ui','zerodep-css','zerodep-css-svelte']}});
         try{const entry=await server.ssrLoadModule('/entry.ts');
-          if(enabled){const result=entry.run();assert(result.body.includes('<svg'));assert(result.body.includes('role="img"'));assert(result.body.includes('<circle'));assert(result.css.includes(':1.25;'));}
+          if(enabled){
+            const result=entry.run();assert(result.body.includes('<svg'));assert(result.body.includes('role="img"'));assert(result.body.includes('<circle'));
+            const variable=result.css.split('stroke-width:var(')[1]?.split(')')[0];assert(variable);
+            assert(result.body.includes(variable+': 1.25;')||result.body.includes(variable+': 1.25"'));
+          }
           else assert.throws(()=>entry.run(),/bx/);
         }finally{await server.close();}
       }

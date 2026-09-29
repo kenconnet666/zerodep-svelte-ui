@@ -14,7 +14,7 @@ export async function renderProvider(theme: UiTheme, locale: string, brand: stri
     const body = render(ProviderSsr, {
       props: { theme, locale, brand, onRead: (s) => authors.push(s) },
     }).body;
-    return { body, css: host.cssText(), authors };
+    return { body, css: host.cssText(), authors, rules: host.rules() };
   });
 }
 
@@ -34,5 +34,5 @@ export function renderWithoutHost() {
 export function renderIcon(label: string) {
   const host = createServerCssHost();
   const body = withCssHost(host, () => render(IconSsr, { props: { label } }).body);
-  return { body, css: host.cssText() };
+  return { body, css: host.cssText(), rules: host.rules() };
 }

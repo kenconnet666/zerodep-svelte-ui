@@ -6,8 +6,10 @@ export const valid: Props = {
   css: new UiCss(),
   theme: 'dark',
   locale: 'en-US',
-  class: ['app', { ready: true }],
+  class: ['color:red;', [false, undefined, 'padding:4px;']],
 };
+// @ts-expect-error class 使用 CssInput，不接受原生 class 条件对象。
+export const badClass: Props = { class: { ready: true } };
 // @ts-expect-error 第一版只支持明确的亮暗模式。
 export const badTheme: Props = { theme: 'system' };
 // @ts-expect-error dir 不属于 Provider API。

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Provider, UiCss, type UiTheme } from 'zerodep-svelte-ui';
+  import { css } from 'zerodep-css-svelte';
   import PublicConfigProbe from './PublicConfigProbe.svelte';
   let {
     theme,
@@ -20,7 +21,7 @@
   const author = new RequestCss();
 </script>
 
-<Provider css={author} {theme} {locale}>
+<Provider css={author} {theme} {locale} class={css(author.color.green)}>
   <PublicConfigProbe {onRead} />
   <Provider locale="ja-JP"><PublicConfigProbe {onRead} /></Provider>
 </Provider>
