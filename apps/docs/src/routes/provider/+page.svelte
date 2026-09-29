@@ -109,11 +109,6 @@
     恢复继承；不自动深合并。自定义配置可用对象展开从预设构建。
   </p>
   <h2>属性</h2>
-  <p>
-    components 用于配置当前子树的组件 token，例如 <code
-      >{"components={{ Icon: { _sizeMd: '20px' } }}"}</code
-    >。它逐字段叠加父级覆盖，undefined 不覆盖；系统 theme 仍采用完整对象替换。
-  </p>
   <table>
     <thead><tr><th>属性</th><th>含义</th></tr></thead><tbody>
       <tr

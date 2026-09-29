@@ -108,12 +108,16 @@ test('Icon 文档通过真实组件演示语义外观、主题、bx 与键盘行
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/icon/');
   await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
-  await expect(page.locator('[data-icon-token-scope]')).toHaveCSS('width', '16px');
-  await page.getByRole('checkbox', { name: '启用作用域尺寸覆盖（28px）' }).check();
-  await expect(page.locator('[data-icon-token-scope]')).toHaveCSS('width', '28px');
-  await expect(page.locator('[data-icon-token-local]')).toHaveCSS('width', '32px');
-  await page.getByRole('checkbox', { name: '启用作用域尺寸覆盖（28px）' }).uncheck();
-  await expect(page.locator('[data-icon-token-scope]')).toHaveCSS('width', '16px');
+  const custom = page.locator('[data-icon-custom]');
+  await expect(custom).toHaveCSS('width', '16px');
+  await page.getByRole('checkbox', { name: '使用自定义外观' }).check();
+  await expect(custom).toHaveCSS('width', '28px');
+  await expect(custom).toHaveCSS('color', 'rgb(126, 34, 206)');
+  await expect(custom).toHaveCSS('stroke-width', '3px');
+  await expect(custom).toHaveCSS('vertical-align', 'middle');
+  await page.getByRole('checkbox', { name: '使用自定义外观' }).uncheck();
+  await expect(custom).toHaveCSS('width', '16px');
+  await expect(custom).toHaveCSS('stroke-width', '2px');
   const icon = page.getByRole('img', { name: '预览图标' });
   await expect(icon).toHaveCSS('width', '16px');
   expect(await icon.locator('circle').evaluate((el) => el.namespaceURI)).toBe(
@@ -122,7 +126,7 @@ test('Icon 文档通过真实组件演示语义外观、主题、bx 与键盘行
   await page.getByRole('combobox', { name: '尺寸', exact: true }).selectOption('_lg');
   await page.getByRole('combobox', { name: '颜色', exact: true }).selectOption('_success');
   await page.getByRole('combobox', { name: '主题', exact: true }).selectOption('dark');
-  await expect(icon).toHaveCSS('width', '24px');
+  await expect(icon).toHaveCSS('width', '20px');
   await expect(icon).toHaveCSS('color', 'rgb(134, 239, 172)');
   const stableClass = await icon.getAttribute('class');
   await page.getByRole('slider', { name: '描边', exact: true }).press('ArrowRight');

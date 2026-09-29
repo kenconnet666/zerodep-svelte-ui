@@ -1,21 +1,15 @@
 <script lang="ts">
+  import type { ComponentProps } from 'svelte';
   import { Search, Check } from '@lucide/icons';
-  import {
-    Icon,
-    Provider,
-    useCss,
-    type UiColor,
-    type UiSize,
-    lightTheme,
-    darkTheme,
-  } from 'zerodep-svelte-ui';
+  import { Icon, Provider, useCss, lightTheme, darkTheme } from 'zerodep-svelte-ui';
   import { css } from 'zerodep-css-svelte';
 
   const s = useCss();
   const panel = css(s.padding.rem(1.5), s.borderRadius.px(12));
   const row = css(s.display.flex, s.alignItems.center, s.gap.rem(1.5), s.flexWrap.wrap);
   const code = css(s.whiteSpace.preWrap, s.overflowWrap.anywhere);
-  const colors: UiColor[] = [
+  type IconProps = ComponentProps<typeof Icon>;
+  const colors: IconProps['color'][] = [
     'inherit',
     '_text',
     '_muted',
@@ -25,15 +19,18 @@
     '_success',
     '_warning',
     '_danger',
+    '_onPrimary',
+    '#7e22ce',
+    'currentColor',
   ];
   let choice = $state<'Search' | 'Check'>('Search');
-  let size = $state<UiSize>('_md');
-  let color = $state<UiColor>('_primary');
+  let size = $state<IconProps['size']>('_md');
+  let color = $state<IconProps['color']>('_primary');
   let theme = $state<'light' | 'dark'>('light');
   const selectedTheme = $derived(theme === 'light' ? lightTheme : darkTheme);
   let strokeWidth = $state(2);
   let searches = $state(0);
-  let customTokens = $state(false);
+  let customAppearance = $state(false);
   const selected = $derived(choice === 'Search' ? Search : Check);
 </script>
 
@@ -50,33 +47,26 @@
 <p class="lead">传入图标数据，统一使用组件库的尺寸、颜色和主题。</p>
 
 <section class="prose">
-  <h2>组件 token</h2>
-  <label><input type="checkbox" bind:checked={customTokens} /> 启用作用域尺寸覆盖（28px）</label>
-  <Provider components={{ Icon: { _sizeMd: customTokens ? '28px' : undefined } }}>
-    <Icon icon={Search} color="_primary" aria-label="作用域 token 图标" data-icon-token-scope />
-    <Icon
-      icon={Check}
-      color="_success"
-      tokens={{ _sizeMd: '32px' }}
-      aria-label="实例 token 图标"
-      data-icon-token-local
-    />
-  </Provider>
-  <p>
-    覆盖顺序：当前系统主题派生默认值 → 外层 Provider → 内层 Provider → 当前 Icon 的
-    tokens。undefined 恢复继承；显式 strokeWidth prop 优先于描边 token。
-  </p>
+  <h2>直接设置外观</h2>
+  <label><input type="checkbox" bind:checked={customAppearance} /> 使用自定义外观</label>
+  <Icon
+    icon={Search}
+    size={customAppearance ? '28px' : undefined}
+    color={customAppearance ? '#7e22ce' : undefined}
+    strokeWidth={customAppearance ? '3px' : undefined}
+    verticalAlign={customAppearance ? 'middle' : undefined}
+    aria-label="自定义外观图标"
+    data-icon-custom
+  />
+  <p>四个属性直接接收对应 CSS 属性的输入；省略或传 undefined 时使用组件默认值。</p>
   <pre class={code}><code
-      >{`<Provider components={{ Icon: { _sizeMd: '28px' } }}>
-  <Icon icon={Search} />
-  <Icon icon={Check} tokens={{ _sizeMd: '32px' }} />
-</Provider>`}</code
+      >{`<Icon icon={Search} size="18px" color="#7e22ce" strokeWidth={1.75} verticalAlign="middle" />
+<Icon icon={Check} size="_xl" color="_success" />`}</code
     ></pre>
   <p>
-    IconTokens 包含
-    _sizeSm/_sizeMd/_sizeLg、_colorText、_colorMuted、_colorTextDisabled、_colorPrimary、_colorInfo、_colorSuccess、_colorWarning、_colorDanger、_strokeWidth
-    和 _verticalAlign。尺寸默认保持 14/16/24px（根字号 16px）；large 使用系统字号 _xl，与正文 _lg
-    分开。
+    size 使用系统字号或带单位的 CSS 值，宽高为 1em；_lg 对应 20px，_xl 对应 24px（根字号 16px）。
+    color 使用系统颜色 token 或原始 CSS 颜色。主题 token 必须带下划线；未知字符串沿用 raw()
+    的行为，不进行拼写校验。
   </p>
 </section>
 
@@ -86,7 +76,9 @@
   >
   <label
     >尺寸 <select bind:value={size}
-      ><option>_sm</option><option>_md</option><option>_lg</option></select
+      ><option>_xs</option><option>_sm</option><option>_md</option><option>_lg</option><option
+        >_xl</option
+      ><option>_2xl</option><option>18px</option><option>inherit</option></select
     ></label
   >
   <label
@@ -134,15 +126,27 @@ import { Provider, Icon } from 'zerodep-svelte-ui';`}</code
           >必填，LucideIconData 图形数据，支持响应式替换，不接受子组件或 children。</td
         ></tr
       >
-      <tr><td>size</td><td>_sm / _md / _lg，默认 _md，选择组件尺寸 token，默认 14/16/24px。</td></tr
+      <tr
+        ><td>size</td><td
+          >fontSize.raw() 的输入，默认 _md；支持全部系统字号、18px、1.25rem、inherit
+          等，不把非零数字转换成 px。</td
+        ></tr
       >
       <tr
         ><td>color</td><td
-          >inherit / _text / _muted / _textDisabled / _primary / _info / _success / _warning /
-          _danger，默认 inherit。</td
+          >color.raw() 的输入，默认 inherit；支持全部系统颜色 token、原始颜色和 CSS 关键字。</td
         ></tr
       >
-      <tr><td>strokeWidth</td><td>数值，默认 2；编译为 CSS 变量，连续更新不重新登记样式类。</td></tr
+      <tr
+        ><td>strokeWidth</td><td
+          >strokeWidth.raw() 的输入，默认 2；支持数字、长度和 CSS 关键字。数值及长度通过 bx
+          连续更新；全局关键字直接作用于描边。</td
+        ></tr
+      >
+      <tr
+        ><td>verticalAlign</td><td
+          >verticalAlign.raw() 的输入，默认 -0.125em；例如 middle、baseline、0px。</td
+        ></tr
       >
       <tr><td>class</td><td>CssInput；外部 css() 结果放在默认声明之后，合成一个类。</td></tr>
       <tr><td>style</td><td>根 SVG 的原生内联样式。</td></tr>

@@ -117,7 +117,7 @@ Provider 位于 src/lib/provider/Provider.svelte，三个子目录分别提供 J
 
 必须在消费组件外包裹 Provider；组件、useCss()、useTheme()、useLocale() 和 useLang() 缺少 Provider 时直接报错，不创建隐式默认作者。同一个组件的初始化代码不能读取自己模板中 Provider 提供的 context。每个 Provider 创建独立 UiCss，传入当前主题的读取函数；useCss() 返回带主题语义属性的工具，useTheme()、useLocale()、useLang() 分别返回对应的只读对象。可选 css prop 为 (readTheme) => new AppCss(readTheme)，创建函数向下继承，但实例不共享；只用于初始化，更换函数需用 key 块重建。
 
-主题通过 Svelte context 向下传递，并注入 UiCss。组件在模板或 $derived 中使用 s.color._primary、s.backgroundColor._surface、s.fontSize._md；s.theme 提供原始主题对象。语义属性由 getter 读取当前主题，不使用主题 CSS 变量。UiCss、UiColorCss、UiBackgroundColorCss、UiFontSizeCss 可通过继承扩展，原生属性和 raw() 仍可使用。系统与组件 token 的叶子键统一带下划线，分类名保持原名；例如 theme.color._primary、theme.space._2xs 和 tokens._sizeMd。不保留无下划线别名。自定义主题使用普通对象，例如 `{ ...lightTheme, color: { ...lightTheme.color, _primary: 'purple' } }`。默认预设冻结，用户对象不会被 Provider 修改。容器提供 color-scheme 与文字颜色，背景和布局由调用者设置；class/style 不会改变后代读取的配置数据。网页示例位于 /provider。
+主题通过 Svelte context 向下传递，并注入 UiCss。组件在模板或 $derived 中使用 s.color._primary、s.backgroundColor._surface、s.fontSize._md；s.theme 提供原始主题对象。语义属性由 getter 读取当前主题，不使用主题 CSS 变量。UiCss、UiColorCss、UiBackgroundColorCss、UiFontSizeCss 可通过继承扩展，原生属性和 raw() 仍可使用。系统 token 的叶子键统一带下划线，分类名保持原名；例如 theme.color._primary、theme.space._2xs。不保留无下划线别名。自定义主题使用普通对象，例如 `{ ...lightTheme, color: { ...lightTheme.color, _primary: 'purple' } }`。默认预设冻结，用户对象不会被 Provider 修改。容器提供 color-scheme 与文字颜色，背景和布局由调用者设置；class/style 不会改变后代读取的配置数据。网页示例位于 /provider。
 
 Provider 和 Icon 的 class 使用 CssInput，优先传入同一 CSS 宿主的 css(...) 结果；也接受声明字符串、嵌套数组及 false/null/undefined 条件空项。组件最终使用一个组合类，同等层叠条件下外部声明覆盖默认值。普通类名、多类名字符串和条件对象不作为原生 class 透传；style 仍是原生内联样式。SSR 中先在当前请求宿主登记外部类，客户端沿用同一宿主的水合清单。
 
@@ -140,7 +140,9 @@ Provider 和 Icon 的 class 使用 CssInput，优先传入同一 CSS 宿主的 c
 </Provider>
 ```
 
-icon 必须是 LucideIconData，只通过 `<Icon icon={Search} />` 传入，不接受子组件或 children snippet。size 为 _sm/_md/_lg（默认 _md），color 为 inherit/_text/_muted/_textDisabled/_primary/_info/_success/_warning/_danger（默认 inherit）。Icon 从本级系统主题派生组件 token，叠加 Provider.components.Icon 和实例 tokens 后生成声明；inherit 保持原生 CSS 继承。Icon 复用 Provider 的作者，不自行创建。strokeWidth 为数值（默认 2），仍由 bx 管理动态 CSS 变量，与主题数据传递分开。精确宽高、原始颜色、动画等通过 class/style 设置。
+icon 必须是 LucideIconData，只通过 `<Icon icon={Search} />` 传入，不接受子组件或 children snippet。size、color、strokeWidth、verticalAlign 直接使用 UiCss 对应 raw() 的输入类型，默认值在 $props() 中分别为 _md、inherit、2、-0.125em。支持全部系统字号/颜色 token 和原始 CSS 值，如 size="18px"、color="#7e22ce"、strokeWidth="3px"、verticalAlign="middle"。size 对应 font-size，图标宽高为 1em；_lg 是 20px，_xl 是 24px，不再做 Icon 专属尺寸映射。原始字符串沿用 raw() 契约，不进行 token 拼写校验，非零尺寸数字不自动补 px。
+
+Icon 复用最近 Provider 的作者，主题更新直接由 UiCss 响应。没有 IconTokens、tokens prop 或 Provider.components。描边数值与长度继续使用 bx 保持连续更新时的类稳定；inherit/initial/unset/revert/revert-layer 直接作为描边声明，避免自定义属性改变全局关键字语义。class/style 继续提供最终样式定制。
 
 默认图标作为装饰内容隐藏；提供 aria-label 或 aria-labelledby 时自动设置 img 角色，显式 aria-hidden/role 保持优先。图标默认不增加 Tab 停靠点，按钮自身承担名称与交互。SVG 根属性可透传，但 children、width/height、viewBox 和原生 stroke-width 由组件管理。图形数据保持只读，递归子节点使用正确的 SVG 命名空间，内部 key 元数据不输出。网页交互示例位于 /icon。
 
@@ -191,4 +193,4 @@ Provider 的作者、继承、编译和 SSR 契约见 [Provider 设计记录](.d
 
 Firefox 组件测试暂时串行执行文件，避免多页面并行时真实键盘输入受到焦点干扰；跟踪 https://github.com/vitest-dev/vitest/issues/7916 ，待所用版本在 CI 的并行键盘测试稳定后恢复。
 
-系统 token 分类、默认值与组件覆盖规则见 [主题设计](.design/theme-tokens.md)。Icon 已移至 packages/ui/src/lib/display/gene/Icon.svelte，公开导入仍是 import { Icon } from 'zerodep-svelte-ui'。Provider 的 components 当前只开放 Icon，实例通过 tokens 定制；未来组件按实际需求增加。
+系统 token 分类与默认值见 [主题设计](.design/theme-tokens.md)。Icon 位于 packages/ui/src/lib/display/gene/Icon.svelte，公开导入仍是 import { Icon } from 'zerodep-svelte-ui'。后续组件按实际需求设计，不提前增加组件覆盖框架。

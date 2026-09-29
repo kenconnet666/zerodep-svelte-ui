@@ -8,7 +8,7 @@ export const valid: Props = {
   size: '_sm',
   color: '_primary',
   strokeWidth: 1.5,
-  tokens: { _sizeMd: '20px', _colorPrimary: 'purple' },
+  verticalAlign: 'middle',
   'aria-label': '搜索',
   class: ['width:24px;', [false, null, 'color:red;']],
 };
@@ -18,18 +18,29 @@ export const badClass: Props = { icon: Search, class: { active: true } };
 export const missing: Props = {};
 // @ts-expect-error 图标名字符串不是 SVG 资源。
 export const badIcon: Props = { icon: 'Search' };
-// @ts-expect-error 尺寸是语义名称，精确样式通过 class 设置。
+export const rawValues: Props = {
+  icon: Search,
+  size: '18px',
+  color: '#fff',
+  strokeWidth: '2px',
+  verticalAlign: 'text-bottom',
+};
+export const allThemeKeys: Props = { icon: Search, size: '_2xl', color: '_onPrimary' };
+export const inherited: Props = {
+  icon: Search,
+  size: 'inherit',
+  color: 'currentColor',
+  strokeWidth: 'inherit',
+  verticalAlign: 'inherit',
+};
+// @ts-expect-error 非零尺寸必须带 CSS 单位，不额外约定数字转 px。
 export const badSize: Props = { icon: Search, size: 24 };
-// @ts-expect-error 颜色是语义名称。
-export const badColor: Props = { icon: Search, color: '#fff' };
-// @ts-expect-error 主题颜色必须带下划线。
-export const oldColor: Props = { icon: Search, color: 'primary' };
-// @ts-expect-error 主题字号必须带下划线。
-export const oldSize: Props = { icon: Search, size: 'md' };
-// @ts-expect-error 组件 token 拒绝拼写错误。
-export const badToken: Props = { icon: Search, tokens: { sizeMD: '20px' } };
-// @ts-expect-error 描边 token 为数字。
-export const badTokenValue: Props = { icon: Search, tokens: { _strokeWidth: '2px' } };
+// @ts-expect-error CSS 颜色不接受数字。
+export const badColor: Props = { icon: Search, color: 123 };
+// @ts-expect-error 描边不接受布尔值。
+export const badStroke: Props = { icon: Search, strokeWidth: false };
+// @ts-expect-error 垂直对齐不接受对象。
+export const badAlign: Props = { icon: Search, verticalAlign: {} };
 // @ts-expect-error viewBox 由图标数据决定。
 export const badGeometry: Props = { icon: Search, viewBox: '0 0 1 1' };
 declare const children: Snippet;
@@ -38,5 +49,5 @@ export const badChildren: Props = { icon: Search, children };
 // @ts-expect-error icon 接收 SVG 数据，不接受 Svelte 组件。
 export const badComponent: Props = { icon: Icon };
 
-// @ts-expect-error 组件 token 统一带下划线，普通 strokeWidth prop 不受影响。
+// @ts-expect-error Icon 不再接收组件 tokens。
 export const oldComponentToken: Props = { icon: Search, tokens: { strokeWidth: 2 } };

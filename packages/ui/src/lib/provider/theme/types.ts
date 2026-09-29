@@ -1,15 +1,3 @@
-export type UiSize = '_sm' | '_md' | '_lg';
-export type UiColor =
-  | 'inherit'
-  | '_text'
-  | '_muted'
-  | '_textDisabled'
-  | '_primary'
-  | '_info'
-  | '_success'
-  | '_warning'
-  | '_danger';
-
 /** 主题是普通 JS 数据；叶子 token 键统一带下划线，分类名保持原名。组件读取对象生成声明，不依赖主题 CSS 变量。 */
 export interface UiTheme {
   readonly themeName: 'light' | 'dark';

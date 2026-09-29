@@ -8,15 +8,11 @@
     localeContext,
     langContext,
     cssFactoryContext,
-    componentThemesContext,
-    mergeTokens,
     provideCss,
   } from '../../internal/provider-context.js';
   import type { UiTheme } from './theme/types.js';
   import type { UiLanguage } from './lang/types.js';
   import type { UiLocale } from './locale/types.js';
-  import type { UiComponentThemes } from './component-themes.js';
-  import type { IconTokens } from '../display/gene/icon-theme.js';
   import { lightTheme } from './theme/light.js';
   import { zhCNLanguage } from './lang/zh-CN.js';
   import { chinaLocale } from './locale/china.js';
@@ -26,37 +22,15 @@
     theme?: UiTheme;
     lang?: UiLanguage;
     locale?: UiLocale;
-    components?: UiComponentThemes;
     children?: Snippet;
     class?: CssInput;
   };
 
-  let {
-    css,
-    theme,
-    lang,
-    locale,
-    components,
-    children,
-    class: className,
-    ...rest
-  }: Props = $props();
+  let { css, theme, lang, locale, children, class: className, ...rest }: Props = $props();
   const parentTheme = themeContext.optional();
   const parentLocale = localeContext.optional();
   const parentLang = langContext.optional();
   const parentFactory = cssFactoryContext.optional();
-  const parentComponents = componentThemesContext.optional();
-  // 只继承显式覆盖，让内层组件按本级系统主题重新计算默认 token。
-  const iconOverrides = $derived(
-    mergeTokens<Partial<IconTokens>>({}, parentComponents?.Icon, components?.Icon),
-  );
-  componentThemesContext.provide(
-    Object.freeze({
-      get Icon() {
-        return iconOverrides;
-      },
-    }),
-  );
   const initialCss = untrack(() => css);
   const createCss: UiCssFactory =
     initialCss ?? parentFactory ?? ((readTheme) => new UiCss(readTheme));

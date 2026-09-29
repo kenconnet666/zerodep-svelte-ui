@@ -58,19 +58,29 @@ test('缺少 Provider 或 SSR 宿主时明确失败', () => {
   assert.throws(() => entry.renderWithoutHost(), /CSS server host is unavailable/);
 });
 
-test('组件覆盖与实例 token 在并发 SSR 中按层解析且请求隔离', async () => {
+test('直接 CSS props 在并发 SSR 中正确输出且请求隔离', async () => {
   const [a, b] = await Promise.all([
-    entry.renderIconTokens(
-      { Icon: { _sizeLg: '21px', _colorPrimary: 'purple' } },
-      { _colorPrimary: 'teal' },
-    ),
-    entry.renderIconTokens({ Icon: { _sizeLg: '27px', _colorPrimary: 'orange' } }),
+    entry.renderIconAppearance({
+      size: '21px',
+      color: 'teal',
+      strokeWidth: '3px',
+      verticalAlign: 'middle',
+    }),
+    entry.renderIconAppearance({
+      size: '27px',
+      color: 'orange',
+      strokeWidth: 'inherit',
+      verticalAlign: 'baseline',
+    }),
   ]);
   assert.match(a.css, /font-size:21px/);
   assert.match(a.css, /color:teal/);
   assert.doesNotMatch(a.css, /color:purple|color:orange|font-size:27px/);
   assert.match(b.css, /font-size:27px/);
   assert.match(b.css, /color:orange/);
+  assert.match(a.css, /vertical-align:middle/);
+  assert.match(b.css, /vertical-align:baseline/);
+  assert.match(b.css, /stroke-width:inherit/);
   assert.doesNotMatch(b.css, /color:teal|font-size:21px/);
 });
 

@@ -2,34 +2,30 @@
   import type { SVGAttributes } from 'svelte/elements';
   import type { LucideIconData, LucideIconNode } from '@lucide/icons';
   import { bx, css, type CssInput } from 'zerodep-css-svelte';
-  import { useCss, useTheme } from '../../provider/context.js';
-  import type { UiColor, UiSize } from '../../provider/theme/types.js';
-  import { createIconTokens, type IconTokens } from './icon-theme.js';
-  import { componentThemesContext, mergeTokens } from '../../../internal/provider-context.js';
+  import { useCss } from '../../provider/context.js';
+  import type { UiCss } from '../../provider/css.js';
 
   type Props = Omit<
     SVGAttributes<SVGSVGElement>,
     'children' | 'class' | 'color' | 'width' | 'height' | 'viewBox' | 'stroke-width'
   > & {
     icon: LucideIconData;
-    size?: UiSize;
-    color?: UiColor;
-    strokeWidth?: number;
-    /** 当前图标的组件 token，优先于 Provider 的 components.Icon。 */
-    tokens?: Partial<IconTokens>;
+    /** 系统字号 token 或原始 font-size 值；图标宽高为 1em。 */
+    size?: Parameters<UiCss['fontSize']['raw']>[0];
+    color?: Parameters<UiCss['color']['raw']>[0];
+    strokeWidth?: Parameters<UiCss['strokeWidth']['raw']>[0];
+    verticalAlign?: Parameters<UiCss['verticalAlign']['raw']>[0];
     /** 与默认声明合成；传入当前宿主的 css() 结果或 CSS 声明。 */
     class?: CssInput;
   };
 
   const s = useCss();
-  const theme = useTheme();
-  const components = componentThemesContext.use();
   let {
     icon,
     size = '_md',
     color = 'inherit',
-    strokeWidth,
-    tokens,
+    strokeWidth = 2,
+    verticalAlign = '-0.125em',
     class: className,
     role,
     focusable = 'false',
@@ -39,23 +35,12 @@
     ...rest
   }: Props = $props();
 
-  const resolvedTokens = $derived(mergeTokens(createIconTokens(theme), components.Icon, tokens));
-  const effectiveStrokeWidth = $derived(strokeWidth ?? resolvedTokens._strokeWidth);
-  const fontSize = $derived(
-    { _sm: resolvedTokens._sizeSm, _md: resolvedTokens._sizeMd, _lg: resolvedTokens._sizeLg }[size],
-  );
-  const textColor = $derived(
-    {
-      inherit: 'inherit',
-      _text: resolvedTokens._colorText,
-      _muted: resolvedTokens._colorMuted,
-      _textDisabled: resolvedTokens._colorTextDisabled,
-      _primary: resolvedTokens._colorPrimary,
-      _info: resolvedTokens._colorInfo,
-      _success: resolvedTokens._colorSuccess,
-      _warning: resolvedTokens._colorWarning,
-      _danger: resolvedTokens._colorDanger,
-    }[color],
+  // CSS 全局关键字必须作用于 stroke-width 本身，不能写进 bx 的自定义属性。
+  const globalStrokeWidth = $derived(
+    typeof strokeWidth === 'string' &&
+      ['inherit', 'initial', 'unset', 'revert', 'revert-layer'].includes(
+        strokeWidth.trim().toLowerCase(),
+      ),
   );
 
   const named = $derived(Boolean(label?.trim() || labelledBy?.trim()));
@@ -74,16 +59,16 @@
   class={css(
     s.display.inlineBlock,
     s.flexShrink.raw(0),
-    s.verticalAlign.raw(resolvedTokens._verticalAlign),
+    s.verticalAlign.raw(verticalAlign),
     s.width.em(1),
     s.height.em(1),
     s.fill.none,
     s.stroke.currentColor,
     s.strokeLinecap.round,
     s.strokeLinejoin.round,
-    s.fontSize.raw(fontSize),
-    s.color.raw(textColor),
-    s.strokeWidth.raw(bx(effectiveStrokeWidth)),
+    s.fontSize.raw(size),
+    s.color.raw(color),
+    globalStrokeWidth ? s.strokeWidth.raw(strokeWidth) : s.strokeWidth.raw(bx(strokeWidth)),
     className,
   )}
 >

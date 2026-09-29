@@ -17,7 +17,6 @@ export const valid: Props = {
   theme: { ...lightTheme, color: { ...lightTheme.color, _primary: 'purple' } },
   lang: enUSLanguage,
   locale: usLocale,
-  components: { Icon: { _sizeMd: '20px' } },
   class: ['color:red;', [false, undefined, 'padding:4px;']],
 };
 // @ts-expect-error class 接受 CssInput，不接受条件对象。
@@ -34,8 +33,8 @@ export const badLocaleName: Props = { locale: { ...usLocale, localeName: 'fr-FR'
 export const badLocale: Props = { locale: { localeName: 'en-US' } };
 // @ts-expect-error 作者应实现 Css。
 export const badCss: Props = { css: {} };
-// @ts-expect-error 不提前开放尚未实现的组件 token。
-export const badComponentTokens: Props = { components: { Button: { heightMd: '36px' } } };
+// @ts-expect-error Provider 不再提供组件 token 覆盖。
+export const badComponentTokens: Props = { components: { Icon: { _sizeMd: '20px' } } };
 export function readonlyObjects() {
   const theme = useTheme();
   const locale = useLocale();

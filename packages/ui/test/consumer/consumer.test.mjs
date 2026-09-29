@@ -79,7 +79,7 @@ test(
         join(installed, 'dist/lib/display/gene/Icon.svelte'),
         'utf8',
       );
-      assert.match(iconSource, /bx\(effectiveStrokeWidth\)/);
+      assert.match(iconSource, /bx\(strokeWidth\)/);
 
       await writeFile(
         join(directory, 'Consumer.svelte'),
@@ -87,7 +87,7 @@ test(
       import { Provider, Icon, darkTheme } from 'zerodep-svelte-ui';
       import { Search } from '@lucide/icons';
       </script>
-      <Provider theme={darkTheme} components={{Icon:{_sizeMd:'20px'}}}><Icon icon={Search} color="_primary" tokens={{_colorPrimary:'purple'}} strokeWidth={1.25} aria-label="搜索" /></Provider>`,
+      <Provider theme={darkTheme}><Icon icon={Search} size="20px" color="purple" strokeWidth={1.25} verticalAlign="middle" aria-label="搜索" /></Provider>`,
       );
       await writeFile(
         join(directory, 'entry.ts'),
@@ -105,7 +105,7 @@ test(
         `import type {ComponentProps} from 'svelte';
       import {Provider,Icon,UiCss,darkTheme,enUSLanguage,usLocale} from 'zerodep-svelte-ui';import {Search} from '@lucide/icons';
 
-      export const provider:ComponentProps<typeof Provider>={css:(readTheme)=>new UiCss(readTheme),theme:darkTheme,lang:enUSLanguage,locale:usLocale,components:{Icon:{_sizeMd:'20px'}}};
+      export const provider:ComponentProps<typeof Provider>={css:(readTheme)=>new UiCss(readTheme),theme:darkTheme,lang:enUSLanguage,locale:usLocale};
       // @ts-expect-error 内部 context 设置器不进入公共导出。
       import {provideCss} from 'zerodep-svelte-ui';
       // @ts-expect-error 聚合配置入口已移除。
@@ -113,8 +113,9 @@ test(
       // @ts-expect-error 聚合配置类型已移除。
       import type {UiConfig} from 'zerodep-svelte-ui';
       export const icon:ComponentProps<typeof Icon>={icon:Search,size:'_sm',color:'_primary'};
-      // @ts-expect-error 不接受任意颜色名称
-      export const bad:ComponentProps<typeof Icon>={icon:Search,color:'blue'};`,
+      export const raw:ComponentProps<typeof Icon>={icon:Search,size:'18px',color:'blue',strokeWidth:'2px',verticalAlign:'middle'};
+      // @ts-expect-error 不再支持组件 token 覆盖
+      export const bad:ComponentProps<typeof Icon>={icon:Search,tokens:{_sizeMd:'20px'}};`,
       );
       await writeFile(
         join(directory, 'tsconfig.json'),
