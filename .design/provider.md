@@ -26,13 +26,13 @@ Provider 使用 Svelte context 注入三个普通 JS 对象；主题、地区、
 - Provider 容器提供 color-scheme、基础字体排版与文字颜色。背景、间距等布局由使用者提供。
 - class 使用 CssInput。外部 css() 结果放在默认声明后合成一个类，不使用 @layer，不透传普通类名或条件对象。
 - 容器的 class/style 只改变 DOM 样式，不修改后代获取的配置对象。需要整个子树使用新的主题值时，传 theme 对象。
-- Icon 的主题 size/color 参数直接使用下划线标识，通过 raw() 消费主题声明；inherit 保持原生 CSS 继承。bx 仍由 CSS 适配器管理动态变量，它与主题的数据传递分开。
+- Icon 的主题 size/color 参数直接使用下划线标识，通过 raw() 消费主题声明；inherit 保持原生 CSS 继承。Icon 四个外观属性均直接使用 raw()，不使用 bx。
 
 ## SSR 与验证
 
 - SvelteKit 每请求 CSS 宿主负责规则收集与 hydration，Provider 不另建或销毁整页宿主。
 - 浏览器验证三个配置对象的继承、覆盖、替换、恢复和时区格式化，以及作用域作者隔离、创建函数继承、样式组合与规则复用。
-- Node SSR 验证并发请求隔离、公开包入口和 bx 初值；真实 tarball 消费验证内部依赖完整且内部设置器没有公开。
+- Node SSR 验证并发请求隔离、公开包入口和 Icon 的直接 CSS 声明；真实 tarball 消费验证内部依赖完整且内部设置器没有公开。
 - 文档站验证水合后切换、无 JS 首屏和可访问性。完整浏览器与跨平台矩阵由 CI 执行。
 
 ## 必须提供上下文

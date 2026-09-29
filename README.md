@@ -142,7 +142,7 @@ Provider 和 Icon 的 class 使用 CssInput，优先传入同一 CSS 宿主的 c
 
 icon 必须是 LucideIconData，只通过 `<Icon icon={Search} />` 传入，不接受子组件或 children snippet。size、color、strokeWidth、verticalAlign 直接使用 UiCss 对应 raw() 的输入类型，默认值在 $props() 中分别为 _md、inherit、2、-0.125em。支持全部系统字号/颜色 token 和原始 CSS 值，如 size="18px"、color="#7e22ce"、strokeWidth="3px"、verticalAlign="middle"。size 对应 font-size，图标宽高为 1em；_lg 是 20px，_xl 是 24px，不再做 Icon 专属尺寸映射。原始字符串沿用 raw() 契约，不进行 token 拼写校验，非零尺寸数字不自动补 px。
 
-Icon 复用最近 Provider 的作者，主题更新直接由 UiCss 响应。没有 IconTokens、tokens prop 或 Provider.components。描边数值与长度继续使用 bx 保持连续更新时的类稳定；inherit/initial/unset/revert/revert-layer 直接作为描边声明，避免自定义属性改变全局关键字语义。class/style 继续提供最终样式定制。
+Icon 复用最近 Provider 的作者，主题更新直接由 UiCss 响应。没有 IconTokens、tokens prop 或 Provider.components。四个外观属性均直接生成 CSS 声明，描边按普通外观配置处理，不使用 bx 或关键字判断分支。class/style 继续提供最终样式定制。
 
 默认图标作为装饰内容隐藏；提供 aria-label 或 aria-labelledby 时自动设置 img 角色，显式 aria-hidden/role 保持优先。图标默认不增加 Tab 停靠点，按钮自身承担名称与交互。SVG 根属性可透传，但 children、width/height、viewBox 和原生 stroke-width 由组件管理。图形数据保持只读，递归子节点使用正确的 SVG 命名空间，内部 key 元数据不输出。网页交互示例位于 /icon。
 

@@ -103,7 +103,7 @@ test('Provider 的配置与主题在禁用 JavaScript 的首屏可用', async ({
   }
 });
 
-test('Icon 文档通过真实组件演示语义外观、主题、bx 与键盘行为', async ({ page }) => {
+test('Icon 文档通过真实组件演示语义外观、主题、描边与键盘行为', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/icon/');
@@ -128,12 +128,10 @@ test('Icon 文档通过真实组件演示语义外观、主题、bx 与键盘行
   await page.getByRole('combobox', { name: '主题', exact: true }).selectOption('dark');
   await expect(icon).toHaveCSS('width', '20px');
   await expect(icon).toHaveCSS('color', 'rgb(134, 239, 172)');
-  const stableClass = await icon.getAttribute('class');
   await page.getByRole('slider', { name: '描边', exact: true }).press('ArrowRight');
   await expect
     .poll(() => icon.evaluate((el) => parseFloat(getComputedStyle(el).strokeWidth)))
     .toBe(2.25);
-  await expect(icon).toHaveAttribute('class', stableClass!);
   await page.getByRole('combobox', { name: '图标', exact: true }).selectOption('Check');
   await expect(icon.locator('circle')).toHaveCount(0);
   await page.getByRole('button', { name: '搜索', exact: true }).press('Enter');

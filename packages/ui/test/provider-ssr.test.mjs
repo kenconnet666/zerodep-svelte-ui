@@ -84,28 +84,19 @@ test('直接 CSS props 在并发 SSR 中正确输出且请求隔离', async () =
   assert.doesNotMatch(b.css, /color:teal|font-size:21px/);
 });
 
-test('正式包产物的 Icon 在 SSR 输出 SVG、名称和 bx 初始样式', () => {
+test('正式包产物的 Icon 在 SSR 输出 SVG、名称和直接 CSS 声明', () => {
   const result = entry.renderIcon('查找 <内容>');
   assert.match(result.body, /<svg[^>]*role="img"/);
   assert.match(result.body, /aria-label="查找 &lt;内容(?:>|&gt;)"/);
   assert.match(result.body, /<path/);
   assert.match(result.body, /<circle/);
   assert.doesNotMatch(result.body, /\skey=/);
-  const variable = result.css.match(/stroke-width:var\((--[\w-]+)\)/)?.[1];
-  assert.ok(variable);
   const svg = result.body.match(/<svg\b(?:[^>"']|"[^"]*"|'[^']*')*>/)?.[0];
   const name = svg.match(/\bclass="([^"]+)"/)?.[1];
   assert.match(name, /^z-[a-z0-9]+$/);
-  // bx 可绑定在元素或私有规则上；两种编译路径都必须为当前 SVG 提供正确初值。
-  const inlineValue = new RegExp(`${variable}:\\s*1\\.5(?:;|")`).test(svg);
-  const boundValue = result.rules.some(
-    (rule) =>
-      rule.kind === 'bindings' &&
-      rule.targets.includes(name) &&
-      rule.body.includes(`${variable}:1.5;`),
-  );
-  assert.ok(inlineValue || boundValue, 'SVG 的描边变量缺少 SSR 初值');
   const body = result.rules.find((rule) => rule.className === name).body;
+  assert.match(body, /stroke-width:1.5;/);
+  assert.match(body, /vertical-align:-0.125em;/);
   assert.match(body, /width:1em;/);
   assert.match(body, /width:30px;$/);
   assert.doesNotMatch(body, /@layer/);

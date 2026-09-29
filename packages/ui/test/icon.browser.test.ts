@@ -3,7 +3,7 @@ import { page, userEvent } from 'vitest/browser';
 import { cleanup, render } from 'vitest-browser-svelte';
 import { Search, Check } from '@lucide/icons';
 import type { LucideIconData } from '@lucide/icons';
-import { Css, css, cssStats } from 'zerodep-css-svelte';
+import { Css, css } from 'zerodep-css-svelte';
 import { lightTheme, darkTheme, UiCss } from '../src/lib/index.js';
 import IconHarness from './fixtures/IconHarness.svelte';
 import IconButtonHarness from './fixtures/IconButtonHarness.svelte';
@@ -63,7 +63,7 @@ test('原始 CSS 输入直接生效，undefined 恢复 Svelte 默认值', async 
   });
 });
 
-test('CSS 继承关键字直接作用于图标属性，描边可在关键字和绑定值之间切换', async () => {
+test('CSS 继承关键字直接作用于图标属性，描边可在关键字和普通值之间切换', async () => {
   const screen = await render(IconHarness, {
     style: 'font-size:30px;color:purple;stroke-width:5px;vertical-align:middle',
     iconProps: {
@@ -185,25 +185,6 @@ test('名称和装饰性状态可切换，显式 aria-hidden 保持优先', asyn
   expect(screen.getByTestId('icon').element().getAttribute('role')).toBeNull();
   await screen.rerender({ iconProps: { icon: Search, 'aria-label': '查找', 'aria-hidden': true } });
   await expect.element(screen.getByTestId('icon')).toHaveAttribute('aria-hidden', 'true');
-});
-
-test('bx 连续更新保持类和规则稳定，卸载不遗留绑定', async () => {
-  const bindingsBefore = cssStats().bindings;
-  const screen = await render(IconHarness, { iconProps: { icon: Search } });
-  const icon = screen.getByTestId('icon');
-  const initial = cssStats();
-  const initialClass = icon.element().getAttribute('class');
-  for (const strokeWidth of [1, 1.25, 1.5, 2, 2.5]) {
-    await screen.rerender({ iconProps: { icon: Search, strokeWidth } });
-    await expect
-      .poll(() => parseFloat(getComputedStyle(icon.element()).strokeWidth))
-      .toBe(strokeWidth);
-  }
-  expect(cssStats().rules).toBe(initial.rules);
-  expect(icon.element().getAttribute('class')).toBe(initialClass);
-  await screen.rerender({ show: false });
-  await expect.element(icon).not.toBeInTheDocument();
-  await expect.poll(() => cssStats().bindings).toBe(bindingsBefore);
 });
 
 test('嵌套 SVG 节点和非正方形 viewBox 保持结构', async () => {

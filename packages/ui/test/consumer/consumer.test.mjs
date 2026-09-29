@@ -75,19 +75,26 @@ test(
       const manifest = JSON.parse(await readFile(join(installed, 'package.json'), 'utf8'));
       assert.equal(manifest.peerDependencies['@lucide/icons'], '^1.48.0');
       assert.equal(manifest.peerDependenciesMeta?.['@lucide/icons']?.optional, undefined);
-      const iconSource = await readFile(
-        join(installed, 'dist/lib/display/gene/Icon.svelte'),
-        'utf8',
-      );
-      assert.match(iconSource, /bx\(strokeWidth\)/);
 
       await writeFile(
         join(directory, 'Consumer.svelte'),
         `<script lang="ts">
       import { Provider, Icon, darkTheme } from 'zerodep-svelte-ui';
       import { Search } from '@lucide/icons';
+      import BindingProbe from './BindingProbe.svelte';
       </script>
-      <Provider theme={darkTheme}><Icon icon={Search} size="20px" color="purple" strokeWidth={1.25} verticalAlign="middle" aria-label="搜索" /></Provider>`,
+      <Provider theme={darkTheme}><Icon icon={Search} size="20px" color="purple" strokeWidth={1.25} verticalAlign="middle" aria-label="搜索" /><BindingProbe /></Provider>`,
+      );
+      // 编译插件契约由明确的动态绑定场景验证，不要求 Icon 为测试而使用 bx。
+      await writeFile(
+        join(directory, 'BindingProbe.svelte'),
+        `<script lang="ts">
+      import { useCss } from 'zerodep-svelte-ui';
+      import { css, bx } from 'zerodep-css-svelte';
+      const s = useCss();
+      let { width = '20px' }: { width?: string } = $props();
+      </script>
+      <div class={css(s.width.raw(bx(width)))}></div>`,
       );
       await writeFile(
         join(directory, 'entry.ts'),
@@ -143,8 +150,9 @@ test(
           if(enabled){
             const result=entry.run();assert(result.body.includes('<svg'));assert(result.body.includes('role="img"'));assert(result.body.includes('<circle'));
             assert(result.css.includes('color:purple;'));assert(result.css.includes('font-size:20px;'));
-            const variable=result.css.split('stroke-width:var(')[1]?.split(')')[0];assert(variable);
-            assert(result.body.includes(variable+': 1.25;')||result.body.includes(variable+': 1.25"')||result.css.includes(variable+':1.25;'));
+            assert(result.css.includes('stroke-width:1.25;'));
+            const variable=result.css.split('width:var(')[1]?.split(')')[0];assert(variable);
+            assert(result.body.includes(variable+': 20px;')||result.body.includes(variable+': 20px"')||result.css.includes(variable+':20px;'));
           }
           else assert.throws(()=>entry.run(),/bx/);
         }finally{await server.close();}

@@ -139,8 +139,7 @@ import { Provider, Icon } from 'zerodep-svelte-ui';`}</code
       >
       <tr
         ><td>strokeWidth</td><td
-          >strokeWidth.raw() 的输入，默认 2；支持数字、长度和 CSS 关键字。数值及长度通过 bx
-          连续更新；全局关键字直接作用于描边。</td
+          >strokeWidth.raw() 的输入，默认 2；支持数字、长度和 CSS 关键字，直接生成描边声明。</td
         ></tr
       >
       <tr

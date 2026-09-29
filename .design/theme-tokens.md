@@ -60,7 +60,7 @@ Icon 直接消费本级 Provider 的 UiCss，不创建作者或额外主题 cont
 
 IconTokens、createIconTokens、UiComponentThemes、Provider.components、Icon.tokens 及其合并逻辑已移除，不保留别名。旧的 UiColor/UiSize 限定枚举同时移除，消费端需要 Icon props 类型时使用 ComponentProps<typeof Icon>。class/style 继续作为最终声明覆盖入口。
 
-描边数值与长度继续通过 bx 更新，以免连续值生成大量类。CSS 全局关键字 inherit/initial/unset/revert/revert-layer 直接写到 stroke-width：把它们绑定为自定义属性会改变其语义。其他外观声明直接通过对应 raw() 生成。
+Icon 的四个外观属性都直接通过对应 raw() 生成声明。描边是普通外观配置，不因文档中的滑块演示就引入 bx 优化或全局关键字分支。bx 留给实际存在高频连续值的场景，按需求单独设计和验证。
 
 ## 后续边界
 

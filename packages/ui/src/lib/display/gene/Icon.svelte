@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { SVGAttributes } from 'svelte/elements';
   import type { LucideIconData, LucideIconNode } from '@lucide/icons';
-  import { bx, css, type CssInput } from 'zerodep-css-svelte';
+  import { css, type CssInput } from 'zerodep-css-svelte';
   import { useCss } from '../../provider/context.js';
   import type { UiCss } from '../../provider/css.js';
 
@@ -35,14 +35,6 @@
     ...rest
   }: Props = $props();
 
-  // CSS 全局关键字必须作用于 stroke-width 本身，不能写进 bx 的自定义属性。
-  const globalStrokeWidth = $derived(
-    typeof strokeWidth === 'string' &&
-      ['inherit', 'initial', 'unset', 'revert', 'revert-layer'].includes(
-        strokeWidth.trim().toLowerCase(),
-      ),
-  );
-
   const named = $derived(Boolean(label?.trim() || labelledBy?.trim()));
   const hidden = $derived(ariaHidden ?? (named ? undefined : true));
 </script>
@@ -68,7 +60,7 @@
     s.strokeLinejoin.round,
     s.fontSize.raw(size),
     s.color.raw(color),
-    globalStrokeWidth ? s.strokeWidth.raw(strokeWidth) : s.strokeWidth.raw(bx(strokeWidth)),
+    s.strokeWidth.raw(strokeWidth),
     className,
   )}
 >
