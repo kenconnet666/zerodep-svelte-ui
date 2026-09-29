@@ -108,7 +108,9 @@ test('按钮拥有可访问名称和键盘交互，装饰图标不增加 Tab 停
   const screen = await render(IconButtonHarness, {});
   await page.getByRole('button', { name: '搜索', exact: true }).click();
   await expect.element(screen.getByRole('status', { name: '点击次数' })).toHaveTextContent('1');
-  // 浏览器 provider 发送真实键盘事件。
+  // 鼠标点击是否聚焦由浏览器决定；键盘场景先明确聚焦，再发送真实按键。
+  screen.getByRole('button', { name: '搜索', exact: true }).element().focus();
+  await expect.element(screen.getByRole('button', { name: '搜索', exact: true })).toHaveFocus();
   await userEvent.keyboard('{Enter}');
   await expect.element(screen.getByRole('status', { name: '点击次数' })).toHaveTextContent('2');
   await userEvent.tab();

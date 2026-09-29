@@ -18,6 +18,8 @@
     brand: { ...lightTheme, name: 'brand', color: { ...lightTheme.color, primary: '#7e22ce' } },
   };
   const panel = css(author.padding.rem(1.5), author.borderRadius.px(12));
+  // 长代码自动换行，避免产生无法通过键盘操作的横向滚动区。
+  const code = css(author.whiteSpace.preWrap, author.overflowWrap.anywhere);
   let choice = $state<'light' | 'dark' | 'brand'>('light');
   let language = $state('zh-CN');
   let region = $state('china');
@@ -77,10 +79,10 @@
 
 <section class="prose">
   <h2>使用</h2>
-  <pre><code
+  <pre class={code}><code
       >{`import { Provider, lightTheme, darkTheme, enUSLanguage, usLocale } from 'zerodep-svelte-ui';`}</code
     ></pre>
-  <pre><code
+  <pre class={code}><code
       >{`<Provider theme={lightTheme} lang={enUSLanguage} locale={usLocale}>
   <Content />
   <Provider theme={darkTheme}><Panel /></Provider>
@@ -96,7 +98,7 @@
       <tr><td>theme</td><td>UiTheme：颜色、字号和 colorScheme。根部默认 lightTheme。</td></tr>
       <tr
         ><td>lang</td><td
-          >UiLanguage：语言代码、文字方向和通用文案。根部默认 zhCNLanguage，同时设置容器 lang/dir。</td
+          >UiLanguage：语言代码和通用文案。根部默认 zhCNLanguage，同时设置容器 lang。</td
         ></tr
       >
       <tr
@@ -117,7 +119,7 @@
     </tbody>
   </table>
   <h2>消费配置</h2>
-  <pre><code
+  <pre class={code}><code
       >{`const config = useConfig();
 const s = useCss();
 // 在模板或 $derived 中读取，才能随配置替换更新。

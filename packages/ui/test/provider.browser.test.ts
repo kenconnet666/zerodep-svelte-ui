@@ -32,7 +32,6 @@ test('后代共享作者，主题、语言和地区对象分别响应父级更�
   expect(authors).toHaveLength(4);
   expect(new Set(authors).size).toBe(1);
   await expect.element(screen.getByTestId('root')).toHaveAttribute('lang', 'zh-CN');
-  await expect.element(screen.getByTestId('root')).toHaveAttribute('dir', 'ltr');
   await expect
     .element(screen.getByTestId('nested-value'))
     .toHaveTextContent('light / zh-CN / Asia/Shanghai');
@@ -53,32 +52,30 @@ test('后代共享作者，主题、语言和地区对象分别响应父级更�
 });
 
 test('子级独立覆盖，父级替换不越界，undefined 恢复继承', async () => {
-  const rtl = { ...enUSLanguage, code: 'ar', dir: 'rtl' as const };
+  const customLanguage = { ...enUSLanguage, code: 'en-GB' };
   const screen = await render(ProviderHarness, {
     theme: darkTheme,
     lang: enUSLanguage,
     locale: usLocale,
     nestedTheme: lightTheme,
-    nestedLang: rtl,
+    nestedLang: customLanguage,
     nestedLocale: chinaLocale,
   });
-  await expect.element(screen.getByTestId('nested')).toHaveAttribute('dir', 'rtl');
-  await expect.element(screen.getByTestId('nested')).toHaveAttribute('lang', 'ar');
+  await expect.element(screen.getByTestId('nested')).toHaveAttribute('lang', 'en-GB');
   await expect
     .element(screen.getByTestId('nested-value'))
-    .toHaveTextContent('light / ar / Asia/Shanghai');
+    .toHaveTextContent('light / en-GB / Asia/Shanghai');
   await expect
     .element(screen.getByTestId('sibling-value'))
     .toHaveTextContent('dark / en-US / America/New_York');
   await screen.rerender({ theme: lightTheme, lang: zhCNLanguage });
   await expect
     .element(screen.getByTestId('nested-value'))
-    .toHaveTextContent('light / ar / Asia/Shanghai');
+    .toHaveTextContent('light / en-GB / Asia/Shanghai');
   await screen.rerender({ nestedTheme: undefined, nestedLang: undefined, nestedLocale: undefined });
   await expect
     .element(screen.getByTestId('nested-value'))
     .toHaveTextContent('light / zh-CN / America/New_York');
-  await expect.element(screen.getByTestId('nested')).toHaveAttribute('dir', 'ltr');
 });
 
 test('自定义主题对象直接驱动后代，切换语言和作者不丢失主题', async () => {

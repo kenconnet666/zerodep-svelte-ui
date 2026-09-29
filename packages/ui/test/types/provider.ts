@@ -20,8 +20,6 @@ export const valid: Props = {
 export const badClass: Props = { class: { ready: true } };
 // @ts-expect-error 主题必须提供数据，不接收模式字符串。
 export const badTheme: Props = { theme: 'dark' };
-// @ts-expect-error dir 从语言对象取得。
-export const noDirection: Props = { dir: 'rtl' };
 // @ts-expect-error lang 是语言对象。
 export const badLanguage: Props = { lang: 'en' };
 // @ts-expect-error 地区配置必须有显式时区。

@@ -74,6 +74,14 @@ test('Provider 文档的配置继承、主题覆盖和恢复', async ({ page }) 
     'color',
     'rgb(126, 34, 206)',
   );
+  await page.setViewportSize({ width: 360, height: 780 });
+  await expect
+    .poll(() =>
+      page
+        .locator('.prose pre')
+        .evaluateAll((blocks) => blocks.every((block) => block.scrollWidth <= block.clientWidth)),
+    )
+    .toBe(true);
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
     .analyze();

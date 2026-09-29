@@ -11,7 +11,7 @@
   import { zhCNLanguage } from './lang/zh-CN.js';
   import { chinaLocale } from './locale/china.js';
 
-  type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class' | 'lang' | 'dir'> & {
+  type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class' | 'lang'> & {
     css?: Css;
     theme?: UiTheme;
     lang?: UiLanguage;
@@ -52,7 +52,6 @@
 <div
   {...rest}
   lang={config.lang.code}
-  dir={config.lang.dir}
   class={styleClass(
     s.colorScheme.raw(config.theme.colorScheme),
     s.color.raw(config.theme.color.text),

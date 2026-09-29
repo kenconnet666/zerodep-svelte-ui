@@ -113,7 +113,7 @@ CSS 作者实例和 SSR 宿主按作用域/请求隔离，没有使用本地兄�
 </Provider>
 ```
 
-Provider 位于 src/lib/provider/Provider.svelte，三个子目录分别提供 JS 配置对象：theme 包含 lightTheme/darkTheme，lang 包含 zhCNLanguage/enUSLanguage，locale 包含 chinaLocale/usLocale（地区代码及 IANA 时区）。theme/lang/locale 独立响应式继承，显式对象整体替换，undefined 撤销覆盖。容器 lang/dir 取自语言对象，地区和时区交给 Intl 格式化，不依赖机器默认时区。
+Provider 位于 src/lib/provider/Provider.svelte，三个子目录分别提供 JS 配置对象：theme 包含 lightTheme/darkTheme，lang 包含 zhCNLanguage/enUSLanguage，locale 包含 chinaLocale/usLocale（地区代码及 IANA 时区）。theme/lang/locale 独立响应式继承，显式对象整体替换，undefined 撤销覆盖。容器 lang 取自语言对象，地区和时区交给 Intl 格式化，不依赖机器默认时区。
 
 根 Provider 创建一次 zerodep-css 的 Css 作者，子 Provider 默认复用父实例；可选 css prop 只用于初始化，更换实例需用 key 块重建。useCss() 取得作者，useConfig() 取得只读配置，均在后代初始化时调用。保留 config 引用，在模板或 $derived 中读取 config.theme 等属性，不解构成一次性快照。
 
