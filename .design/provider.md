@@ -1,48 +1,36 @@
-# Provider 与组件作者模型
+# Provider 与公开入口
 
-Provider、UiCss、注入协议和 Icon 已实现。本文记录采用的契约。
+Provider 使用 Svelte context 注入三个普通 JS 对象；公共消费入口为 useConfig() 和 useCss()。
 
-## 作者与配置
+## 目录边界
 
-- Provider 渲染 div 主题容器，支持 css、theme、locale、children 及适用的原生属性。没有 dir 配置，lang 由 locale 控制。
-- 根部省略 css 时创建一次 UiCss；嵌套省略时直接复用父实例。普通组件只调用 useCss，不自行 new 或退回全局实例。
-- UiCss 通过属性子类定义语义颜色、背景和字号。应用可继承 UiCss、UiColorCss、UiBackgroundColorCss、UiFontSizeCss；覆盖 theme(mode) 时可在 super.theme(mode) 后追加 token。
-- css 是作用域初始化值，挂载后保持身份稳定。更换作者需用 Svelte key 块重建 Provider；直接更换会明确报错。
-- useConfig 返回身份稳定的只读视图，theme/locale 逐字段响应式继承，undefined 恢复继承。消费者读取 config.theme/config.locale，不解构成一次性快照。
-- 根默认 theme='light'、locale='zh-CN'，不提供语言包加载或翻译系统。
+- src/lib 是公开 API 目录。TS、JS 模块的具名导出、默认导出，以及 Svelte 组件和 module script 导出，递归汇总到 src/lib/index.ts。
+- index.ts 由 pnpm exports:generate 生成。构建前自动更新，开发 watch 跟随文件新增、删除和改名更新；pnpm exports:check / pnpm check 验证提交中的入口没有遗漏。
+- 默认导出按文件名转为 PascalCase；index 模块使用所在目录名。导出重名、无导出模块和非模块文件会报错，不静默跳过。公开类型写在 .ts 文件中。
+- 内部 context 设置器和键放在 src/internal。svelte-package 的输入为 src，产物保留 lib/internal 的相对路径；package.json 只公开 dist/lib/index.js，不开放内部子路径。
+- Provider 位于 lib/provider/Provider.svelte；lang、locale、theme 分别放语言、地区时区、主题预设与类型。
 
-## 主题容器
+## 配置对象与继承
 
-- 主题只支持 light/dark，切换容器类而不更换作者对象。
-- 根部、显式 css 或显式 theme 建立主题边界。仅覆盖 locale 的内层容器不重置父级变量或文字颜色。
-- 容器提供 token、color-scheme 和文字颜色；背景通过 class/style 或 UiCss.backgroundColor 选择，不设置页面高度、布局、间距和滚动策略。
-- 默认声明与外部 class 在一次 css(...) 中按顺序合成，不使用 @layer。外部输入放在最后，同等层叠条件下覆盖默认值。
-- class 使用 CssInput，优先接收同一宿主的 css(...) 结果，也支持声明字符串、嵌套数组和条件空项；不透传普通类名、多类名字符串或条件对象。style 保持原生内联样式语义。
-- Portal 移出容器会改变变量的物理继承，后续浮层需确定挂载或桥接策略。
+- theme: UiTheme，包含 name、colorScheme、color、fontSize。默认 lightTheme，同时提供 darkTheme；应用可用对象展开创建其他主题。
+- lang: UiLanguage，包含 code、dir 和通用 messages。默认 zhCNLanguage，另有 enUSLanguage。Provider 容器的 lang/dir 来自该对象。
+- locale: UiLocale，包含 code 和显式 IANA timeZone。默认 chinaLocale，另有 usLocale。通过 Intl 格式化日期/数值；不读取服务器或浏览器的默认时区。
+- 三个维度独立继承。显式对象整体覆盖，不做隐式深合并；undefined 恢复最近父级，根部恢复默认值。
+- context 外层对象固定，getter 读取当前 props 和父配置；子组件保留 config 引用，在模板或 $derived 中读取，支持替换和 Svelte 响应式对象更新。
+- 默认预设及其子对象冻结；Provider 不修改用户对象。context 随组件树和 SSR 请求隔离，无全局可变配置。
 
-## 普通组件
+## 作者与样式
 
-- 默认值留在组件 $props() 中，不增加组件默认值注册表。
-- size/color 接收语义名称，映射到注入的作者属性，例如 s.fontSize._md、s.color._primary。
-- 组件专用状态、Props、样式和分支放在 .svelte 文件，真正共享后再拆分。
-- 动态结构用模板或 $derived；连续值需要变量传输时使用 bx，不承诺自定义作者方法都进入编译器快路径。
+- 根部创建一次 zerodep-css 的 Css 作者，后代复用。css prop 可传入自定义作者，只用于初始化；更换时用 key 重建 Provider。
+- 主题直接作为 JS 数据读取，例如 css(s.color.raw(config.theme.color.primary))。不生成 --ui-color/--ui-font-size 变量，不再导出 UiCss、UiColorCss 等旧语义作者。
+- Provider 容器提供 color-scheme 与文字颜色。背景、间距等布局由使用者提供。
+- class 使用 CssInput。外部 css() 结果放在默认声明后合成一个类，不使用 @layer，不透传普通类名或条件对象。
+- 容器的 class/style 只改变 DOM 样式，不修改后代获取的配置对象。需要整个子树使用新的主题值时，传 theme 对象。
+- Icon 仍接收语义 size/color，但从主题对象读取实际值。bx 仍由 CSS 适配器管理动态变量，它与主题的数据传递分开。
 
-## 编译与 SSR
+## SSR 与验证
 
-- 所有消费者必须启用 zerodep-css-svelte/vite，放在 Svelte/SvelteKit 插件前。
-- svelte-package 保留 bx，消费端必须转换包内 .svelte；包含 bx 的组件要经过真实 tarball 消费验证。
-- 编译器、作者 API 和适配器问题归 zerodep-css；Provider 和 UiCss 属于本库。
-- SvelteKit hooks 创建每请求 CSS 宿主并恢复水合清单。Provider 复用该宿主，不重新创建或在卸载时 dispose 整页宿主。
-- 作者和配置按请求/Provider 隔离。模块级只保留类、上下文键和纯声明。
-- 暂不提供 system 主题、存储持久化或运行时更换作者实例。
-
-## 文件职责与验证
-
-- css.ts：共享语义属性、类型和主题声明。
-- context.ts：只读配置和作者注入，CSS 适配器绑定所有者使用同一实例。
-- Provider.svelte：Props、继承、生命周期和主题容器。
-- 文档站从正式产物导入，用 Provider 提供作者，不创建第二套文档专属上下文键。
-
-浏览器用例覆盖共享实例、父级更新、覆盖及撤销、自定义属性类、变量继承、规则数量与卸载隔离。正式包产物的 Node SSR 用例覆盖并发请求及缺少上下文/宿主的错误；文档站用例覆盖水合、无 JavaScript 首屏和可访问性。类型用例覆盖语义值、只读配置和不支持的 dir/lang 属性。
-
-本地只执行相关焦点验证；完整浏览器与跨平台矩阵交 CI。后续组件仍需自己的行为验收。
+- SvelteKit 每请求 CSS 宿主负责规则收集与 hydration，Provider 不另建或销毁整页宿主。
+- 浏览器验证三个配置对象的继承、覆盖、替换、恢复和时区格式化，以及共享作者、样式组合与规则复用。
+- Node SSR 验证并发请求隔离、公开包入口和 bx 初值；真实 tarball 消费验证内部依赖完整且内部设置器没有公开。
+- 文档站验证水合后切换、无 JS 首屏和可访问性。完整浏览器与跨平台矩阵由 CI 执行。

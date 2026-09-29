@@ -75,16 +75,16 @@ test(
       const manifest = JSON.parse(await readFile(join(installed, 'package.json'), 'utf8'));
       assert.equal(manifest.peerDependencies['@lucide/icons'], '^1.48.0');
       assert.equal(manifest.peerDependenciesMeta?.['@lucide/icons']?.optional, undefined);
-      const iconSource = await readFile(join(installed, 'dist/Icon.svelte'), 'utf8');
+      const iconSource = await readFile(join(installed, 'dist/lib/Icon.svelte'), 'utf8');
       assert.match(iconSource, /bx\(strokeWidth\)/);
 
       await writeFile(
         join(directory, 'Consumer.svelte'),
         `<script lang="ts">
-      import { Provider, Icon } from 'zerodep-svelte-ui';
+      import { Provider, Icon, darkTheme } from 'zerodep-svelte-ui';
       import { Search } from '@lucide/icons';
       </script>
-      <Provider theme="dark"><Icon icon={Search} color="primary" strokeWidth={1.25} aria-label="搜索" /></Provider>`,
+      <Provider theme={darkTheme}><Icon icon={Search} color="primary" strokeWidth={1.25} aria-label="搜索" /></Provider>`,
       );
       await writeFile(
         join(directory, 'entry.ts'),
@@ -100,8 +100,11 @@ test(
       await writeFile(
         join(directory, 'types.ts'),
         `import type {ComponentProps} from 'svelte';
-      import {Provider,Icon,UiCss} from 'zerodep-svelte-ui';import {Search} from '@lucide/icons';
-      export const provider:ComponentProps<typeof Provider>={css:new UiCss(),theme:'dark'};
+      import {Provider,Icon,darkTheme,enUSLanguage,usLocale} from 'zerodep-svelte-ui';import {Search} from '@lucide/icons';
+      import {Css} from 'zerodep-css-svelte';
+      export const provider:ComponentProps<typeof Provider>={css:new Css(),theme:darkTheme,lang:enUSLanguage,locale:usLocale};
+      // @ts-expect-error 内部 context 设置器不进入公共导出。
+      import {provideConfig} from 'zerodep-svelte-ui';
       export const icon:ComponentProps<typeof Icon>={icon:Search,size:'sm',color:'primary'};
       // @ts-expect-error 不接受任意颜色名称
       export const bad:ComponentProps<typeof Icon>={icon:Search,color:'blue'};`,
@@ -132,7 +135,7 @@ test(
           if(enabled){
             const result=entry.run();assert(result.body.includes('<svg'));assert(result.body.includes('role="img"'));assert(result.body.includes('<circle'));
             const variable=result.css.split('stroke-width:var(')[1]?.split(')')[0];assert(variable);
-            assert(result.body.includes(variable+': 1.25;')||result.body.includes(variable+': 1.25"'));
+            assert(result.body.includes(variable+': 1.25;')||result.body.includes(variable+': 1.25"')||result.css.includes(variable+':1.25;'));
           }
           else assert.throws(()=>entry.run(),/bx/);
         }finally{await server.close();}

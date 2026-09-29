@@ -10,7 +10,9 @@
   "scripts": {
     "dev": "pnpm --filter zerodep-svelte-ui build && pnpm -r --parallel dev",
     "sync": "pnpm --filter @zerodep-ui/docs sync",
-    "check": "pnpm --filter zerodep-svelte-ui build && pnpm sync && pnpm -r check && tsc -p tsconfig.json",
+    "exports:generate": "node scripts/generate-ui-exports.mjs",
+    "exports:check": "node scripts/generate-ui-exports.mjs --check",
+    "check": "pnpm exports:check && pnpm --filter zerodep-svelte-ui build && pnpm sync && pnpm -r check && tsc -p tsconfig.json",
     "lint": "eslint . --max-warnings 0",
     "check:package": "pnpm --filter zerodep-svelte-ui build && pnpm pack:ui && publint artifacts/zerodep-svelte-ui.tgz --strict",
     "build": "pnpm -r build",

@@ -2,8 +2,8 @@
   import type { SVGAttributes } from 'svelte/elements';
   import type { LucideIconData, LucideIconNode } from '@lucide/icons';
   import { bx, css, type CssInput } from 'zerodep-css-svelte';
-  import { useCss } from './context.js';
-  import type { UiColor, UiSize } from './css.js';
+  import { useConfig, useCss } from './provider/context.js';
+  import type { UiColor, UiSize } from './provider/theme/types.js';
 
   type Props = Omit<
     SVGAttributes<SVGSVGElement>,
@@ -18,6 +18,7 @@
   };
 
   const s = useCss();
+  const config = useConfig();
   let {
     icon,
     size = 'md',
@@ -55,8 +56,8 @@
     s.stroke.raw('currentColor'),
     s.strokeLinecap.round,
     s.strokeLinejoin.round,
-    s.fontSize[`_${size}`],
-    color === 'inherit' ? s.color.inherit : s.color[`_${color}`],
+    s.fontSize.raw(config.theme.fontSize[size]),
+    color === 'inherit' ? s.color.inherit : s.color.raw(config.theme.color[color]),
     s.strokeWidth.raw(bx(strokeWidth)),
     className,
   )}

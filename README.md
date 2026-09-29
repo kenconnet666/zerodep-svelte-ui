@@ -104,21 +104,20 @@ CSS 作者实例和 SSR 宿主按作用域/请求隔离，没有使用本地兄�
 
 ```svelte
 <script lang="ts">
-  import { Provider, UiCss } from 'zerodep-svelte-ui';
-  const appCss = new UiCss();
+  import { Provider, lightTheme, darkTheme, zhCNLanguage, chinaLocale } from 'zerodep-svelte-ui';
 </script>
 
-<Provider css={appCss} theme="light" locale="zh-CN">
+<Provider theme={lightTheme} lang={zhCNLanguage} locale={chinaLocale}>
   <Content />
-  <Provider theme="dark"><Panel /></Provider>
+  <Provider theme={darkTheme}><Panel /></Provider>
 </Provider>
 ```
 
-根 Provider 省略 css 时创建一次默认 UiCss；子 Provider 默认复用父实例。theme/locale 响应式继承，undefined 撤销覆盖。css 仅用于初始化，更换实例需用 key 块重建作用域。没有 dir 属性；lang 由 locale 设置。
+Provider 位于 src/lib/provider/Provider.svelte，三个子目录分别提供 JS 配置对象：theme 包含 lightTheme/darkTheme，lang 包含 zhCNLanguage/enUSLanguage，locale 包含 chinaLocale/usLocale（地区代码及 IANA 时区）。theme/lang/locale 独立响应式继承，显式对象整体替换，undefined 撤销覆盖。容器 lang/dir 取自语言对象，地区和时区交给 Intl 格式化，不依赖机器默认时区。
 
-useCss() 取得当前作者，useConfig() 取得只读的有效配置，均在后代组件初始化时调用。组件 props 默认值直接写在 $props()；size/color 等语义属性由组件映射到 UiCss 属性。自定义主题可继承 UiCss 并覆盖 theme(mode)，自定义作者属性可继承对应的 UiColorCss 等类型。
+根 Provider 创建一次 zerodep-css 的 Css 作者，子 Provider 默认复用父实例；可选 css prop 只用于初始化，更换实例需用 key 块重建。useCss() 取得作者，useConfig() 取得只读配置，均在后代初始化时调用。保留 config 引用，在模板或 $derived 中读取 config.theme 等属性，不解构成一次性快照。
 
-Provider 提供真实 div 容器、主题变量、color-scheme 与文字颜色，背景和布局由使用者设置。默认声明与外部 class 在一次 css(...) 中按顺序合成，不使用 @layer；外部输入放在最后。只有显式 theme/css 的内层容器重建主题边界，语言覆盖不会抹掉父级局部 token。网页示例位于 /provider。
+主题通过 Svelte context 向下传递，不使用主题 CSS 变量，也不再提供 UiCss/UiColorCss/UiFontSizeCss 等语义作者。自定义主题使用普通对象，例如 `{ ...lightTheme, color: { ...lightTheme.color, primary: 'purple' } }`。默认预设冻结，用户对象不会被 Provider 修改。容器提供 color-scheme 与文字颜色，背景和布局由调用者设置；class/style 不会改变后代读取的配置数据。网页示例位于 /provider。
 
 Provider 和 Icon 的 class 使用 CssInput，优先传入同一 CSS 宿主的 css(...) 结果；也接受声明字符串、嵌套数组及 false/null/undefined 条件空项。组件最终使用一个组合类，同等层叠条件下外部声明覆盖默认值。普通类名、多类名字符串和条件对象不作为原生 class 透传；style 仍是原生内联样式。SSR 中先在当前请求宿主登记外部类，客户端沿用同一宿主的水合清单。
 
@@ -141,11 +140,21 @@ Provider 和 Icon 的 class 使用 CssInput，优先传入同一 CSS 宿主的 c
 </Provider>
 ```
 
-icon 必须是 LucideIconData，只通过 `<Icon icon={Search} />` 传入，不接受子组件或 children snippet。size 为 sm/md/lg（默认 md），color 为 inherit/text/muted/primary/success/warning/danger（默认 inherit）。它们映射到注入的 UiCss 属性；Icon 不自行创建作者。strokeWidth 为数值（默认 2），由 bx 编译成 CSS 变量。精确宽高、原始颜色、动画等通过 class/style 设置。
+icon 必须是 LucideIconData，只通过 `<Icon icon={Search} />` 传入，不接受子组件或 children snippet。size 为 sm/md/lg（默认 md），color 为 inherit/text/muted/primary/success/warning/danger（默认 inherit）。它们从 config.theme.fontSize/color 读取实际值；Icon 不自行创建作者。strokeWidth 为数值（默认 2），仍由 bx 管理动态 CSS 变量，与主题数据传递分开。精确宽高、原始颜色、动画等通过 class/style 设置。
 
 默认图标作为装饰内容隐藏；提供 aria-label 或 aria-labelledby 时自动设置 img 角色，显式 aria-hidden/role 保持优先。图标默认不增加 Tab 停靠点，按钮自身承担名称与交互。SVG 根属性可透传，但 children、width/height、viewBox 和原生 stroke-width 由组件管理。图形数据保持只读，递归子节点使用正确的 SVG 命名空间，内部 key 元数据不输出。网页交互示例位于 /icon。
 
 已安装包的 Vite 依赖 SSR 会使用带缓存查询的 .svelte 文件路径；完整消费链路需要 zerodep-css-svelte 0.1.1 的对应编译修复。不得以跳过插件或只测试工作区源码代替 tarball 验收。
+
+## 公共导出与目录
+
+`packages/ui/src/lib` 中的所有模块都进入公共入口 `src/lib/index.ts`；不公开的实现放到 `src/internal` 等其他目录。组件默认导出按文件名转为 PascalCase，TS/JS 的具名与默认导出、Svelte module script 的具名导出均自动汇总，重名会报错。公开类型使用 .ts 文件，静态资源可通过显式模块包装导出。
+
+- `pnpm exports:generate`：重新生成入口，新增、删除或改名模块后使用。
+- `pnpm exports:check`：只检查同步状态，不修改文件；已纳入 `pnpm check`。
+- 构建自动生成，开发模式自动监听目录；不要手工维护生成文件。
+
+打包输入为 src，内部依赖保留在 dist/internal，公开入口为 dist/lib/index.js。包的 exports 只公开根入口，内部模块不提供消费端子路径。
 
 ## Codex LSP
 

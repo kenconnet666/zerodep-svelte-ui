@@ -2,7 +2,7 @@
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
   import { onMount, type Snippet } from 'svelte';
-  import { Provider } from 'zerodep-svelte-ui';
+  import { Provider, zhCNLanguage } from 'zerodep-svelte-ui';
   import '../app.css';
 
   let { children }: { children: Snippet } = $props();
@@ -13,7 +13,7 @@
   });
 </script>
 
-<Provider locale="zh-CN">
+<Provider lang={zhCNLanguage}>
   <a class="skip-link" href="#main">跳到正文</a>
   <header>
     <a class="brand" href={resolve('/')}>zerodep <span>svelte ui</span></a>

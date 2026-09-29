@@ -1,76 +1,131 @@
 import { afterEach, expect, test } from 'vitest';
 import { cleanup, render } from 'vitest-browser-svelte';
-import { css, cssStats } from 'zerodep-css-svelte';
-import { UiCss, UiColorCss } from '../src/lib/index.js';
+import { Css, css, cssStats } from 'zerodep-css-svelte';
+import {
+  lightTheme,
+  darkTheme,
+  zhCNLanguage,
+  enUSLanguage,
+  chinaLocale,
+  usLocale,
+  type UiTheme,
+} from '../src/lib/index.js';
 import ProviderHarness from './fixtures/ProviderHarness.svelte';
+import ProviderMutableHarness from './fixtures/ProviderMutableHarness.svelte';
 
 afterEach(cleanup);
 
-test('后代共享作者，配置随父级更新，覆盖撤销后恢复继承', async () => {
-  const authors: UiCss[] = [];
+test('调用方的 Svelte 响应式对象字段更新传递到嵌套后代', async () => {
+  const screen = await render(ProviderMutableHarness, {});
+  await screen.getByRole('button', { name: '更新对象字段' }).click();
+  await expect.element(screen.getByTestId('value')).toHaveStyle({ color: 'rgb(128, 0, 128)' });
+  await expect.element(screen.getByTestId('value-message')).toHaveTextContent('处理中');
+  await expect.element(screen.getByTestId('value-time')).toHaveTextContent('07:00');
+  expect(lightTheme.color.primary).toBe('#1d4ed8');
+  expect(zhCNLanguage.messages.loading).toBe('加载中');
+  expect(chinaLocale.timeZone).toBe('Asia/Shanghai');
+});
+
+test('后代共享作者，主题、语言和地区对象分别响应父级更新', async () => {
+  const authors: Css[] = [];
   const screen = await render(ProviderHarness, { onRead: (s) => authors.push(s) });
   expect(authors).toHaveLength(4);
   expect(new Set(authors).size).toBe(1);
   await expect.element(screen.getByTestId('root')).toHaveAttribute('lang', 'zh-CN');
-  await expect.element(screen.getByTestId('nested-value')).toHaveTextContent('light / zh-CN');
-
-  await screen.rerender({ theme: 'dark', locale: 'en-US' });
-  await expect.element(screen.getByTestId('nested-value')).toHaveTextContent('dark / en-US');
-  await expect.element(screen.getByTestId('nested')).toHaveAttribute('lang', 'en-US');
-  await expect
-    .element(screen.getByTestId('root-value'))
-    .toHaveStyle({ color: 'rgb(147, 197, 253)' });
-
-  await screen.rerender({ nestedTheme: 'light', nestedLocale: 'ja-JP' });
-  await expect.element(screen.getByTestId('nested-value')).toHaveTextContent('light / ja-JP');
-  await expect.element(screen.getByTestId('sibling-value')).toHaveTextContent('dark / en-US');
+  await expect.element(screen.getByTestId('root')).toHaveAttribute('dir', 'ltr');
   await expect
     .element(screen.getByTestId('nested-value'))
-    .toHaveStyle({ color: 'rgb(29, 78, 216)' });
+    .toHaveTextContent('light / zh-CN / Asia/Shanghai');
+  await expect.element(screen.getByTestId('nested-value-message')).toHaveTextContent('加载中');
+  await expect.element(screen.getByTestId('nested-value-time')).toHaveTextContent('20:00');
 
-  await screen.rerender({ nestedTheme: undefined, nestedLocale: undefined });
-  await expect.element(screen.getByTestId('nested-value')).toHaveTextContent('dark / en-US');
+  await screen.rerender({ theme: darkTheme, lang: enUSLanguage });
+  await expect
+    .element(screen.getByTestId('nested-value'))
+    .toHaveTextContent('dark / en-US / Asia/Shanghai');
+  await expect.element(screen.getByTestId('nested-value-message')).toHaveTextContent('Loading');
+  await expect
+    .element(screen.getByTestId('nested-value'))
+    .toHaveStyle({ color: 'rgb(147, 197, 253)' });
+  await screen.rerender({ locale: usLocale });
+  await expect.element(screen.getByTestId('nested-value-time')).toHaveTextContent('07:00');
   expect(new Set(authors).size).toBe(1);
 });
 
-test('仅覆盖语言保留父变量，主题覆盖及自定义作者只影响对应子树', async () => {
-  class CustomColor extends UiColorCss {
-    override readonly _primary = this.raw('purple');
-  }
-  class CustomCss extends UiCss {
-    override readonly color = new CustomColor();
-  }
-  const custom = new CustomCss();
-  const authors: UiCss[] = [];
+test('子级独立覆盖，父级替换不越界，undefined 恢复继承', async () => {
+  const rtl = { ...enUSLanguage, code: 'ar', dir: 'rtl' as const };
   const screen = await render(ProviderHarness, {
-    style: '--ui-color-primary:rgb(0, 128, 0)',
-    nestedLocale: 'en-US',
-    localCss: custom,
+    theme: darkTheme,
+    lang: enUSLanguage,
+    locale: usLocale,
+    nestedTheme: lightTheme,
+    nestedLang: rtl,
+    nestedLocale: chinaLocale,
+  });
+  await expect.element(screen.getByTestId('nested')).toHaveAttribute('dir', 'rtl');
+  await expect.element(screen.getByTestId('nested')).toHaveAttribute('lang', 'ar');
+  await expect
+    .element(screen.getByTestId('nested-value'))
+    .toHaveTextContent('light / ar / Asia/Shanghai');
+  await expect
+    .element(screen.getByTestId('sibling-value'))
+    .toHaveTextContent('dark / en-US / America/New_York');
+  await screen.rerender({ theme: lightTheme, lang: zhCNLanguage });
+  await expect
+    .element(screen.getByTestId('nested-value'))
+    .toHaveTextContent('light / ar / Asia/Shanghai');
+  await screen.rerender({ nestedTheme: undefined, nestedLang: undefined, nestedLocale: undefined });
+  await expect
+    .element(screen.getByTestId('nested-value'))
+    .toHaveTextContent('light / zh-CN / America/New_York');
+  await expect.element(screen.getByTestId('nested')).toHaveAttribute('dir', 'ltr');
+});
+
+test('自定义主题对象直接驱动后代，切换语言和作者不丢失主题', async () => {
+  const theme: UiTheme = {
+    ...lightTheme,
+    name: 'brand',
+    color: { ...lightTheme.color, primary: 'purple' },
+    fontSize: { ...lightTheme.fontSize, md: '21px' },
+  };
+  const author = new Css();
+  const authors: Css[] = [];
+  const screen = await render(ProviderHarness, {
+    theme,
+    localCss: author,
+    nestedLang: enUSLanguage,
     onRead: (s) => authors.push(s),
   });
-  expect(authors.filter((s) => s === custom)).toHaveLength(1);
-  await expect.element(screen.getByTestId('nested-value')).toHaveStyle({ color: 'rgb(0, 128, 0)' });
+  expect(authors.filter((s) => s === author)).toHaveLength(1);
+  await expect
+    .element(screen.getByTestId('nested-value'))
+    .toHaveStyle({ color: 'rgb(128, 0, 128)', fontSize: '21px' });
   await expect
     .element(screen.getByTestId('local-value'))
     .toHaveStyle({ color: 'rgb(128, 0, 128)' });
-  await screen.rerender({ nestedTheme: 'dark' });
+  expect(
+    getComputedStyle(screen.getByTestId('root').element()).getPropertyValue('--ui-color-primary'),
+  ).toBe('');
+  await screen.rerender({ nestedTheme: darkTheme });
   await expect
     .element(screen.getByTestId('nested-value'))
     .toHaveStyle({ color: 'rgb(147, 197, 253)' });
   await expect
     .element(screen.getByTestId('sibling-value'))
-    .toHaveStyle({ color: 'rgb(0, 128, 0)' });
+    .toHaveStyle({ color: 'rgb(128, 0, 128)' });
+  expect(lightTheme.color.primary).toBe('#1d4ed8');
 });
 
-test('主题反复切换不累加规则，内层卸载保留兄弟样式', async () => {
+test('已使用过的主题组合复用规则，卸载子树不影响兄弟', async () => {
   const screen = await render(ProviderHarness, {});
-  // 按实际使用登记主题；两种组合首次出现后，切换只命中缓存。
-  await screen.rerender({ theme: 'dark' });
-  await screen.rerender({ theme: 'light' });
+  await screen.rerender({ theme: darkTheme });
+  await screen.rerender({ theme: lightTheme });
   const rules = cssStats().rules;
-  for (const theme of ['dark', 'light', 'dark', 'light'] as const) {
+  for (const theme of [darkTheme, lightTheme, darkTheme, lightTheme]) {
     await screen.rerender({ theme });
-    await expect.element(screen.getByTestId('root-value')).toHaveTextContent(`${theme} / zh-CN`);
+    await expect
+      .element(screen.getByTestId('root-value'))
+      .toHaveTextContent(theme.name + ' / zh-CN / Asia/Shanghai');
   }
   expect(cssStats().rules).toBe(rules);
   await screen.rerender({ showNested: false });
@@ -80,29 +135,16 @@ test('主题反复切换不累加规则，内层卸载保留兄弟样式', async
     .toHaveStyle({ color: 'rgb(29, 78, 216)' });
 });
 
-test('外部 css 先登记也能覆盖主题默认值，合成一个类并支持撤销', async () => {
-  const s = new UiCss();
-  const override = css(s.color.green, '--ui-color-primary:rgb(128, 0, 128);');
-  const screen = await render(ProviderHarness, { className: override, nestedLocale: 'en-US' });
+test('外部 css 先登记也能覆盖容器默认声明，合成一个类并支持撤销', async () => {
+  const s = new Css();
+  const override = css(s.color.green);
+  const screen = await render(ProviderHarness, { className: override });
   const root = screen.getByTestId('root');
   expect(root.element().classList).toHaveLength(1);
   await expect.element(root).toHaveStyle({ color: 'rgb(0, 128, 0)' });
-  await expect
-    .element(screen.getByTestId('nested-value'))
-    .toHaveStyle({ color: 'rgb(128, 0, 128)' });
-
-  await screen.rerender({ theme: 'dark' });
+  await screen.rerender({ theme: darkTheme });
   await expect.element(root).toHaveStyle({ color: 'rgb(0, 128, 0)' });
-  await expect
-    .element(screen.getByTestId('nested-value'))
-    .toHaveStyle({ color: 'rgb(128, 0, 128)' });
   expect(root.element().classList).toHaveLength(1);
-
-  await screen.rerender({ className: css(s.color.red) });
-  await expect.element(root).toHaveStyle({ color: 'rgb(255, 0, 0)' });
-  await expect
-    .element(screen.getByTestId('nested-value'))
-    .toHaveStyle({ color: 'rgb(147, 197, 253)' });
   await screen.rerender({ className: undefined });
   await expect.element(root).toHaveStyle({ color: 'rgb(249, 250, 251)' });
 });

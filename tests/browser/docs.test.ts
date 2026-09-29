@@ -56,6 +56,10 @@ test('Provider 文档的配置继承、主题覆盖和恢复', async ({ page }) 
   await page.getByRole('combobox', { name: '父主题', exact: true }).selectOption('dark');
   await page.getByRole('combobox', { name: '语言', exact: true }).selectOption('en-US');
   await expect(page.locator('[data-provider-value="子级"]')).toHaveText('子级：dark / en-US');
+  await expect(page.locator('[data-provider-language="子级"]')).toHaveText('Loading');
+  await expect(page.locator('[data-provider-time="子级"]')).toHaveText('20:00');
+  await page.getByRole('combobox', { name: '地区与时区', exact: true }).selectOption('us');
+  await expect(page.locator('[data-provider-time="子级"]')).toHaveText('07:00');
   await expect(page.locator('[data-provider-value="子级"]')).toHaveCSS(
     'color',
     'rgb(147, 197, 253)',
@@ -65,6 +69,11 @@ test('Provider 文档的配置继承、主题覆盖和恢复', async ({ page }) 
   await expect(page.locator('[data-provider-value="兄弟"]')).toHaveText('兄弟：dark / en-US');
   await page.getByRole('combobox', { name: '子主题', exact: true }).selectOption('inherit');
   await expect(page.locator('[data-provider-value="子级"]')).toHaveText('子级：dark / en-US');
+  await page.getByRole('combobox', { name: '父主题', exact: true }).selectOption('brand');
+  await expect(page.locator('[data-provider-value="子级"]')).toHaveCSS(
+    'color',
+    'rgb(126, 34, 206)',
+  );
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
     .analyze();

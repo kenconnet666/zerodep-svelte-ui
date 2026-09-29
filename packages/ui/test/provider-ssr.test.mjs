@@ -24,13 +24,14 @@ after(async () => {
 
 test('正式包产物的 Provider 隔离并发 SSR，嵌套作用域共享请求作者', async () => {
   const [a, b] = await Promise.all([
-    entry.renderProvider('light', 'zh-CN', '#123456'),
-    entry.renderProvider('dark', 'en-US', '#abcdef'),
+    entry.renderProvider(false, '#123456'),
+    entry.renderProvider(true, '#abcdef'),
   ]);
   assert.match(a.body, /light\/zh-CN/);
-  assert.match(a.body, /light\/ja-JP/);
+  assert.match(a.body, /Asia\/Shanghai\/加载中/);
   assert.match(b.body, /dark\/en-US/);
-  assert.match(b.body, /dark\/ja-JP/);
+  assert.match(b.body, /dark\/zh-CN\/America\/New_York\/加载中/);
+  assert.match(b.body, /America\/New_York\/Loading/);
   assert.match(a.css, /#123456/);
   assert.doesNotMatch(a.css, /#abcdef/);
   assert.match(b.css, /#abcdef/);
@@ -42,8 +43,9 @@ test('正式包产物的 Provider 隔离并发 SSR，嵌套作用域共享请求
     const name = result.body.match(/<div[^>]*class="([^"]+)"/)?.[1];
     assert.match(name, /^z-[a-z0-9]+$/);
     const body = result.rules.find((rule) => rule.className === name).body;
-    assert.match(body, /color:var\(--ui-color-text\);color:green;$/);
+    assert.match(body, /color:#[a-f0-9]+;color:green;$/);
     assert.doesNotMatch(body, /@layer/);
+    assert.doesNotMatch(result.css, /--ui-color|--ui-font-size/);
   }
 });
 
@@ -61,13 +63,21 @@ test('正式包产物的 Icon 在 SSR 输出 SVG、名称和 bx 初始样式', (
   assert.doesNotMatch(result.body, /\skey=/);
   const variable = result.css.match(/stroke-width:var\((--[\w-]+)\)/)?.[1];
   assert.ok(variable);
-  // 直接组合声明可使用元素绑定：SSR 初值在 SVG 上，规则引用同一个变量。
   const svg = result.body.match(/<svg\b(?:[^>"']|"[^"]*"|'[^']*')*>/)?.[0];
-  assert.match(svg, new RegExp(`${variable}:\\s*1\\.5(?:;|")`));
   const name = svg.match(/\bclass="([^"]+)"/)?.[1];
   assert.match(name, /^z-[a-z0-9]+$/);
+  // bx 可绑定在元素或私有规则上；两种编译路径都必须为当前 SVG 提供正确初值。
+  const inlineValue = new RegExp(`${variable}:\\s*1\\.5(?:;|")`).test(svg);
+  const boundValue = result.rules.some(
+    (rule) =>
+      rule.kind === 'bindings' &&
+      rule.targets.includes(name) &&
+      rule.body.includes(`${variable}:1.5;`),
+  );
+  assert.ok(inlineValue || boundValue, 'SVG 的描边变量缺少 SSR 初值');
   const body = result.rules.find((rule) => rule.className === name).body;
   assert.match(body, /width:1em;/);
   assert.match(body, /width:30px;$/);
   assert.doesNotMatch(body, /@layer/);
+  assert.doesNotMatch(result.css, /--ui-color|--ui-font-size/);
 });

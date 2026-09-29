@@ -6,18 +6,20 @@
     useCss,
     type UiColor,
     type UiSize,
-    type UiTheme,
+    lightTheme,
+    darkTheme,
   } from 'zerodep-svelte-ui';
   import { css } from 'zerodep-css-svelte';
 
   const s = useCss();
-  const panel = css(s.backgroundColor._background, s.padding.rem(1.5), s.borderRadius.px(12));
+  const panel = css(s.padding.rem(1.5), s.borderRadius.px(12));
   const row = css(s.display.flex, s.alignItems.center, s.gap.rem(1.5), s.flexWrap.wrap);
   const colors: UiColor[] = ['inherit', 'text', 'muted', 'primary', 'success', 'warning', 'danger'];
   let choice = $state<'Search' | 'Check'>('Search');
   let size = $state<UiSize>('md');
   let color = $state<UiColor>('primary');
-  let theme = $state<UiTheme>('light');
+  let theme = $state<'light' | 'dark'>('light');
+  const selectedTheme = $derived(theme === 'light' ? lightTheme : darkTheme);
   let strokeWidth = $state(2);
   let searches = $state(0);
   const selected = $derived(choice === 'Search' ? Search : Check);
@@ -55,7 +57,10 @@
   <output aria-label="描边宽度">{strokeWidth}</output>
 </div>
 
-<Provider {theme} class={panel}>
+<Provider
+  theme={selectedTheme}
+  class={css(panel, s.backgroundColor.raw(selectedTheme.color.background))}
+>
   <div class={row}>
     <Icon icon={selected} {size} {color} {strokeWidth} aria-label="预览图标" data-icon-preview />
     <span>语义尺寸 {size}，颜色 {color}</span>
@@ -86,7 +91,7 @@ import { Provider, Icon } from 'zerodep-svelte-ui';`}</code
           >必填，LucideIconData 图形数据，支持响应式替换，不接受子组件或 children。</td
         ></tr
       >
-      <tr><td>size</td><td>sm / md / lg，默认 md，映射到作者的 fontSize 语义属性。</td></tr>
+      <tr><td>size</td><td>sm / md / lg，默认 md，读取主题对象的 fontSize。</td></tr>
       <tr
         ><td>color</td><td
           >inherit / text / muted / primary / success / warning / danger，默认 inherit。</td
@@ -110,8 +115,8 @@ import { Provider, Icon } from 'zerodep-svelte-ui';`}</code
     不透传普通类名、多类名字符串或条件对象。同等层叠条件下，外部声明覆盖默认值。
   </p>
   <p>
-    Icon 不创建 Css 实例，读取最近 Provider 注入的 UiCss。应用可覆盖 UiFontSizeCss、UiColorCss 或
-    UiCss.theme。viewBox 来自图标数据；图形节点保留 SVG 命名空间，不修改共享资源。
+    Icon 复用最近 Provider 的 Css 作者，颜色和字号从注入的主题对象读取。 应用通过 Provider 的 theme
+    传入自定义对象。viewBox 来自图标数据；图形节点保留 SVG 命名空间，不修改共享资源。
   </p>
   <p>
     消费应用必须安装 @lucide/icons 并启用
