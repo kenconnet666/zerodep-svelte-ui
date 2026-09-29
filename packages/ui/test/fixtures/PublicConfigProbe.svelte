@@ -11,5 +11,5 @@
 </script>
 
 <span class={css(author.color.primary)}
-  >{theme.themeName}/{lang.code}/{locale.timeZone}/{lang.messages.loading}</span
+  >{theme.themeName}/{lang.languageName}/{locale.timeZone}/{lang.messages.loading}</span
 >

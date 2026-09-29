@@ -52,8 +52,8 @@
   );
   const language = langContext.provide(
     Object.freeze({
-      get code() {
-        return (lang ?? parentLang ?? zhCNLanguage).code;
+      get languageName() {
+        return (lang ?? parentLang ?? zhCNLanguage).languageName;
       },
       get messages() {
         return (lang ?? parentLang ?? zhCNLanguage).messages;
@@ -62,8 +62,8 @@
   );
   localeContext.provide(
     Object.freeze({
-      get code() {
-        return (locale ?? parentLocale ?? chinaLocale).code;
+      get localeName() {
+        return (locale ?? parentLocale ?? chinaLocale).localeName;
       },
       get timeZone() {
         return (locale ?? parentLocale ?? chinaLocale).timeZone;
@@ -85,7 +85,7 @@
 
 <div
   {...rest}
-  lang={language.code}
+  lang={language.languageName}
   class={styleClass(s.colorScheme.raw(s.theme.themeName), s.color.text, className)}
 >
   {@render children?.()}

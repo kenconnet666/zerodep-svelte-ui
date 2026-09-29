@@ -56,7 +56,7 @@ test('同一 Provider 后代共享作者，嵌套作用域独立，配置响应�
 });
 
 test('子级独立覆盖，父级替换不越界，undefined 恢复继承', async () => {
-  const customLanguage = { ...enUSLanguage, code: 'en-GB' };
+  const customLanguage = { ...enUSLanguage, languageName: 'en-GB' };
   const screen = await render(ProviderHarness, {
     theme: darkTheme,
     lang: enUSLanguage,

@@ -10,7 +10,7 @@
   untrack(() => onRead?.(s));
   const appearance = $derived(css(s.color.primary, s.fontSize.md));
   const time = $derived(
-    new Intl.DateTimeFormat(locale.code, {
+    new Intl.DateTimeFormat(locale.localeName, {
       timeZone: locale.timeZone,
       hour: '2-digit',
       minute: '2-digit',
@@ -23,7 +23,7 @@
   data-testid={name}
   data-primary={theme.color.primary}
   data-font-size={theme.fontSize.md}
-  class={appearance}>{theme.themeName} / {lang.code} / {locale.timeZone}</span
+  class={appearance}>{theme.themeName} / {lang.languageName} / {locale.timeZone}</span
 >
 <span data-testid={name + '-message'}>{lang.messages.loading}</span>
 <time data-testid={name + '-time'}>{time}</time>

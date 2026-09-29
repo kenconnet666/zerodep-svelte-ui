@@ -26,7 +26,7 @@ export const badTheme: Props = { theme: 'dark' };
 // @ts-expect-error lang 是语言对象。
 export const badLanguage: Props = { lang: 'en' };
 // @ts-expect-error 地区配置必须有显式时区。
-export const badLocale: Props = { locale: { code: 'en-US' } };
+export const badLocale: Props = { locale: { localeName: 'en-US' } };
 // @ts-expect-error 作者应实现 Css。
 export const badCss: Props = { css: {} };
 export function readonlyObjects() {

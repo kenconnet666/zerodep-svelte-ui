@@ -8,7 +8,7 @@
   const s = useCss();
   const appearance = $derived(css(s.color.primary, s.fontSize.md));
   const time = $derived(
-    new Intl.DateTimeFormat(locale.code, {
+    new Intl.DateTimeFormat(locale.localeName, {
       timeZone: locale.timeZone,
       hour: '2-digit',
       minute: '2-digit',
@@ -18,9 +18,9 @@
 </script>
 
 <p class={appearance} data-provider-value={label}>
-  {label}：{theme.themeName} / {lang.code}
+  {label}：{theme.themeName} / {lang.languageName}
 </p>
 <p data-provider-language={label}>{lang.messages.loading}</p>
 <p>
-  {locale.code} · {locale.timeZone} · <time data-provider-time={label}>{time}</time>
+  {locale.localeName} · {locale.timeZone} · <time data-provider-time={label}>{time}</time>
 </p>

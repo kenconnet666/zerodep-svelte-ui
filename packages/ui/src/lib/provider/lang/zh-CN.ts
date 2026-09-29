@@ -1,7 +1,7 @@
 import type { UiLanguage } from './types.js';
 
 export const zhCNLanguage: UiLanguage = Object.freeze({
-  code: 'zh-CN',
+  languageName: 'zh-CN',
   messages: Object.freeze({
     confirm: '确认',
     cancel: '取消',
