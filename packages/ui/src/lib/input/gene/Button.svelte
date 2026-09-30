@@ -30,7 +30,6 @@
   import type { UiCss } from '../../provider/css.js';
   import { focusRing } from '../../tool/focus-ring.js';
   import { rippleButton } from '../../tool/ripple-button.js';
-  import { isButtonBlocked } from '../../../internal/button-blocked.js';
 
   let {
     type = 'button',
@@ -57,7 +56,12 @@
   let ripple = $state<RippleHandle>();
 
   function activate(event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
-    if (isButtonBlocked(event.currentTarget, disabled || loading)) {
+    if (
+      disabled ||
+      loading ||
+      event.currentTarget.matches(':disabled') ||
+      event.currentTarget.getAttribute('aria-disabled') === 'true'
+    ) {
       event.preventDefault();
       event.stopPropagation();
       return;
