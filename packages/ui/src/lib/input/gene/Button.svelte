@@ -26,7 +26,7 @@
   import type { LucideIconData } from '@lucide/icons';
   import { css, type CssInput } from 'zerodep-css-svelte';
   import type { RippleHandle } from '../../feedback/gene/Ripple.svelte';
-  import { useCss } from '../../provider/context.js';
+  import { useCss } from '../../provider/Provider.svelte';
   import type { UiCss } from '../../provider/css.js';
   import { focusRing } from '../../tool/focus-ring.js';
   import { rippleButton } from '../../tool/ripple-button.js';

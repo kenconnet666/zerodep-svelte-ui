@@ -14,9 +14,9 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
   import { css, type CssInput } from 'zerodep-css-svelte';
-  import { useCss } from '../../provider/context.js';
+  import { useCss } from '../../provider/Provider.svelte';
   import type { UiCss } from '../../provider/css.js';
-  import { createRippleController } from '../../../internal/ripple-controller.js';
+  import { createRippleController } from '../../tool/ripple-controller.js';
 
   let {
     color = '_primary',

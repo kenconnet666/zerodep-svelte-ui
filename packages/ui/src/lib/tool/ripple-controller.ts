@@ -1,7 +1,11 @@
-import type { RippleHandle, RippleOrigin } from '../lib/feedback/gene/Ripple.svelte';
-import type { UiCss } from '../lib/provider/css.js';
+import type { RippleHandle, RippleOrigin } from '../feedback/gene/Ripple.svelte';
+import type { UiCss } from '../provider/css.js';
 
-/** Svelte 管理空覆盖层；本控制器独占其子节点，attachment 清理时一并销毁。 */
+/**
+ * 在浏览器挂载后接入空覆盖层；控制器独占新增的波纹子节点。
+ * layer 需要定位和尺寸，circleClass 负责圆形、背景及绝对定位；disabled 每次启动时读取。
+ * 调用方负责在卸载时 destroy()，释放动画、定时器和减少动效监听；不要在 SSR 中调用。
+ */
 export function createRippleController(
   layer: HTMLSpanElement,
   s: UiCss,

@@ -116,8 +116,11 @@ test(
       export const provider:ComponentProps<typeof Provider>={css:(readTheme)=>new UiCss(readTheme),theme:darkTheme,lang:enUSLanguage,locale:usLocale};
       // @ts-expect-error 内部 context 设置器不进入公共导出。
       import {provideCss} from 'zerodep-svelte-ui';
-      // @ts-expect-error 动画控制器属于内部实现。
-      import {createRippleController} from 'zerodep-svelte-ui';
+      import {context,createRippleController} from 'zerodep-svelte-ui';
+      export const customContext:{optional():number|undefined;provide(value:number):number;use():number}=context<number>();
+      export const rippleController:typeof createRippleController=createRippleController;
+      // @ts-expect-error Provider 的 context 实例就近私有，不是公开配置入口。
+      import {themeContext} from 'zerodep-svelte-ui';
             export const button:ComponentProps<typeof Button>={size:'_lg',slotProps:{label:{size:'18px'},icon:{size:'1em'},loading:{color:'_primary'},ripple:{opacity:0.1}}};
       export const loading:ComponentProps<typeof Loading>={size:'_md',label:'请稍候'};
       // @ts-expect-error Button 不提供根组件替换。

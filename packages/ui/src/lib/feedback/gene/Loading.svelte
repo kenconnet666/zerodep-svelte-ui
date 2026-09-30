@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
   import { css, keyframes, type CssInput } from 'zerodep-css-svelte';
-  import { useCss, useLang } from '../../provider/context.js';
+  import { useCss, useLang } from '../../provider/Provider.svelte';
   import type { UiCss } from '../../provider/css.js';
 
   let {

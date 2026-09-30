@@ -174,9 +174,11 @@ Icon 复用最近 Provider 的作者，主题更新直接由 UiCss 响应。没�
 - rippleButton(() => ripple, () => disabled) 是原生 button 的 Svelte attachment；观察 pointerdown/up/cancel、移出、失焦和无指针 click，不合成点击、不拦截键盘、不管理业务回调或表单。原生 disabled、fieldset 和 aria-disabled 都会阻止反馈；loading 的业务拦截仍由按钮负责。
 - focusRing(s) 只返回 :focus-visible CSS，复用 _focusRing，不引入焦点管理器。原生 Enter/Space/Tab 保持浏览器行为。
 
-Ripple 父容器需要定位和尺寸，建议建立局部 stacking context；覆盖层自己裁剪圆角，焦点环不会被整个按钮的 overflow:hidden 裁掉。动画控制器在 src/internal/ripple-controller.ts，独占空覆盖层的子节点，attachment 负责清理；几何值写入内联样式，不按点击坐标登记 CSS 类。没有引入新依赖或 bx。
+Ripple 父容器需要定位和尺寸，建议建立局部 stacking context；覆盖层自己裁剪圆角，焦点环不会被整个按钮的 overflow:hidden 裁掉。createRippleController 在 src/lib/tool/ripple-controller.ts 公开导出，独占空覆盖层新增的波纹子节点，调用方在挂载后创建并在卸载时 destroy()；Ripple 已通过 attachment 管理这些操作。几何值写入内联样式，不按点击坐标登记 CSS 类。没有引入新依赖或 bx。
 
 文档与真实原生按钮示例见 /text、/ripple。该按钮只是验证夹具，不是新增的 Button API。几何定位支持未旋转的矩形与普通缩放；不承诺任意旋转/倾斜宿主的坐标还原。
+
+通用 `context<T>()` 从包入口导出，模块顶层创建一次，组件初始化时使用 `provide(value)` 注入、`optional()` 可选读取或 `use()` 必须读取。每次创建使用独立键，缺失值仅在 use() 时报错；值仍由 Svelte 按组件树隔离。Provider 自身的 context 实例和四个 use hook 就近放在 Provider.svelte 的 module script，实例不导出，不再保留独立 provider-context 文件与 provideCss 包装。
 
 ## Button 与 Loading
 

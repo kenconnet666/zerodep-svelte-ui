@@ -50,14 +50,26 @@ test('正式包产物的 Provider 隔离并发 SSR 和嵌套主题作者', async
 });
 
 test('缺少 Provider 或 SSR 宿主时明确失败', () => {
-  assert.throws(() => entry.renderWithoutProvider(), /inside a Provider/);
-  assert.throws(() => entry.renderIconWithoutProvider(), /inside a Provider/);
-  assert.throws(() => entry.renderFoundationWithoutProvider('text'), /inside a Provider/);
-  assert.throws(() => entry.renderFoundationWithoutProvider('ripple'), /inside a Provider/);
-  assert.throws(() => entry.renderFoundationWithoutProvider('button'), /inside a Provider/);
-  assert.throws(() => entry.renderFoundationWithoutProvider('loading'), /inside a Provider/);
+  assert.throws(() => entry.renderWithoutProvider(), /CSS author was not provided/);
+  assert.throws(() => entry.renderIconWithoutProvider(), /CSS author was not provided/);
+  assert.throws(() => entry.renderFoundationWithoutProvider('text'), /CSS author was not provided/);
+  assert.throws(
+    () => entry.renderFoundationWithoutProvider('ripple'),
+    /CSS author was not provided/,
+  );
+  assert.throws(
+    () => entry.renderFoundationWithoutProvider('button'),
+    /CSS author was not provided/,
+  );
+  assert.throws(
+    () => entry.renderFoundationWithoutProvider('loading'),
+    /CSS author was not provided/,
+  );
   for (const kind of ['theme', 'locale', 'lang', 'css']) {
-    assert.throws(() => entry.readWithoutProvider(kind), /inside a Provider/);
+    assert.throws(
+      () => entry.readWithoutProvider(kind),
+      kind === 'css' ? /CSS author was not provided/ : /Required context was not provided/,
+    );
   }
   assert.throws(() => entry.renderWithoutHost(), /CSS server host is unavailable/);
 });

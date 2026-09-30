@@ -2,7 +2,7 @@
   import type { SVGAttributes } from 'svelte/elements';
   import type { LucideIconData, LucideIconNode } from '@lucide/icons';
   import { css, type CssInput } from 'zerodep-css-svelte';
-  import { useCss } from '../../provider/context.js';
+  import { useCss } from '../../provider/Provider.svelte';
   import type { UiCss } from '../../provider/css.js';
 
   let {

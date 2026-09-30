@@ -1,18 +1,30 @@
+<script module lang="ts">
+  import { createCssContext } from 'zerodep-css-svelte';
+  import { context } from '../tool/context.js';
+  import { UiCss, type UiCssFactory } from './css.js';
+  import type { UiTheme } from './theme/types.js';
+  import type { UiLanguage } from './lang/types.js';
+  import type { UiLocale } from './locale/types.js';
+
+  // 键在模块内共享，值由 Svelte 按组件树隔离；Provider 可选读父级，消费 hook 必须读到值。
+  const themeContext = context<UiTheme>();
+  const localeContext = context<UiLocale>();
+  const langContext = context<UiLanguage>();
+  const cssFactoryContext = context<UiCssFactory>();
+  const bindingContext = createCssContext<UiCss>();
+
+  /** 在后代组件初始化时读取；保留对象，在模板或派生表达式中读取其字段。 */
+  export const useTheme = themeContext.use;
+  export const useLocale = localeContext.use;
+  export const useLang = langContext.use;
+  // CSS 消费和编译绑定复用同一上下文，不再重复注入一份 UiCss。
+  export const useCss = bindingContext.useCss;
+</script>
+
 <script lang="ts">
   import { untrack, type Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
   import { css as styleClass, type CssInput } from 'zerodep-css-svelte';
-  import { UiCss, type UiCssFactory } from './css.js';
-  import {
-    themeContext,
-    localeContext,
-    langContext,
-    cssFactoryContext,
-    provideCss,
-  } from '../../internal/provider-context.js';
-  import type { UiTheme } from './theme/types.js';
-  import type { UiLanguage } from './lang/types.js';
-  import type { UiLocale } from './locale/types.js';
   import { lightTheme } from './theme/light.js';
   import { zhCNLanguage } from './lang/zh-CN.js';
   import { chinaLocale } from './locale/china.js';
@@ -106,7 +118,7 @@
     }),
   );
   cssFactoryContext.provide(createCss);
-  provideCss(s);
+  bindingContext.provideCss(s);
 
   // 作者与绑定所有者按作用域固定；主题、语言、地区对象可直接替换。
   $effect.pre(() => {

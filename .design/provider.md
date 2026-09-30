@@ -7,7 +7,7 @@ Provider 使用 Svelte context 注入三个普通 JS 对象；主题、地区、
 - src/lib 是公开 API 目录。TS、JS 模块的具名导出、默认导出，以及 Svelte 组件和 module script 导出，递归汇总到 src/lib/index.ts。
 - index.ts 由 pnpm exports:generate 生成。构建前自动更新，开发 watch 跟随文件新增、删除和改名更新；pnpm exports:check / pnpm check 验证提交中的入口没有遗漏。
 - 默认导出按文件名转为 PascalCase；index 模块使用所在目录名。导出重名、无导出模块和非模块文件会报错，不静默跳过。公开类型写在 .ts 文件中。
-- 内部 context 设置器和键放在 src/internal。svelte-package 的输入为 src，产物保留 lib/internal 的相对路径；package.json 只公开 dist/lib/index.js，不开放内部子路径。
+- 通用 context<T>() 放在 src/lib/tool/context.ts 并公开。Provider 专用的 context 实例就近放在 Provider.svelte 的 module script，只有 useTheme/useLocale/useLang/useCss 公开；无需独立内部文件或单次调用包装。CSS 作者直接复用 createCssContext 的注入和消费，不重复创建 UiCss context。package.json 只公开 dist/lib/index.js。
 - Provider 位于 lib/provider/Provider.svelte；lang、locale、theme 分别放语言、地区时区、主题预设与类型。
 
 ## 配置对象与继承
@@ -39,7 +39,7 @@ Provider 使用 Svelte context 注入三个普通 JS 对象；主题、地区、
 
 ## 必须提供上下文
 
-所有消费组件及 useCss()/useTheme()/useLocale()/useLang() 必须位于 Provider 后代中；缺失时统一抛出明确错误，不做默认作者回退。根 Provider 可以没有父级，并提供默认主题、语言与地区；只有 Provider 处理默认值。SSR 与浏览器使用相同约束。
+所有消费组件及 useCss()/useTheme()/useLocale()/useLang() 必须位于 Provider 后代中；缺失时抛出明确错误，不做默认作者回退。通用 context.use() 报 Required context was not provided，useCss() 沿用 CSS 工具的 CSS author was not provided。根 Provider 可以没有父级，并提供默认主题、语言与地区；只有 Provider 处理默认值。SSR 与浏览器使用相同约束。
 
 主题声明统一使用下划线：s.color._primary 与 s.color.raw('_primary') 等价；背景色与字号同理。只解析完整的已知主题标识，原生 CSS 值继续由基础 raw() 处理。主题数据对象中的 color._primary、fontSize._md 与声明同名，不再剥离下划线；Icon 的主题参数同样带下划线，如 color="_primary"、size="_md"。
 
