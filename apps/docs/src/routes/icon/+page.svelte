@@ -4,6 +4,8 @@
   import { Search, Check } from '@lucide/icons';
   import {
     Icon,
+    Card,
+    Flex,
     Checkbox,
     Select,
     Slider,
@@ -15,8 +17,6 @@
   import { css } from 'zerodep-css-svelte';
 
   const s = useCss();
-  const panel = css(s.padding.rem(1.5), s.borderRadius.px(12));
-  const row = css(s.display.flex, s.alignItems.center, s.gap.rem(1.5), s.flexWrap.wrap);
   const code = css(s.whiteSpace.preWrap, s.overflowWrap.anywhere);
   type IconProps = ComponentProps<typeof Icon>;
   const colors: IconProps['color'][] = [
@@ -92,7 +92,7 @@ verticalAlign?: Parameters<UiCss['verticalAlign']['raw']>[0];`}</code
   </p>
 </section>
 
-<div class="demo-controls">
+<Flex wrap="wrap" align="center" gap="_lg" class={css(s.marginBlock.raw(s.theme.space._xl))}>
   <label class="demo-label"
     >图标 <Select bind:value={choice}><option>Search</option><option>Check</option></Select></label
   >
@@ -115,20 +115,19 @@ verticalAlign?: Parameters<UiCss['verticalAlign']['raw']>[0];`}</code
     >描边 <Slider min={0.5} max={4} step={0.25} bind:value={strokeWidth} /></label
   >
   <output aria-label="描边宽度">{strokeWidth}</output>
-</div>
+</Flex>
 
-<Provider
-  theme={selectedTheme}
-  class={css(panel, s.backgroundColor.raw(selectedTheme.color._background))}
->
-  <div class={row}>
-    <Icon icon={selected} {size} {color} {strokeWidth} aria-label="预览图标" data-icon-preview />
-    <span>语义尺寸 {size}，颜色 {color}</span>
-    <button type="button" aria-label="搜索" onclick={() => searches++}
-      ><Icon icon={Search} /></button
-    >
-    <output aria-label="搜索次数">{searches}</output>
-  </div>
+<Provider theme={selectedTheme}>
+  <Card padding="_xl">
+    <Flex gap="_xl" align="center" wrap="wrap">
+      <Icon icon={selected} {size} {color} {strokeWidth} aria-label="预览图标" data-icon-preview />
+      <span>语义尺寸 {size}，颜色 {color}</span>
+      <button type="button" aria-label="搜索" onclick={() => searches++}
+        ><Icon icon={Search} /></button
+      >
+      <output aria-label="搜索次数">{searches}</output>
+    </Flex>
+  </Card>
 </Provider>
 
 <section class="prose">

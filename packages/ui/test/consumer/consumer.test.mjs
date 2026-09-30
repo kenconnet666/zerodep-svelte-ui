@@ -79,12 +79,12 @@ test(
       await writeFile(
         join(directory, 'Consumer.svelte'),
         `<script lang="ts">
-      import { Provider, Icon, Text, Ripple, Button, Loading, Checkbox, Select, Slider, rippleButton, darkTheme, type RippleHandle } from 'zerodep-svelte-ui';
+      import { Provider, Icon, Text, Ripple, Button, Loading, Checkbox, Select, Slider, Flex, Grid, Container, Divider, Card, rippleButton, darkTheme, type RippleHandle } from 'zerodep-svelte-ui';
       import { Search } from '@lucide/icons';
       import BindingProbe from './BindingProbe.svelte';
       let ripple = $state<RippleHandle>();
       </script>
-      <Provider theme={darkTheme}><Icon icon={Search} size="20px" color="purple" strokeWidth={1.25} verticalAlign="middle" aria-label="搜索" /><button type="button" style="position:relative" {@attach rippleButton(() => ripple)}><Text as="strong">基础文字</Text><Ripple bind:this={ripple} /></button><Button size="20px" loading slotProps={{ label: { size: '18px' } }}>保存</Button><Loading /><Checkbox checked>接受</Checkbox><Select value={2}><option value={1}>一</option><option value={2}>二</option></Select><Slider value={3} /><BindingProbe /></Provider>`,
+      <Provider theme={darkTheme}><Icon icon={Search} size="20px" color="purple" strokeWidth={1.25} verticalAlign="middle" aria-label="搜索" /><button type="button" style="position:relative" {@attach rippleButton(() => ripple)}><Text as="strong">基础文字</Text><Ripple bind:this={ripple} /></button><Button size="20px" loading slotProps={{ label: { size: '18px' } }}>保存</Button><Loading /><Checkbox checked>接受</Checkbox><Select value={2}><option value={1}>一</option><option value={2}>二</option></Select><Slider value={3} /><Container><Grid><Card title="标题" divided><Flex><Text>正文</Text><Divider orientation="vertical" /></Flex></Card></Grid></Container><BindingProbe /></Provider>`,
       );
       // 编译插件契约由明确的动态绑定场景验证，不要求 Icon 为测试而使用 bx。
       await writeFile(
@@ -111,7 +111,7 @@ test(
       await writeFile(
         join(directory, 'types.ts'),
         `import type {ComponentProps} from 'svelte';
-      import {Provider,Icon,Text,Ripple,Button,Loading,Checkbox,Select,Slider,UiCss,focusRing,rippleButton,darkTheme,enUSLanguage,usLocale} from 'zerodep-svelte-ui';import {Search} from '@lucide/icons';
+      import {Provider,Icon,Text,Ripple,Button,Loading,Checkbox,Select,Slider,Flex,Grid,Container,Divider,Card,UiCss,focusRing,rippleButton,darkTheme,enUSLanguage,usLocale} from 'zerodep-svelte-ui';import {Search} from '@lucide/icons';
 
       export const provider:ComponentProps<typeof Provider>={css:(readTheme)=>new UiCss(readTheme),theme:darkTheme,lang:enUSLanguage,locale:usLocale};
       // @ts-expect-error 内部 context 设置器不进入公共导出。
@@ -131,6 +131,15 @@ test(
       export const badSlider:ComponentProps<typeof Slider>={value:'2'};
       // @ts-expect-error Checkbox 不允许替换原生 input 类型。
       export const badCheckbox:ComponentProps<typeof Checkbox>={type:'radio'};
+      export const flex:ComponentProps<typeof Flex>={direction:'column',gap:'_lg',wrap:'wrap'};
+      export const grid:ComponentProps<typeof Grid>={columns:'repeat(2,minmax(0,1fr))',gap:0};
+      export const container:ComponentProps<typeof Container>={maxWidth:'60rem',paddingInline:'_xl'};
+      export const divider:ComponentProps<typeof Divider>={orientation:'vertical',thickness:'_thin'};
+      export const card:ComponentProps<typeof Card>={title:'标题',padding:'_lg',slotProps:{title:{as:'h2'},header:{wrap:'wrap'},body:{style:'min-height:100px'}}};
+      // @ts-expect-error 固定根节点，不提供组件替换。
+      export const badCard:ComponentProps<typeof Card>={as:'button'};
+      // @ts-expect-error 分隔方向影响结构和语义，有明确限制。
+      export const badDivider:ComponentProps<typeof Divider>={orientation:'diagonal'};
       export const loading:ComponentProps<typeof Loading>={size:'_md',label:'请稍候'};
       // @ts-expect-error Button 不提供根组件替换。
       export const badAs:ComponentProps<typeof Button>={as:'div'};

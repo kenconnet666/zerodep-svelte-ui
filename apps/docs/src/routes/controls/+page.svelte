@@ -1,6 +1,8 @@
 <script lang="ts">
   import {
     Checkbox,
+    Flex,
+    Card,
     Select,
     Slider,
     Button,
@@ -27,7 +29,7 @@
 <p class="eyebrow">表单基础</p>
 <h1>Checkbox、Select 与 Slider</h1>
 <p class="lead">以原生表单控件处理交互，复用 Text、Icon、主题和焦点样式。</p>
-<div class="demo-controls">
+<Flex wrap="wrap" align="center" gap="_lg" class={css(s.marginBlock.raw(s.theme.space._xl))}>
   <Checkbox bind:checked={dark}>深色主题</Checkbox>
   <Checkbox bind:checked={disabled}>禁用字段组</Checkbox>
   <label class="demo-label"
@@ -35,64 +37,68 @@
       ><option>_sm</option><option>_md</option><option>_lg</option><option>24px</option></Select
     ></label
   >
-</div>
-<Provider
-  {theme}
-  class={css(s.padding._lg, s.borderRadius._md, s.backgroundColor.raw(theme.color._background))}
->
-  <form
-    onsubmit={(event) => {
-      event.preventDefault();
-      submitted = JSON.stringify([...new FormData(event.currentTarget)]);
-    }}
-  >
-    <fieldset
-      {disabled}
-      class={css(s.borderWidth.px(0), s.padding.px(0), s.margin.px(0), s.minWidth.px(0))}
+</Flex>
+<Provider {theme}>
+  <Card>
+    <form
+      onsubmit={(event) => {
+        event.preventDefault();
+        submitted = JSON.stringify([...new FormData(event.currentTarget)]);
+      }}
     >
-      <legend>原生表单演示</legend>
-      <div class="demo-controls">
-        <Checkbox
-          {size}
-          name="accepted"
-          value="yes"
-          defaultChecked
-          bind:checked
-          bind:indeterminate={mixed}>接受条款</Checkbox
+      <fieldset
+        {disabled}
+        class={css(s.borderWidth.px(0), s.padding.px(0), s.margin.px(0), s.minWidth.px(0))}
+      >
+        <legend>原生表单演示</legend>
+        <Flex
+          wrap="wrap"
+          align="center"
+          gap="_lg"
+          class={css(s.marginBlock.raw(s.theme.space._xl))}
         >
-        <label class="demo-label"
-          >选项 <Select {size} name="choice" defaultValue="b" bind:value={choice}>
-            <option value="a">选项 A</option><option value="b">选项 B</option>
-            <option value="c" disabled>选项 C（禁用）</option>
-            <optgroup label="其他"><option value="d">选项 D</option></optgroup>
-          </Select></label
-        >
-        <label class="demo-label"
-          >时长 <Slider
+          <Checkbox
             {size}
-            name="duration"
-            min={0}
-            max={10}
-            step={0.5}
-            defaultValue={3}
-            bind:value={amount}
-            showValue
-            formatValue={(value) => `${value}秒`}
-          /></label
-        >
-      </div>
-    </fieldset>
-    <div class="demo-controls">
-      <Button type="submit">读取表单</Button><Button type="reset">重置表单</Button>
-      <Button onclick={() => (mixed = true)}>设为半选</Button>
-    </div>
-  </form>
-  <p>
-    <output aria-label="绑定状态"
-      >{checked ? '已勾选' : '未勾选'} / {mixed ? '半选' : '非半选'} / {choice} / {amount}</output
-    >
-  </p>
-  <p>表单数据：<output aria-label="表单数据">{submitted || '尚未读取'}</output></p>
+            name="accepted"
+            value="yes"
+            defaultChecked
+            bind:checked
+            bind:indeterminate={mixed}>接受条款</Checkbox
+          >
+          <label class="demo-label"
+            >选项 <Select {size} name="choice" defaultValue="b" bind:value={choice}>
+              <option value="a">选项 A</option><option value="b">选项 B</option>
+              <option value="c" disabled>选项 C（禁用）</option>
+              <optgroup label="其他"><option value="d">选项 D</option></optgroup>
+            </Select></label
+          >
+          <label class="demo-label"
+            >时长 <Slider
+              {size}
+              name="duration"
+              min={0}
+              max={10}
+              step={0.5}
+              defaultValue={3}
+              bind:value={amount}
+              showValue
+              formatValue={(value) => `${value}秒`}
+            /></label
+          >
+        </Flex>
+      </fieldset>
+      <Flex wrap="wrap" align="center" gap="_lg" class={css(s.marginBlock.raw(s.theme.space._xl))}>
+        <Button type="submit">读取表单</Button><Button type="reset">重置表单</Button>
+        <Button onclick={() => (mixed = true)}>设为半选</Button>
+      </Flex>
+    </form>
+    <p>
+      <output aria-label="绑定状态"
+        >{checked ? '已勾选' : '未勾选'} / {mixed ? '半选' : '非半选'} / {choice} / {amount}</output
+      >
+    </p>
+    <p>表单数据：<output aria-label="表单数据">{submitted || '尚未读取'}</output></p>
+  </Card>
 </Provider>
 
 <section class="prose">

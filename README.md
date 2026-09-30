@@ -1,6 +1,6 @@
 # zerodep-svelte-ui
 
-Svelte 5 组件库与直接编写网页的文档站。已实现 Provider、Icon、Text，以及 Ripple、原生按钮反馈接入和焦点样式基础，并具备打包、语言服务与 CI。已提供 Button、Loading、Checkbox、Select 和 Slider。项目仍保持 private，尚未发布 npm。
+Svelte 5 组件库与直接编写网页的文档站。已实现 Provider、Icon、Text，以及 Ripple、原生按钮反馈接入和焦点样式基础，并具备打包、语言服务与 CI。已提供 Button、Loading、Checkbox、Select、Slider，以及 Flex、Grid、Container、Divider、Card。项目仍保持 private，尚未发布 npm。
 
 ## 目录
 
@@ -201,6 +201,19 @@ Button 根节点长期固定为 `<button>`，默认 `type="button"`，不提供 
 文档站 /controls 提供完整表单、主题、尺寸、半选、禁用和重置演示；Icon/Text/Provider/Button/Ripple 页的控制区已实际使用这些组件。后续滚动容器按半透明覆盖式滚动条设计，显隐不挤占内容、不改变布局；该滚动容器尚未实现，不对原生 Select 的系统弹出列表作此承诺。
 
 兼容边界：Svelte 5.57.0 在本机 Chromium 中，真实重置按钮触发的 reset 即使被表单取消，绑定仍可能先恢复默认值；原生 input 与 Slider 对照均可复现。需要条件取消时在触发按钮的 onclick 中 preventDefault，或使用 type="button" 判断后再 form.reset()，不在 UI 内复制绑定框架。已测试该方式；升级 Svelte 后应复核原生/组件对照，确认取消 reset 不再改变绑定后移除此说明。
+
+## 布局与 Card
+
+Flex、Grid、Container、Divider 放在 src/lib/layout/gene，Card 放在 src/lib/display/gene。均要求 Provider，外观参数直接使用 UiCss 对应 raw() 输入，class 最后组合，原生 style/属性继续透传；没有新增依赖、断点对象或组件专用主题配置。
+
+- Flex：默认 row/nowrap/stretch/flex-start，gap=_md（12px）。Grid：默认单列 minmax(0,1fr)、gap=_md，columns/rows 直接写 CSS。根节点允许收缩，不批量改子项的最小尺寸或字号。
+- Container：100% 宽度、自动居中，maxWidth 默认 72rem，包含左右各 _xl（24px）的内边距；根字号 16px 时外框 1152px、内容 1104px。文档站用 1148px 保持内容上限 1100px。
+- Divider：默认水平、_divider 颜色、_thin（1px）单侧边框、零 margin。竖线依赖横向 Flex 的交叉轴或显式高度。语义为 separator，decorative 隐藏纯视觉分隔。
+- Card：复用 Flex、Text、Divider，默认每个存在的区域独立 padding=_lg（16px）、radius=_lg（10px）、1px 边框、无阴影。title/description、children、actions、footer 组织内容，缺省区域不生成空盒子。标题默认 span，文档层级通过 slotProps.title.as 指定；divided 启用装饰分隔线。
+
+Card.slotProps.header/actions/footer 转发 Flex；title/description 转发 Text；body 转发 div 属性与 CssInput；divider 转发颜色、粗细和 class。显式配置优先。Card 不主动裁剪溢出、不滚动、不添加可点击语义；长正文按需设置换行或后续组合 ScrollArea。
+
+文档站 /layout 提供自适应/固定列、窄屏、深色主题、分区和键盘示例。首页使用 Grid+Card，站点宽度使用 Container，各演示控制区使用 Flex，Icon/Text/Provider/表单预览复用 Card，并移除了对应的重复布局 CSS。ScrollArea、Demo、CodeBlock 留待下一批。
 
 ## 公共导出与目录
 

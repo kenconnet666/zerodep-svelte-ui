@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     Ripple,
+    Flex,
     Checkbox,
     Select,
     Text,
@@ -25,7 +26,7 @@
 <p class="eyebrow">交互基础</p>
 <h1>Ripple 与原生按钮</h1>
 <p class="lead">从点击位置扩散的视觉反馈。下方是原生按钮测试示例，还不是正式 Button 组件。</p>
-<div class="demo-controls">
+<Flex wrap="wrap" align="center" gap="_lg" class={css(s.marginBlock.raw(s.theme.space._xl))}>
   <Checkbox bind:checked={disabled}>禁用按钮</Checkbox>
   <Checkbox bind:checked={loading}>加载中</Checkbox>
   <Checkbox bind:checked={fieldsetDisabled}>禁用字段组</Checkbox>
@@ -33,7 +34,7 @@
     >按钮类型 <Select bind:value={type}><option>button</option><option>submit</option></Select
     ></label
   >
-</div>
+</Flex>
 <button type="button" data-focus-before>前一项</button>
 <form
   onsubmit={(event) => {

@@ -1,6 +1,8 @@
 <script lang="ts">
   import {
     Provider,
+    Card,
+    Flex,
     Select,
     lightTheme,
     darkTheme,
@@ -19,7 +21,6 @@
     dark: darkTheme,
     brand: { ...lightTheme, color: { ...lightTheme.color, _primary: '#7e22ce' } },
   };
-  const panel = css(author.padding.rem(1.5), author.borderRadius.px(12));
   // 长代码自动换行，避免产生无法通过键盘操作的横向滚动区。
   const code = css(author.whiteSpace.preWrap, author.overflowWrap.anywhere);
   let choice = $state<'light' | 'dark' | 'brand'>('light');
@@ -57,7 +58,12 @@
 <h1>Provider</h1>
 <p class="lead">把主题、语言和地区作为 JS 对象传入，让后代共享配置。</p>
 
-<div class="demo-controls">
+<Flex
+  wrap="wrap"
+  align="center"
+  gap="_lg"
+  class={css(author.marginBlock.raw(author.theme.space._xl))}
+>
   <label class="demo-label"
     >父主题 <Select bind:value={choice}
       ><option>light</option><option>dark</option><option>brand</option></Select
@@ -77,21 +83,21 @@
       ></Select
     ></label
   >
-</div>
+</Flex>
 <Provider
   {theme}
   lang={language === 'zh-CN' ? zhCNLanguage : enUSLanguage}
   locale={region === 'china' ? chinaLocale : usLocale}
-  class={css(panel, author.backgroundColor.raw(theme.color._background))}
 >
-  <ProviderState label="父级" />
-  <Provider
-    theme={childTheme}
-    class={css(panel, author.backgroundColor.raw((childTheme ?? theme).color._background))}
-  >
-    <ProviderState label="子级" />
-  </Provider>
-  <ProviderState label="兄弟" />
+  <Card padding="_xl">
+    <ProviderState label="父级" />
+    <Provider theme={childTheme}>
+      <Card padding="_xl">
+        <ProviderState label="子级" />
+      </Card>
+    </Provider>
+    <ProviderState label="兄弟" />
+  </Card>
 </Provider>
 
 <section class="prose">

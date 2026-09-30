@@ -1,4 +1,6 @@
 // 此文件由 pnpm exports:generate 自动维护，请将公开模块放在 src/lib。
+export { default as Card } from './display/gene/Card.svelte';
+export * from './display/gene/Card.svelte';
 export { default as Icon } from './display/gene/Icon.svelte';
 export { default as Text } from './display/gene/Text.svelte';
 export { default as Loading } from './feedback/gene/Loading.svelte';
@@ -12,6 +14,10 @@ export { default as Select } from './input/gene/Select.svelte';
 export * from './input/gene/Select.svelte';
 export { default as Slider } from './input/gene/Slider.svelte';
 export * from './input/gene/Slider.svelte';
+export { default as Container } from './layout/gene/Container.svelte';
+export { default as Divider } from './layout/gene/Divider.svelte';
+export { default as Flex } from './layout/gene/Flex.svelte';
+export { default as Grid } from './layout/gene/Grid.svelte';
 export { default as Provider } from './provider/Provider.svelte';
 export * from './provider/Provider.svelte';
 export * from './provider/css.js';

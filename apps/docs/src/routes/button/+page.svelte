@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Search } from '@lucide/icons';
-  import { Button, Loading, Checkbox, useCss } from 'zerodep-svelte-ui';
+  import { Button, Loading, Checkbox, Flex, useCss } from 'zerodep-svelte-ui';
   import { css } from 'zerodep-css-svelte';
   const s = useCss();
   let loading = $state(false);
@@ -15,17 +15,17 @@
 <p class="lead">
   固定的原生按钮，复用 Text、Icon、Loading、Ripple。通过 class 和 slotProps 定制外观。
 </p>
-<div class="demo-controls">
+<Flex wrap="wrap" align="center" gap="_lg" class={css(s.marginBlock.raw(s.theme.space._xl))}>
   <Checkbox bind:checked={loading}>加载中</Checkbox>
   <Checkbox bind:checked={disabled}>禁用</Checkbox>
-</div>
-<div class="demo-controls">
+</Flex>
+<Flex wrap="wrap" align="center" gap="_lg" class={css(s.marginBlock.raw(s.theme.space._xl))}>
   <Button data-button-preview {loading} {disabled} icon={Search} onclick={() => clicks++}
     >保存</Button
   >
   <output aria-label="操作次数">{clicks}</output>
   <Loading />
-</div>
+</Flex>
 
 <section class="prose">
   <h2>size 等比联动，slotProps 局部覆盖</h2>
@@ -39,11 +39,11 @@
     54px，带图标约 78px；实际字宽取决于字体。size 改为 20px 时，外框高 42.5px、文字 17.5px、图标
     20px、左右内边距各 15px。这里的 _md/_lg 是字号分类的基准，并非 controlHeight 的档位。
   </p>
-  <div class="demo-controls">
+  <Flex wrap="wrap" align="center" gap="_lg" class={css(s.marginBlock.raw(s.theme.space._xl))}>
     <Button data-default-size>保存</Button>
     <Button size="_lg">等比放大</Button>
     <Button class={css(s.width.px(120), s.height.px(40))}>固定宽高</Button>
-  </div>
+  </Flex>
   <Button class={css(s.width.raw('100%'))}>铺满父容器</Button>
   <pre class={code}><code
       >{`<Button

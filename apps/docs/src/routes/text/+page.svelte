@@ -2,6 +2,8 @@
   import type { ComponentProps } from 'svelte';
   import {
     Text,
+    Flex,
+    Card,
     Checkbox,
     Select,
     Provider,
@@ -21,23 +23,22 @@
 <p class="eyebrow">基础组件</p>
 <h1>Text</h1>
 <p class="lead">保留原生文本语义，按需使用系统主题或直接 CSS 值。</p>
-<div class="demo-controls">
+<Flex wrap="wrap" align="center" gap="_lg" class={css(s.marginBlock.raw(s.theme.space._xl))}>
   <Checkbox bind:checked={dark}>深色主题</Checkbox>
   <label class="demo-label"
     >文字大小 <Select bind:value={size}
       ><option>_sm</option><option>_md</option><option>_xl</option><option>18px</option></Select
     ></label
   >
-</div>
-<Provider
-  {theme}
-  class={css(s.padding._lg, s.borderRadius._md, s.backgroundColor.raw(theme.color._surface))}
->
-  <Text {size} color="_primary" data-text-preview>主题文字 &lt;内容&gt;</Text>
-  <Text as="p"
-    >普通段落中的 <Text as="strong">强调文字</Text> 和 <Text as="em">语气强调</Text>。</Text
-  >
-  <Text as="code">const value = 1;</Text>
+</Flex>
+<Provider {theme}>
+  <Card>
+    <Text {size} color="_primary" data-text-preview>主题文字 &lt;内容&gt;</Text>
+    <Text as="p"
+      >普通段落中的 <Text as="strong">强调文字</Text> 和 <Text as="em">语气强调</Text>。</Text
+    >
+    <Text as="code">const value = 1;</Text>
+  </Card>
 </Provider>
 <section class="prose">
   <h2>使用</h2>

@@ -18,6 +18,11 @@ import {
   Checkbox,
   Select,
   Slider,
+  Flex,
+  Grid,
+  Container,
+  Divider,
+  Card,
 } from 'zerodep-svelte-ui';
 import ProviderSsr from './ProviderSsr.svelte';
 import PublicConfigProbe from './PublicConfigProbe.svelte';
@@ -26,6 +31,7 @@ import ContextWithoutProvider from './ContextWithoutProvider.svelte';
 import FoundationSsr from './FoundationSsr.svelte';
 import ButtonSsr from './ButtonSsr.svelte';
 import ControlsSsr from './ControlsSsr.svelte';
+import LayoutSsr from './LayoutSsr.svelte';
 
 export async function renderProvider(dark: boolean, brand: string) {
   const host = createServerCssHost();
@@ -84,7 +90,19 @@ export function renderFoundations(label: string) {
 }
 
 export function renderFoundationWithoutProvider(
-  kind: 'text' | 'ripple' | 'button' | 'loading' | 'checkbox' | 'select' | 'slider',
+  kind:
+    | 'text'
+    | 'ripple'
+    | 'button'
+    | 'loading'
+    | 'checkbox'
+    | 'select'
+    | 'slider'
+    | 'flex'
+    | 'grid'
+    | 'container'
+    | 'divider'
+    | 'card',
 ) {
   return withCssHost(createServerCssHost(), () =>
     ({
@@ -95,6 +113,11 @@ export function renderFoundationWithoutProvider(
       checkbox: () => render(Checkbox).body,
       select: () => render(Select<string>).body,
       slider: () => render(Slider).body,
+      flex: () => render(Flex).body,
+      grid: () => render(Grid).body,
+      container: () => render(Container).body,
+      divider: () => render(Divider).body,
+      card: () => render(Card).body,
     })[kind](),
   );
 }
@@ -108,6 +131,12 @@ export function renderButton() {
 export function renderControls() {
   const host = createServerCssHost();
   const body = withCssHost(host, () => render(ControlsSsr).body);
+  return { body, css: host.cssText() };
+}
+
+export function renderLayout() {
+  const host = createServerCssHost();
+  const body = withCssHost(host, () => render(LayoutSsr).body);
   return { body, css: host.cssText() };
 }
 

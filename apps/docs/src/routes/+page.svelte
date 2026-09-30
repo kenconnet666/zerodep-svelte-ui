@@ -1,7 +1,7 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
   import { css } from 'zerodep-css-svelte';
-  import { useCss } from '$lib/css';
+  import { useCss, Grid, Card } from 'zerodep-svelte-ui';
 
   const s = useCss();
   const primaryLink = css(
@@ -25,19 +25,28 @@
 <p class="lead">从清晰的组件边界出发，用自然的组合方式构建界面。</p>
 <a class={primaryLink} href={resolve('/guide')}>了解项目 →</a>
 
-<section class="principles" aria-label="设计原则">
-  <article>
-    <h2>直接易用</h2>
-    <p>让常见场景写得自然，让进阶用法保持清晰。</p>
-  </article>
-  <article>
-    <h2>灵活组合</h2>
-    <p>复用原生能力，保留按需扩展的空间。</p>
-  </article>
-  <article>
-    <h2>长期维护</h2>
-    <p>优先简单实现，用真实场景和测试验证取舍。</p>
-  </article>
+<section aria-label="设计原则">
+  <Grid
+    columns="repeat(auto-fit, minmax(min(100%, 16rem), 1fr))"
+    gap="_xl"
+    class={css(s.marginTop.raw(s.theme.space._3xl))}
+  >
+    <Card
+      title="直接易用"
+      description="让常见场景写得自然，让进阶用法保持清晰。"
+      slotProps={{ title: { as: 'h2', size: '_lg' }, description: { size: '_md' } }}
+    />
+    <Card
+      title="灵活组合"
+      description="复用原生能力，保留按需扩展的空间。"
+      slotProps={{ title: { as: 'h2', size: '_lg' }, description: { size: '_md' } }}
+    />
+    <Card
+      title="长期维护"
+      description="优先简单实现，用真实场景和测试验证取舍。"
+      slotProps={{ title: { as: 'h2', size: '_lg' }, description: { size: '_md' } }}
+    />
+  </Grid>
 </section>
 
 <p class="status">首批 Provider 与 Icon 已提供交互示例，组件库仍在持续完善，尚未发布 npm。</p>

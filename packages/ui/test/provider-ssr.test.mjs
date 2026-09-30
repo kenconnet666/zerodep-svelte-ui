@@ -50,6 +50,12 @@ test('正式包产物的 Provider 隔离并发 SSR 和嵌套主题作者', async
 });
 
 test('缺少 Provider 或 SSR 宿主时明确失败', () => {
+  for (const component of ['flex', 'grid', 'container', 'divider', 'card']) {
+    assert.throws(
+      () => entry.renderFoundationWithoutProvider(component),
+      /CSS author was not provided/,
+    );
+  }
   for (const control of ['checkbox', 'select', 'slider']) {
     assert.throws(
       () => entry.renderFoundationWithoutProvider(control),
@@ -111,6 +117,17 @@ test('表单控件 SSR 保留勾选、选项、数值与可访问状态', () => 
   assert.match(result.body, /<option value="b" selected/);
   assert.match(result.body, /type="range"[^>]*value="3.5"/);
   assert.match(result.body, /aria-valuetext="3.5秒"/);
+});
+
+test('布局与 Card 正式产物 SSR 保留内容、标题层级及分隔语义', () => {
+  const result = entry.renderLayout();
+  assert.match(result.body.replace(/<!--[\s\S]*?-->/g, ''), /<h2[^>]*>标题 &lt;内容/);
+  assert.match(result.body, /正文/);
+  assert.match(result.body, /底部/);
+  assert.equal((result.body.match(/role="separator"/g) ?? []).length, 1);
+  assert.match(result.css, /max-width:40rem/);
+  assert.match(result.css, /grid-template-columns:minmax\(0, 1fr\)/);
+  assert.doesNotMatch(result.css, /overflow:hidden/);
 });
 
 test('直接 CSS props 在并发 SSR 中正确输出且请求隔离', async () => {
