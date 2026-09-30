@@ -29,6 +29,12 @@
       <a href={resolve('/icon')} aria-current={page.route.id === '/icon' ? 'page' : undefined}
         >Icon</a
       >
+      <a href={resolve('/text')} aria-current={page.route.id === '/text' ? 'page' : undefined}
+        >Text</a
+      >
+      <a href={resolve('/ripple')} aria-current={page.route.id === '/ripple' ? 'page' : undefined}
+        >Ripple</a
+      >
       <a href="https://github.com/kenconnet666/zerodep-svelte-ui">GitHub</a>
     </nav>
   </header>

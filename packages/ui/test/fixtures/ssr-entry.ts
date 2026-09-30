@@ -11,11 +11,14 @@ import {
   chinaLocale,
   usLocale,
   Icon,
+  Text,
+  Ripple,
 } from 'zerodep-svelte-ui';
 import ProviderSsr from './ProviderSsr.svelte';
 import PublicConfigProbe from './PublicConfigProbe.svelte';
 import IconSsr from './IconSsr.svelte';
 import ContextWithoutProvider from './ContextWithoutProvider.svelte';
+import FoundationSsr from './FoundationSsr.svelte';
 
 export async function renderProvider(dark: boolean, brand: string) {
   const host = createServerCssHost();
@@ -65,6 +68,18 @@ export function renderIcon(label: string) {
   const host = createServerCssHost();
   const body = withCssHost(host, () => render(IconSsr, { props: { label } }).body);
   return { body, css: host.cssText(), rules: host.rules() };
+}
+
+export function renderFoundations(label: string) {
+  const host = createServerCssHost();
+  const body = withCssHost(host, () => render(FoundationSsr, { props: { label } }).body);
+  return { body, css: host.cssText() };
+}
+
+export function renderFoundationWithoutProvider(kind: 'text' | 'ripple') {
+  return withCssHost(createServerCssHost(), () =>
+    kind === 'text' ? render(Text).body : render(Ripple).body,
+  );
 }
 
 export async function renderIconAppearance(appearance: Partial<ComponentProps<typeof Icon>>) {

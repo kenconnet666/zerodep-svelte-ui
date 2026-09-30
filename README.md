@@ -1,6 +1,6 @@
 # zerodep-svelte-ui
 
-Svelte 5 组件库与直接编写网页的文档站。已实现 Provider、Icon、共享 CSS 作者和配置注入，并具备打包、语言服务与 CI 基础。项目仍保持 private，尚未发布 npm。
+Svelte 5 组件库与直接编写网页的文档站。已实现 Provider、Icon、Text，以及 Ripple、原生按钮反馈接入和焦点样式基础，并具备打包、语言服务与 CI。正式 Button 尚未实现。项目仍保持 private，尚未发布 npm。
 
 ## 目录
 
@@ -167,9 +167,20 @@ Icon 复用最近 Provider 的作者，主题更新直接由 UiCss 响应。没�
 
 已安装包的 Vite 依赖 SSR 会使用带缓存查询的 .svelte 文件路径；完整消费链路需要 zerodep-css-svelte 0.1.1 的对应编译修复。不得以跳过插件或只测试工作区源码代替 tarball 验收。
 
+## 按钮准备与文字基础
+
+- Text 默认渲染 span，也支持 p、strong、em、code 和标题等原生文本标签。外观 props 从对应 UiCss.raw() 提取类型；不传时保留原生样式，class 在最后组合。内容使用 children snippet，不提供富文本 HTML、复制或自动省略。
+- Ripple 是装饰覆盖层，提供 start(origin?)、stop(id?)、cancel()；颜色/透明度复用 CSS 输入类型。扩散 250ms、淡出 150ms，快速点击至少显示 80ms，最多 4 个波纹；持续按压保留到释放或取消。减少动效、禁用和卸载会清理资源。
+- rippleButton(() => ripple, () => disabled) 是原生 button 的 Svelte attachment；观察 pointerdown/up/cancel、移出、失焦和无指针 click，不合成点击、不拦截键盘、不管理业务回调或表单。原生 disabled、fieldset 和 aria-disabled 都会阻止反馈；loading 的业务拦截仍由按钮负责。
+- focusRing(s) 只返回 :focus-visible CSS，复用 _focusRing，不引入焦点管理器。原生 Enter/Space/Tab 保持浏览器行为。
+
+Ripple 父容器需要定位和尺寸，建议建立局部 stacking context；覆盖层自己裁剪圆角，焦点环不会被整个按钮的 overflow:hidden 裁掉。动画控制器在 src/internal/ripple-controller.ts，独占空覆盖层的子节点，attachment 负责清理；几何值写入内联样式，不按点击坐标登记 CSS 类。没有引入新依赖或 bx。
+
+文档与真实原生按钮示例见 /text、/ripple。该按钮只是验证夹具，不是新增的 Button API。几何定位支持未旋转的矩形与普通缩放；不承诺任意旋转/倾斜宿主的坐标还原。
+
 ## 公共导出与目录
 
-`packages/ui/src/lib` 中的所有模块都进入公共入口 `src/lib/index.ts`；不公开的实现放到 `src/internal` 等其他目录。组件默认导出按文件名转为 PascalCase，TS/JS 的具名与默认导出、Svelte module script 的具名导出均自动汇总，重名会报错。公开类型使用 .ts 文件，静态资源可通过显式模块包装导出。
+`packages/ui/src/lib` 中的所有模块都进入公共入口 `src/lib/index.ts`；不公开的实现放到 `src/internal` 等其他目录。组件默认导出按文件名转为 PascalCase，TS/JS 的具名与默认导出、Svelte module script 的具名导出均自动汇总，重名会报错。公开类型使用 .ts 文件或组件的 module script，静态资源可通过显式模块包装导出。
 
 - `pnpm exports:generate`：重新生成入口，新增、删除或改名模块后使用。
 - `pnpm exports:check`：只检查同步状态，不修改文件；已纳入 `pnpm check`。

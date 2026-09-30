@@ -1,5 +1,8 @@
 // 此文件由 pnpm exports:generate 自动维护，请将公开模块放在 src/lib。
 export { default as Icon } from './display/gene/Icon.svelte';
+export { default as Text } from './display/gene/Text.svelte';
+export { default as Ripple } from './feedback/gene/Ripple.svelte';
+export * from './feedback/gene/Ripple.svelte';
 export { default as Provider } from './provider/Provider.svelte';
 export * from './provider/context.js';
 export * from './provider/css.js';
@@ -13,3 +16,5 @@ export * from './provider/theme/common.js';
 export * from './provider/theme/dark.js';
 export * from './provider/theme/light.js';
 export * from './provider/theme/types.js';
+export * from './tool/focus-ring.js';
+export * from './tool/ripple-button.js';

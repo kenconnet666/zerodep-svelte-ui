@@ -79,11 +79,12 @@ test(
       await writeFile(
         join(directory, 'Consumer.svelte'),
         `<script lang="ts">
-      import { Provider, Icon, darkTheme } from 'zerodep-svelte-ui';
+      import { Provider, Icon, Text, Ripple, rippleButton, darkTheme, type RippleHandle } from 'zerodep-svelte-ui';
       import { Search } from '@lucide/icons';
       import BindingProbe from './BindingProbe.svelte';
+      let ripple = $state<RippleHandle>();
       </script>
-      <Provider theme={darkTheme}><Icon icon={Search} size="20px" color="purple" strokeWidth={1.25} verticalAlign="middle" aria-label="搜索" /><BindingProbe /></Provider>`,
+      <Provider theme={darkTheme}><Icon icon={Search} size="20px" color="purple" strokeWidth={1.25} verticalAlign="middle" aria-label="搜索" /><button type="button" style="position:relative" {@attach rippleButton(() => ripple)}><Text as="strong">基础文字</Text><Ripple bind:this={ripple} /></button><BindingProbe /></Provider>`,
       );
       // 编译插件契约由明确的动态绑定场景验证，不要求 Icon 为测试而使用 bx。
       await writeFile(
@@ -110,11 +111,15 @@ test(
       await writeFile(
         join(directory, 'types.ts'),
         `import type {ComponentProps} from 'svelte';
-      import {Provider,Icon,UiCss,darkTheme,enUSLanguage,usLocale} from 'zerodep-svelte-ui';import {Search} from '@lucide/icons';
+      import {Provider,Icon,Text,Ripple,UiCss,focusRing,rippleButton,darkTheme,enUSLanguage,usLocale} from 'zerodep-svelte-ui';import {Search} from '@lucide/icons';
 
       export const provider:ComponentProps<typeof Provider>={css:(readTheme)=>new UiCss(readTheme),theme:darkTheme,lang:enUSLanguage,locale:usLocale};
       // @ts-expect-error 内部 context 设置器不进入公共导出。
       import {provideCss} from 'zerodep-svelte-ui';
+      // @ts-expect-error 动画控制器属于内部实现。
+      import {createRippleController} from 'zerodep-svelte-ui';
+      export const text:ComponentProps<typeof Text>={as:'h2',size:'_xl',fontWeight:600};
+      export const ripple:ComponentProps<typeof Ripple>={color:'_primary',opacity:0.12};
       // @ts-expect-error 聚合配置入口已移除。
       import {useConfig} from 'zerodep-svelte-ui';
       // @ts-expect-error 聚合配置类型已移除。
@@ -149,6 +154,7 @@ test(
         try{const entry=await server.ssrLoadModule('/entry.ts');
           if(enabled){
             const result=entry.run();assert(result.body.includes('<svg'));assert(result.body.includes('role="img"'));assert(result.body.includes('<circle'));
+            assert(result.body.includes('<strong'));assert(result.body.includes('基础文字'));assert(result.body.includes('aria-hidden="true"'));
             assert(result.css.includes('color:purple;'));assert(result.css.includes('font-size:20px;'));
             assert(result.css.includes('stroke-width:1.25;'));
             const variable=result.css.split('width:var(')[1]?.split(')')[0];assert(variable);

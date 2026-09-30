@@ -52,10 +52,23 @@ test('正式包产物的 Provider 隔离并发 SSR 和嵌套主题作者', async
 test('缺少 Provider 或 SSR 宿主时明确失败', () => {
   assert.throws(() => entry.renderWithoutProvider(), /inside a Provider/);
   assert.throws(() => entry.renderIconWithoutProvider(), /inside a Provider/);
+  assert.throws(() => entry.renderFoundationWithoutProvider('text'), /inside a Provider/);
+  assert.throws(() => entry.renderFoundationWithoutProvider('ripple'), /inside a Provider/);
   for (const kind of ['theme', 'locale', 'lang', 'css']) {
     assert.throws(() => entry.readWithoutProvider(kind), /inside a Provider/);
   }
   assert.throws(() => entry.renderWithoutHost(), /CSS server host is unavailable/);
+});
+
+test('Text 与 Ripple 的正式产物可 SSR，文本转义且没有运行时波纹节点', () => {
+  const result = entry.renderFoundations('<script>unsafe</script>');
+  assert.match(result.body, /<h2/);
+  assert.match(result.body, /&lt;script>/);
+  assert.doesNotMatch(result.body, /<script>unsafe/);
+  assert.match(result.body, /aria-hidden="true"/);
+  assert.match(result.body, /<button type="button"/);
+  assert.doesNotMatch(result.body, /scale\(0\)/);
+  assert.match(result.css, /pointer-events:none/);
 });
 
 test('直接 CSS props 在并发 SSR 中正确输出且请求隔离', async () => {
