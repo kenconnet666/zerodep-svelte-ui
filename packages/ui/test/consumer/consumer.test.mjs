@@ -79,12 +79,12 @@ test(
       await writeFile(
         join(directory, 'Consumer.svelte'),
         `<script lang="ts">
-      import { Provider, Icon, Text, Ripple, Button, Loading, rippleButton, darkTheme, type RippleHandle } from 'zerodep-svelte-ui';
+      import { Provider, Icon, Text, Ripple, Button, Loading, Checkbox, Select, Slider, rippleButton, darkTheme, type RippleHandle } from 'zerodep-svelte-ui';
       import { Search } from '@lucide/icons';
       import BindingProbe from './BindingProbe.svelte';
       let ripple = $state<RippleHandle>();
       </script>
-      <Provider theme={darkTheme}><Icon icon={Search} size="20px" color="purple" strokeWidth={1.25} verticalAlign="middle" aria-label="搜索" /><button type="button" style="position:relative" {@attach rippleButton(() => ripple)}><Text as="strong">基础文字</Text><Ripple bind:this={ripple} /></button><Button size="20px" loading slotProps={{ label: { size: '18px' } }}>保存</Button><Loading /><BindingProbe /></Provider>`,
+      <Provider theme={darkTheme}><Icon icon={Search} size="20px" color="purple" strokeWidth={1.25} verticalAlign="middle" aria-label="搜索" /><button type="button" style="position:relative" {@attach rippleButton(() => ripple)}><Text as="strong">基础文字</Text><Ripple bind:this={ripple} /></button><Button size="20px" loading slotProps={{ label: { size: '18px' } }}>保存</Button><Loading /><Checkbox checked>接受</Checkbox><Select value={2}><option value={1}>一</option><option value={2}>二</option></Select><Slider value={3} /><BindingProbe /></Provider>`,
       );
       // 编译插件契约由明确的动态绑定场景验证，不要求 Icon 为测试而使用 bx。
       await writeFile(
@@ -111,7 +111,7 @@ test(
       await writeFile(
         join(directory, 'types.ts'),
         `import type {ComponentProps} from 'svelte';
-      import {Provider,Icon,Text,Ripple,Button,Loading,UiCss,focusRing,rippleButton,darkTheme,enUSLanguage,usLocale} from 'zerodep-svelte-ui';import {Search} from '@lucide/icons';
+      import {Provider,Icon,Text,Ripple,Button,Loading,Checkbox,Select,Slider,UiCss,focusRing,rippleButton,darkTheme,enUSLanguage,usLocale} from 'zerodep-svelte-ui';import {Search} from '@lucide/icons';
 
       export const provider:ComponentProps<typeof Provider>={css:(readTheme)=>new UiCss(readTheme),theme:darkTheme,lang:enUSLanguage,locale:usLocale};
       // @ts-expect-error 内部 context 设置器不进入公共导出。
@@ -121,7 +121,16 @@ test(
       export const rippleController:typeof createRippleController=createRippleController;
       // @ts-expect-error Provider 的 context 实例就近私有，不是公开配置入口。
       import {themeContext} from 'zerodep-svelte-ui';
-            export const button:ComponentProps<typeof Button>={size:'_lg',slotProps:{label:{size:'18px'},icon:{size:'1em'},loading:{color:'_primary'},ripple:{opacity:0.1}}};
+      export const button:ComponentProps<typeof Button>={size:'_lg',slotProps:{label:{size:'18px'},icon:{size:'1em'},loading:{color:'_primary'},ripple:{opacity:0.1}}};
+      export const checkbox:ComponentProps<typeof Checkbox>={checked:true,indeterminate:true,size:'_md',slotProps:{label:{size:'12px'}}};
+      export const select:ComponentProps<typeof Select<number>>={value:2,defaultValue:1,size:'_lg'};
+      export const slider:ComponentProps<typeof Slider>={value:2.5,min:0,max:10,step:0.5,showValue:true};
+      // @ts-expect-error Select 的值保留泛型类型。
+      export const badSelect:ComponentProps<typeof Select<number>>={value:'2'};
+      // @ts-expect-error Slider 只接受数值。
+      export const badSlider:ComponentProps<typeof Slider>={value:'2'};
+      // @ts-expect-error Checkbox 不允许替换原生 input 类型。
+      export const badCheckbox:ComponentProps<typeof Checkbox>={type:'radio'};
       export const loading:ComponentProps<typeof Loading>={size:'_md',label:'请稍候'};
       // @ts-expect-error Button 不提供根组件替换。
       export const badAs:ComponentProps<typeof Button>={as:'div'};

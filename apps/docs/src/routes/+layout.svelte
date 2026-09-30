@@ -38,6 +38,10 @@
       <a href={resolve('/button')} aria-current={page.route.id === '/button' ? 'page' : undefined}
         >Button</a
       >
+      <a
+        href={resolve('/controls')}
+        aria-current={page.route.id === '/controls' ? 'page' : undefined}>表单控件</a
+      >
       <a href="https://github.com/kenconnet666/zerodep-svelte-ui">GitHub</a>
     </nav>
   </header>

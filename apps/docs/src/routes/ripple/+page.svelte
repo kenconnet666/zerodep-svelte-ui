@@ -1,6 +1,8 @@
 <script lang="ts">
   import {
     Ripple,
+    Checkbox,
+    Select,
     Text,
     useCss,
     focusRing,
@@ -24,11 +26,11 @@
 <h1>Ripple 与原生按钮</h1>
 <p class="lead">从点击位置扩散的视觉反馈。下方是原生按钮测试示例，还不是正式 Button 组件。</p>
 <div class="demo-controls">
-  <label><input type="checkbox" bind:checked={disabled} /> 禁用按钮</label>
-  <label><input type="checkbox" bind:checked={loading} /> 加载中</label>
-  <label><input type="checkbox" bind:checked={fieldsetDisabled} /> 禁用字段组</label>
-  <label
-    >按钮类型 <select bind:value={type}><option>button</option><option>submit</option></select
+  <Checkbox bind:checked={disabled}>禁用按钮</Checkbox>
+  <Checkbox bind:checked={loading}>加载中</Checkbox>
+  <Checkbox bind:checked={fieldsetDisabled}>禁用字段组</Checkbox>
+  <label class="demo-label"
+    >按钮类型 <Select bind:value={type}><option>button</option><option>submit</option></Select
     ></label
   >
 </div>

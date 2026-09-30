@@ -1,6 +1,6 @@
 # zerodep-svelte-ui
 
-Svelte 5 组件库与直接编写网页的文档站。已实现 Provider、Icon、Text，以及 Ripple、原生按钮反馈接入和焦点样式基础，并具备打包、语言服务与 CI。已提供固定原生根节点的 Button 与 Loading。项目仍保持 private，尚未发布 npm。
+Svelte 5 组件库与直接编写网页的文档站。已实现 Provider、Icon、Text，以及 Ripple、原生按钮反馈接入和焦点样式基础，并具备打包、语言服务与 CI。已提供 Button、Loading、Checkbox、Select 和 Slider。项目仍保持 private，尚未发布 npm。
 
 ## 目录
 
@@ -187,6 +187,20 @@ Button 根节点长期固定为 `<button>`，默认 `type="button"`，不提供 
 `size` 复用 `Parameters<UiCss['fontSize']['raw']>[0]`，默认 `_md=1rem`。尺寸基准 B 默认 16px：高度 2.125B=34px（含边框），左右内边距 0.75B=12px，边框 0.0625B=1px，圆角 0.375B=6px，文字 0.875B=14px、行高 1.5，图标/Loading 1B=16px，图文间距 0.5B=8px。size 默认等比联动；slotProps 显式值优先，根 class 最后组合。不额外维护尺寸档位映射。单独覆盖字号后需保证外框足够高。
 
 原生 disabled（包括 fieldset）阻止激活。受控 loading 保留焦点和原内容占位，通过 aria-disabled/aria-busy 表达状态，同时拦截点击回调和默认提交；不会追踪 Promise。表单仍需在 onsubmit 中管理绕过点击的提交路径，SSR 首屏的点击守卫需要水合后生效。Loading 单独使用时提供当前语言的状态名称，嵌入 Button 时为装饰；减少动效时停止旋转。
+
+## Checkbox、Select 与 Slider
+
+三个组件位于 src/lib/input/gene，复用 Text、Icon、focusRing、UiCss 和 Svelte 原生双向绑定。当前系统 token 足够，组件专用比例在组件内定义，没有新增主题分类、状态框架或依赖。
+
+- Checkbox：bind:checked、bind:indeterminate、defaultChecked；默认复选框 16px、文字 14px、间距 8px。内部为原生 checkbox，保留 Space、required、标签点击和表单能力；半选不改变表单提交值，其图形在水合后设置。
+- Select：原生单选，children 放 option/optgroup，bind:value 保留选项值类型，支持 defaultValue、禁用选项及分组。默认外框 192×34px、文字 14px，箭头复用 Icon；不提供搜索、多选或可替换弹层，弹出列表由系统管理。
+- Slider：单滑块水平 range，bind:value 为数值，支持 min/max/step、defaultValue（省略初值时从 min 开始）、原生 input/change 和键盘交互。默认宽 192px、输入高 24px、滑块 16px、轨道 4px。showValue 复用 Text，formatValue 同时用于数值文本和 aria-valuetext；数值变化不会生成新 CSS 类。程序化传值应符合边界和步长；当前无双滑块、垂直方向或刻度标签组件。
+
+上述默认尺寸按根字号 16px 换算。size 使用 UiCss.fontSize.raw() 的输入，默认 _md=1rem，并通过 em 联动。顶层 class/style 作用于外层，其他原生属性/事件转发到 input/select；slotProps.input/select 转发 class/style，slotProps.label/icon/value 转发对应底层组件的外观，显式值优先。form.reset() 恢复默认值并同步绑定；fieldset 禁用保持原生效果。
+
+文档站 /controls 提供完整表单、主题、尺寸、半选、禁用和重置演示；Icon/Text/Provider/Button/Ripple 页的控制区已实际使用这些组件。后续滚动容器按半透明覆盖式滚动条设计，显隐不挤占内容、不改变布局；该滚动容器尚未实现，不对原生 Select 的系统弹出列表作此承诺。
+
+兼容边界：Svelte 5.57.0 在本机 Chromium 中，真实重置按钮触发的 reset 即使被表单取消，绑定仍可能先恢复默认值；原生 input 与 Slider 对照均可复现。需要条件取消时在触发按钮的 onclick 中 preventDefault，或使用 type="button" 判断后再 form.reset()，不在 UI 内复制绑定框架。已测试该方式；升级 Svelte 后应复核原生/组件对照，确认取消 reset 不再改变绑定后移除此说明。
 
 ## 公共导出与目录
 

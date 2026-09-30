@@ -2,7 +2,16 @@
   import type { ComponentProps } from 'svelte';
   import { resolve } from '$app/paths';
   import { Search, Check } from '@lucide/icons';
-  import { Icon, Provider, useCss, lightTheme, darkTheme } from 'zerodep-svelte-ui';
+  import {
+    Icon,
+    Checkbox,
+    Select,
+    Slider,
+    Provider,
+    useCss,
+    lightTheme,
+    darkTheme,
+  } from 'zerodep-svelte-ui';
   import { css } from 'zerodep-css-svelte';
 
   const s = useCss();
@@ -49,7 +58,7 @@
 
 <section class="prose">
   <h2>直接设置外观</h2>
-  <label><input type="checkbox" bind:checked={customAppearance} /> 使用自定义外观</label>
+  <Checkbox bind:checked={customAppearance}>使用自定义外观</Checkbox>
   <Icon
     icon={Search}
     size={customAppearance ? '28px' : undefined}
@@ -84,24 +93,27 @@ verticalAlign?: Parameters<UiCss['verticalAlign']['raw']>[0];`}</code
 </section>
 
 <div class="demo-controls">
-  <label
-    >图标 <select bind:value={choice}><option>Search</option><option>Check</option></select></label
+  <label class="demo-label"
+    >图标 <Select bind:value={choice}><option>Search</option><option>Check</option></Select></label
   >
-  <label
-    >尺寸 <select bind:value={size}
+  <label class="demo-label"
+    >尺寸 <Select bind:value={size}
       ><option>_xs</option><option>_sm</option><option>_md</option><option>_lg</option><option
         >_xl</option
-      ><option>_2xl</option><option>18px</option><option>inherit</option></select
+      ><option>_2xl</option><option>18px</option><option>inherit</option></Select
     ></label
   >
-  <label
-    >颜色 <select bind:value={color}
-      >{#each colors as value (value)}<option>{value}</option>{/each}</select
+  <label class="demo-label"
+    >颜色 <Select bind:value={color}
+      >{#each colors as value (value)}<option>{value}</option>{/each}</Select
     ></label
   >
-  <label>主题 <select bind:value={theme}><option>light</option><option>dark</option></select></label
+  <label class="demo-label"
+    >主题 <Select bind:value={theme}><option>light</option><option>dark</option></Select></label
   >
-  <label>描边 <input type="range" min="0.5" max="4" step="0.25" bind:value={strokeWidth} /></label>
+  <label class="demo-label"
+    >描边 <Slider min={0.5} max={4} step={0.25} bind:value={strokeWidth} /></label
+  >
   <output aria-label="描边宽度">{strokeWidth}</output>
 </div>
 

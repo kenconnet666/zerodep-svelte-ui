@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     Provider,
+    Select,
     lightTheme,
     darkTheme,
     zhCNLanguage,
@@ -57,23 +58,23 @@
 <p class="lead">把主题、语言和地区作为 JS 对象传入，让后代共享配置。</p>
 
 <div class="demo-controls">
-  <label
-    >父主题 <select bind:value={choice}
-      ><option>light</option><option>dark</option><option>brand</option></select
+  <label class="demo-label"
+    >父主题 <Select bind:value={choice}
+      ><option>light</option><option>dark</option><option>brand</option></Select
     ></label
   >
-  <label
-    >语言 <select bind:value={language}><option>zh-CN</option><option>en-US</option></select></label
+  <label class="demo-label"
+    >语言 <Select bind:value={language}><option>zh-CN</option><option>en-US</option></Select></label
   >
-  <label
-    >地区与时区 <select bind:value={region}
-      ><option value="china">中国 · 上海</option><option value="us">美国 · 纽约</option></select
+  <label class="demo-label"
+    >地区与时区 <Select bind:value={region}
+      ><option value="china">中国 · 上海</option><option value="us">美国 · 纽约</option></Select
     ></label
   >
-  <label
-    >子主题 <select bind:value={nested}
+  <label class="demo-label"
+    >子主题 <Select bind:value={nested}
       ><option>inherit</option><option>light</option><option>dark</option><option>brand</option
-      ></select
+      ></Select
     ></label
   >
 </div>

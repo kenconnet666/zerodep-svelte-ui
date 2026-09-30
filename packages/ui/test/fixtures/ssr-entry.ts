@@ -15,6 +15,9 @@ import {
   Ripple,
   Button,
   Loading,
+  Checkbox,
+  Select,
+  Slider,
 } from 'zerodep-svelte-ui';
 import ProviderSsr from './ProviderSsr.svelte';
 import PublicConfigProbe from './PublicConfigProbe.svelte';
@@ -22,6 +25,7 @@ import IconSsr from './IconSsr.svelte';
 import ContextWithoutProvider from './ContextWithoutProvider.svelte';
 import FoundationSsr from './FoundationSsr.svelte';
 import ButtonSsr from './ButtonSsr.svelte';
+import ControlsSsr from './ControlsSsr.svelte';
 
 export async function renderProvider(dark: boolean, brand: string) {
   const host = createServerCssHost();
@@ -79,16 +83,31 @@ export function renderFoundations(label: string) {
   return { body, css: host.cssText() };
 }
 
-export function renderFoundationWithoutProvider(kind: 'text' | 'ripple' | 'button' | 'loading') {
-  return withCssHost(
-    createServerCssHost(),
-    () => render({ text: Text, ripple: Ripple, button: Button, loading: Loading }[kind]).body,
+export function renderFoundationWithoutProvider(
+  kind: 'text' | 'ripple' | 'button' | 'loading' | 'checkbox' | 'select' | 'slider',
+) {
+  return withCssHost(createServerCssHost(), () =>
+    ({
+      text: () => render(Text).body,
+      ripple: () => render(Ripple).body,
+      button: () => render(Button).body,
+      loading: () => render(Loading).body,
+      checkbox: () => render(Checkbox).body,
+      select: () => render(Select<string>).body,
+      slider: () => render(Slider).body,
+    })[kind](),
   );
 }
 
 export function renderButton() {
   const host = createServerCssHost();
   const body = withCssHost(host, () => render(ButtonSsr).body);
+  return { body, css: host.cssText() };
+}
+
+export function renderControls() {
+  const host = createServerCssHost();
+  const body = withCssHost(host, () => render(ControlsSsr).body);
   return { body, css: host.cssText() };
 }
 

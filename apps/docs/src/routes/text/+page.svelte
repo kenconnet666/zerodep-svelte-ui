@@ -1,6 +1,14 @@
 <script lang="ts">
   import type { ComponentProps } from 'svelte';
-  import { Text, Provider, lightTheme, darkTheme, useCss } from 'zerodep-svelte-ui';
+  import {
+    Text,
+    Checkbox,
+    Select,
+    Provider,
+    lightTheme,
+    darkTheme,
+    useCss,
+  } from 'zerodep-svelte-ui';
   import { css } from 'zerodep-css-svelte';
   const s = useCss();
   let dark = $state(false);
@@ -14,10 +22,10 @@
 <h1>Text</h1>
 <p class="lead">保留原生文本语义，按需使用系统主题或直接 CSS 值。</p>
 <div class="demo-controls">
-  <label><input type="checkbox" bind:checked={dark} /> 深色主题</label>
-  <label
-    >文字大小 <select bind:value={size}
-      ><option>_sm</option><option>_md</option><option>_xl</option><option>18px</option></select
+  <Checkbox bind:checked={dark}>深色主题</Checkbox>
+  <label class="demo-label"
+    >文字大小 <Select bind:value={size}
+      ><option>_sm</option><option>_md</option><option>_xl</option><option>18px</option></Select
     ></label
   >
 </div>

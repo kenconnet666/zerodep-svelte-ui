@@ -50,6 +50,12 @@ test('正式包产物的 Provider 隔离并发 SSR 和嵌套主题作者', async
 });
 
 test('缺少 Provider 或 SSR 宿主时明确失败', () => {
+  for (const control of ['checkbox', 'select', 'slider']) {
+    assert.throws(
+      () => entry.renderFoundationWithoutProvider(control),
+      /CSS author was not provided/,
+    );
+  }
   assert.throws(() => entry.renderWithoutProvider(), /CSS author was not provided/);
   assert.throws(() => entry.renderIconWithoutProvider(), /CSS author was not provided/);
   assert.throws(() => entry.renderFoundationWithoutProvider('text'), /CSS author was not provided/);
@@ -95,6 +101,16 @@ test('Button 与 Loading 产物输出首屏语义、转义内容及减少动效�
   assert.match(result.body, /aria-label="加载中"/);
   assert.match(result.css, /height:2.125em/);
   assert.match(result.css, /prefers-reduced-motion:\s*reduce/);
+});
+
+test('表单控件 SSR 保留勾选、选项、数值与可访问状态', () => {
+  const result = entry.renderControls();
+  assert.match(result.body, /type="checkbox"[^>]*checked/);
+  assert.match(result.body, /aria-checked="mixed"/);
+  assert.match(result.body, /&lt;条款/);
+  assert.match(result.body, /<option value="b" selected/);
+  assert.match(result.body, /type="range"[^>]*value="3.5"/);
+  assert.match(result.body, /aria-valuetext="3.5秒"/);
 });
 
 test('直接 CSS props 在并发 SSR 中正确输出且请求隔离', async () => {

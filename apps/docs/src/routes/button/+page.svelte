@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Search } from '@lucide/icons';
-  import { Button, Loading, useCss } from 'zerodep-svelte-ui';
+  import { Button, Loading, Checkbox, useCss } from 'zerodep-svelte-ui';
   import { css } from 'zerodep-css-svelte';
   const s = useCss();
   let loading = $state(false);
@@ -16,8 +16,8 @@
   固定的原生按钮，复用 Text、Icon、Loading、Ripple。通过 class 和 slotProps 定制外观。
 </p>
 <div class="demo-controls">
-  <label><input type="checkbox" bind:checked={loading} /> 加载中</label>
-  <label><input type="checkbox" bind:checked={disabled} /> 禁用</label>
+  <Checkbox bind:checked={loading}>加载中</Checkbox>
+  <Checkbox bind:checked={disabled}>禁用</Checkbox>
 </div>
 <div class="demo-controls">
   <Button data-button-preview {loading} {disabled} icon={Search} onclick={() => clicks++}
