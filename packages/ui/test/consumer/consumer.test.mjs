@@ -79,12 +79,12 @@ test(
       await writeFile(
         join(directory, 'Consumer.svelte'),
         `<script lang="ts">
-      import { Provider, Icon, Text, Ripple, rippleButton, darkTheme, type RippleHandle } from 'zerodep-svelte-ui';
+      import { Provider, Icon, Text, Ripple, Button, Loading, rippleButton, darkTheme, type RippleHandle } from 'zerodep-svelte-ui';
       import { Search } from '@lucide/icons';
       import BindingProbe from './BindingProbe.svelte';
       let ripple = $state<RippleHandle>();
       </script>
-      <Provider theme={darkTheme}><Icon icon={Search} size="20px" color="purple" strokeWidth={1.25} verticalAlign="middle" aria-label="搜索" /><button type="button" style="position:relative" {@attach rippleButton(() => ripple)}><Text as="strong">基础文字</Text><Ripple bind:this={ripple} /></button><BindingProbe /></Provider>`,
+      <Provider theme={darkTheme}><Icon icon={Search} size="20px" color="purple" strokeWidth={1.25} verticalAlign="middle" aria-label="搜索" /><button type="button" style="position:relative" {@attach rippleButton(() => ripple)}><Text as="strong">基础文字</Text><Ripple bind:this={ripple} /></button><Button size="20px" loading slotProps={{ label: { size: '18px' } }}>保存</Button><Loading /><BindingProbe /></Provider>`,
       );
       // 编译插件契约由明确的动态绑定场景验证，不要求 Icon 为测试而使用 bx。
       await writeFile(
@@ -111,13 +111,23 @@ test(
       await writeFile(
         join(directory, 'types.ts'),
         `import type {ComponentProps} from 'svelte';
-      import {Provider,Icon,Text,Ripple,UiCss,focusRing,rippleButton,darkTheme,enUSLanguage,usLocale} from 'zerodep-svelte-ui';import {Search} from '@lucide/icons';
+      import {Provider,Icon,Text,Ripple,Button,Loading,UiCss,focusRing,rippleButton,darkTheme,enUSLanguage,usLocale} from 'zerodep-svelte-ui';import {Search} from '@lucide/icons';
 
       export const provider:ComponentProps<typeof Provider>={css:(readTheme)=>new UiCss(readTheme),theme:darkTheme,lang:enUSLanguage,locale:usLocale};
       // @ts-expect-error 内部 context 设置器不进入公共导出。
       import {provideCss} from 'zerodep-svelte-ui';
       // @ts-expect-error 动画控制器属于内部实现。
       import {createRippleController} from 'zerodep-svelte-ui';
+            export const button:ComponentProps<typeof Button>={size:'_lg',slotProps:{label:{size:'18px'},icon:{size:'1em'},loading:{color:'_primary'},ripple:{opacity:0.1}}};
+      export const loading:ComponentProps<typeof Loading>={size:'_md',label:'请稍候'};
+      // @ts-expect-error Button 不提供根组件替换。
+      export const badAs:ComponentProps<typeof Button>={as:'div'};
+      // @ts-expect-error Button 不提供链接语义。
+      export const badHref:ComponentProps<typeof Button>={href:'/'};
+      // @ts-expect-error 内部 Text 标签由 Button 固定。
+      export const badLabel:ComponentProps<typeof Button>={slotProps:{label:{as:'h1'}}};
+      // @ts-expect-error loading 装饰语义由 Button 管理。
+      export const badLoading:ComponentProps<typeof Button>={slotProps:{loading:{decorative:false}}};
       export const text:ComponentProps<typeof Text>={as:'h2',size:'_xl',fontWeight:600};
       export const ripple:ComponentProps<typeof Ripple>={color:'_primary',opacity:0.12};
       // @ts-expect-error 聚合配置入口已移除。

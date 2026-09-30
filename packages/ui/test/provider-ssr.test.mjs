@@ -54,6 +54,8 @@ test('缺少 Provider 或 SSR 宿主时明确失败', () => {
   assert.throws(() => entry.renderIconWithoutProvider(), /inside a Provider/);
   assert.throws(() => entry.renderFoundationWithoutProvider('text'), /inside a Provider/);
   assert.throws(() => entry.renderFoundationWithoutProvider('ripple'), /inside a Provider/);
+  assert.throws(() => entry.renderFoundationWithoutProvider('button'), /inside a Provider/);
+  assert.throws(() => entry.renderFoundationWithoutProvider('loading'), /inside a Provider/);
   for (const kind of ['theme', 'locale', 'lang', 'css']) {
     assert.throws(() => entry.readWithoutProvider(kind), /inside a Provider/);
   }
@@ -69,6 +71,18 @@ test('Text 与 Ripple 的正式产物可 SSR，文本转义且没有运行时波
   assert.match(result.body, /<button type="button"/);
   assert.doesNotMatch(result.body, /scale\(0\)/);
   assert.match(result.css, /pointer-events:none/);
+});
+
+test('Button 与 Loading 产物输出首屏语义、转义内容及减少动效样式，无需浏览器 API', () => {
+  const result = entry.renderButton();
+  assert.match(result.body, /<button[^>]*type="button"/);
+  assert.match(result.body, /aria-busy="true"/);
+  assert.match(result.body, /aria-disabled="true"/);
+  assert.match(result.body, /&lt;内容/);
+  assert.equal((result.body.match(/role="status"/g) ?? []).length, 1);
+  assert.match(result.body, /aria-label="加载中"/);
+  assert.match(result.css, /height:2.125em/);
+  assert.match(result.css, /prefers-reduced-motion:\s*reduce/);
 });
 
 test('直接 CSS props 在并发 SSR 中正确输出且请求隔离', async () => {

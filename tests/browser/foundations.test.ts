@@ -17,6 +17,18 @@ test('Ripple 从指针位置覆盖按钮，松开后回收且不重复激活', a
     }).observe(element, { childList: true });
   });
   const box = (await layer.boundingBox())!;
+  // WebKit 会把注入的小数指针坐标取整；依据实际事件验证换算，不假定请求坐标原样派发。
+  await button.evaluate((element) => {
+    element.addEventListener(
+      'pointerdown',
+      (event) => {
+        if (!(event instanceof PointerEvent)) throw new Error('Expected PointerEvent');
+        element.setAttribute('data-pointer-x', String(event.clientX));
+        element.setAttribute('data-pointer-y', String(event.clientY));
+      },
+      { once: true },
+    );
+  });
   await page.mouse.move(box.x + 5, box.y + 7);
   await page.mouse.down();
   await expect(layer.locator(':scope > span')).toHaveCount(1);
@@ -31,8 +43,10 @@ test('Ripple 从指针位置覆盖按钮，松开后回收且不重复激活', a
       height: element.clientHeight,
     };
   });
-  expect(circle.x).toBeCloseTo(5, 0);
-  expect(circle.y).toBeCloseTo(7, 0);
+  const pointerX = Number(await button.getAttribute('data-pointer-x'));
+  const pointerY = Number(await button.getAttribute('data-pointer-y'));
+  expect(circle.x).toBeCloseTo(((pointerX - box.x) * circle.width) / box.width, 3);
+  expect(circle.y).toBeCloseTo(((pointerY - box.y) * circle.height) / box.height, 3);
   expect(circle.radius).toBeGreaterThanOrEqual(
     Math.hypot(circle.width - circle.x, circle.height - circle.y) - 0.1,
   );

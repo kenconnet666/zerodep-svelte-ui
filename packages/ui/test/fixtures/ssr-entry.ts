@@ -13,12 +13,15 @@ import {
   Icon,
   Text,
   Ripple,
+  Button,
+  Loading,
 } from 'zerodep-svelte-ui';
 import ProviderSsr from './ProviderSsr.svelte';
 import PublicConfigProbe from './PublicConfigProbe.svelte';
 import IconSsr from './IconSsr.svelte';
 import ContextWithoutProvider from './ContextWithoutProvider.svelte';
 import FoundationSsr from './FoundationSsr.svelte';
+import ButtonSsr from './ButtonSsr.svelte';
 
 export async function renderProvider(dark: boolean, brand: string) {
   const host = createServerCssHost();
@@ -76,10 +79,17 @@ export function renderFoundations(label: string) {
   return { body, css: host.cssText() };
 }
 
-export function renderFoundationWithoutProvider(kind: 'text' | 'ripple') {
-  return withCssHost(createServerCssHost(), () =>
-    kind === 'text' ? render(Text).body : render(Ripple).body,
+export function renderFoundationWithoutProvider(kind: 'text' | 'ripple' | 'button' | 'loading') {
+  return withCssHost(
+    createServerCssHost(),
+    () => render({ text: Text, ripple: Ripple, button: Button, loading: Loading }[kind]).body,
   );
+}
+
+export function renderButton() {
+  const host = createServerCssHost();
+  const body = withCssHost(host, () => render(ButtonSsr).body);
+  return { body, css: host.cssText() };
 }
 
 export async function renderIconAppearance(appearance: Partial<ComponentProps<typeof Icon>>) {

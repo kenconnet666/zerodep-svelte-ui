@@ -1,5 +1,6 @@
 import type { Attachment } from 'svelte/attachments';
 import type { RippleHandle } from '../feedback/gene/Ripple.svelte';
+import { isButtonBlocked } from '../../internal/button-blocked.js';
 
 /** 原生按钮的视觉反馈接入；不合成 click、不拦截键盘、不管理业务回调。 */
 export function rippleButton(
@@ -16,10 +17,7 @@ export function rippleButton(
     const document = button.ownerDocument;
     const view = document.defaultView;
     let active: { pointer: number; wave: number } | undefined;
-    const blocked = () =>
-      readDisabled() ||
-      button.matches(':disabled') ||
-      button.getAttribute('aria-disabled') === 'true';
+    const blocked = () => isButtonBlocked(button, readDisabled());
     const unlisten = () => {
       document.removeEventListener('pointerup', release, true);
       document.removeEventListener('pointercancel', abort, true);

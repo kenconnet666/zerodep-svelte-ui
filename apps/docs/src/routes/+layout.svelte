@@ -35,6 +35,9 @@
       <a href={resolve('/ripple')} aria-current={page.route.id === '/ripple' ? 'page' : undefined}
         >Ripple</a
       >
+      <a href={resolve('/button')} aria-current={page.route.id === '/button' ? 'page' : undefined}
+        >Button</a
+      >
       <a href="https://github.com/kenconnet666/zerodep-svelte-ui">GitHub</a>
     </nav>
   </header>

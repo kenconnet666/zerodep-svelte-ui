@@ -134,4 +134,6 @@ Icon 的四个外观属性都直接通过对应 raw() 生成声明。描边是�
 
 ## 后续边界
 
-Button/Input 尚未实现。后续组件的外观参数默认从对应 UiCss.raw() 提取，通用或常用外观 token 直接进入 CSS 工具主题树；专用 padding、图标与状态样式在组件内部通过 CSS 工具定义，外部定制使用 class。组件 token 的注册、注入、覆盖和合并不再列为后续建设项。交互状态、键盘或子部件协作需要的 context 按具体行为设计，不承载样式 token 覆盖。
+Button 已实现，Input 尚未实现。Button.size 直接复用 UiCss.fontSize.raw() 的输入，默认 _md=1rem，作为统一比例基准；通过 em 联动高度、padding、文字、图标、Loading、间距和圆角，不将 controlHeight 的档位映射到多套组件尺寸。默认基准 16px 时外框高 34px、文字 14px、图标 16px。slotProps 的显式值优先于比例默认值，class 在默认声明之后组合，完整比例与边界见 README 和 /button 文档。
+
+后续组件的外观参数默认从对应 UiCss.raw() 提取，通用或常用外观 token 直接进入 CSS 工具主题树；专用 padding、图标与状态样式在组件内部通过 CSS 工具定义。组件 token 的注册、注入、覆盖和合并不再列为后续建设项。交互状态、键盘或子部件协作需要的 context 按具体行为设计，不承载样式 token 覆盖。

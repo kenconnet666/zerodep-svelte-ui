@@ -1,6 +1,6 @@
 # zerodep-svelte-ui
 
-Svelte 5 组件库与直接编写网页的文档站。已实现 Provider、Icon、Text，以及 Ripple、原生按钮反馈接入和焦点样式基础，并具备打包、语言服务与 CI。正式 Button 尚未实现。项目仍保持 private，尚未发布 npm。
+Svelte 5 组件库与直接编写网页的文档站。已实现 Provider、Icon、Text，以及 Ripple、原生按钮反馈接入和焦点样式基础，并具备打包、语言服务与 CI。已提供固定原生根节点的 Button 与 Loading。项目仍保持 private，尚未发布 npm。
 
 ## 目录
 
@@ -177,6 +177,14 @@ Icon 复用最近 Provider 的作者，主题更新直接由 UiCss 响应。没�
 Ripple 父容器需要定位和尺寸，建议建立局部 stacking context；覆盖层自己裁剪圆角，焦点环不会被整个按钮的 overflow:hidden 裁掉。动画控制器在 src/internal/ripple-controller.ts，独占空覆盖层的子节点，attachment 负责清理；几何值写入内联样式，不按点击坐标登记 CSS 类。没有引入新依赖或 bx。
 
 文档与真实原生按钮示例见 /text、/ripple。该按钮只是验证夹具，不是新增的 Button API。几何定位支持未旋转的矩形与普通缩放；不承诺任意旋转/倾斜宿主的坐标还原。
+
+## Button 与 Loading
+
+Button 根节点长期固定为 `<button>`，默认 `type="button"`，不提供 as、链接按钮或替换根组件。复用 Text、Icon、Loading、Ripple；`slotProps.label/icon/loading/ripple` 转发底层外观、class、原生 style，状态和内容由 Button 管理。
+
+`size` 复用 `Parameters<UiCss['fontSize']['raw']>[0]`，默认 `_md=1rem`。尺寸基准 B 默认 16px：高度 2.125B=34px（含边框），左右内边距 0.75B=12px，边框 0.0625B=1px，圆角 0.375B=6px，文字 0.875B=14px、行高 1.5，图标/Loading 1B=16px，图文间距 0.5B=8px。size 默认等比联动；slotProps 显式值优先，根 class 最后组合。不额外维护尺寸档位映射。单独覆盖字号后需保证外框足够高。
+
+原生 disabled（包括 fieldset）阻止激活。受控 loading 保留焦点和原内容占位，通过 aria-disabled/aria-busy 表达状态，同时拦截点击回调和默认提交；不会追踪 Promise。表单仍需在 onsubmit 中管理绕过点击的提交路径，SSR 首屏的点击守卫需要水合后生效。Loading 单独使用时提供当前语言的状态名称，嵌入 Button 时为装饰；减少动效时停止旋转。
 
 ## 公共导出与目录
 
