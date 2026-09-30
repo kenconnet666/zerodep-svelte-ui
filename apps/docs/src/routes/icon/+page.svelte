@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ComponentProps } from 'svelte';
+  import { resolve } from '$app/paths';
   import { Search, Check } from '@lucide/icons';
   import { Icon, Provider, useCss, lightTheme, darkTheme } from 'zerodep-svelte-ui';
   import { css } from 'zerodep-css-svelte';
@@ -59,6 +60,18 @@
     data-icon-custom
   />
   <p>四个属性直接接收对应 CSS 属性的输入；省略或传 undefined 时使用组件默认值。</p>
+  <pre class={code}><code
+      >{`size?: Parameters<UiCss['fontSize']['raw']>[0];
+color?: Parameters<UiCss['color']['raw']>[0];
+strokeWidth?: Parameters<UiCss['strokeWidth']['raw']>[0];
+verticalAlign?: Parameters<UiCss['verticalAlign']['raw']>[0];`}</code
+    ></pre>
+  <p>
+    这是组件外观 props 的默认设计方式。后续组件确有需要时，可在本组件收窄或扩展对应输入；Icon
+    当前不额外转换非零尺寸数字，也不接收 false 等扩展值。详见 <a href={resolve('/guide')}
+      >组件外观参数约定</a
+    >。
+  </p>
   <pre class={code}><code
       >{`<Icon icon={Search} size="18px" color="#7e22ce" strokeWidth={1.75} verticalAlign="middle" />
 <Icon icon={Check} size="_xl" color="_success" />`}</code

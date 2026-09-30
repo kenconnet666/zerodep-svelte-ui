@@ -102,7 +102,20 @@ CSS 作者实例和 SSR 宿主按作用域/请求隔离，没有使用本地兄�
 
 ## 样式与 token
 
-通用 token 和组件专用样式统一通过 CSS 工具生成声明。通用 token 由 UiCss 提供，各组件直接使用 s.color._primary、s.fontSize._md 等属性；组件专用值直接写在组件内部，例如 Icon 的描边默认 2、垂直对齐默认 -0.125em。props 默认值用 Svelte $props() 声明，固定结构样式直接写在 css() 中。
+通用、常用且需要统一定制的外观 token 进入 UiCss 对应的主题分类，各组件直接使用 s.color._primary、s.fontSize._md 等属性。优先复用已有 token；组件专用值直接写在组件内部，例如 Icon 的描边默认 2、垂直对齐默认 -0.125em。props 默认值用 Svelte $props() 声明，固定结构样式直接写在 css() 中。
+
+组件外观 props 以 CSS 工具的输入类型为准，统一采用 `Parameters<UiCss['属性']['raw']>[0]`；它包含该属性支持的主题标识和原生 CSS 输入，不另外维护一套 size/color 枚举：
+
+```ts
+import type { UiCss } from 'zerodep-svelte-ui';
+
+type AppearanceProps = {
+  size?: Parameters<UiCss['fontSize']['raw']>[0];
+  color?: Parameters<UiCss['color']['raw']>[0];
+};
+```
+
+只有组件确实需要不同语义时，才在本组件临时用 Exclude/Extract 收窄或用联合类型增加输入；新增值必须转换成 CSS 工具能处理的值。完整示例与开放字符串的边界见 [组件参数约定](.design/theme-tokens.md#组件外观参数以-css-输入类型为准)。这是一条通用组件设计规则，不只适用于 Icon。
 
 外部样式定制使用 class: CssInput，组件将外部声明放在默认声明之后组合。无需额外的组件 token 注册表、context、tokens prop、Provider.components 或覆盖合并器，也不为后续组件预留这些设施。Provider.theme 用于调整通用主题，class 用于定制具体组件的样式，两者各自负责明确的范围。
 
