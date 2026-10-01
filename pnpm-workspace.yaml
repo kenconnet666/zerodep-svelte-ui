@@ -3,9 +3,9 @@ packages:
   - apps/docs
 
 catalog:
-  zerodep-css: 0.1.3
-  zerodep-css-svelte: 0.1.3
-  zerodep-css-sveltekit: 0.1.3
+  zerodep-css: 0.2.0
+  zerodep-css-svelte: 0.2.0
+  zerodep-css-sveltekit: 0.2.0
   '@axe-core/playwright': 4.13.0
   '@eslint/js': 10.0.1
   '@floating-ui/dom': 1.8.0

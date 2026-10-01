@@ -51,6 +51,12 @@ export function readonlyObjects() {
 export const badInstance: Props = { css: new Css() };
 
 export function themeAuthor(s: UiCss) {
+  const value: string = s.keywords.color._primary;
+  const weight: number = s.keywords.fontWeight._semibold;
+  // @ts-expect-error 值对象保持只读。
+  s.keywords.color._primary = 'red';
+  // @ts-expect-error 值对象不包含声明方法。
+  s.keywords.color.raw('red');
   const declarations: string[] = [
     s.color._primary,
     s.color.raw('_primary'),
@@ -64,7 +70,7 @@ export function themeAuthor(s: UiCss) {
   void s.color.primary;
   // @ts-expect-error 主题字号属性必须带下划线。
   void s.fontSize.md;
-  return declarations;
+  return { declarations, value, weight };
 }
 
 export const oldThemeKey: Props = {

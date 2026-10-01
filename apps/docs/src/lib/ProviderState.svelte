@@ -21,6 +21,7 @@
   {label}：{theme.themeName} / {lang.languageName}
 </p>
 <p data-provider-language={label}>{lang.messages.loading}</p>
+<p data-provider-keyword={label}>主色实际值：{s.keywords.color._primary}</p>
 <p>
   {locale.localeName} · {locale.timeZone} · <time data-provider-time={label}>{time}</time>
 </p>

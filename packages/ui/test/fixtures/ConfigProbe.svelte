@@ -22,6 +22,7 @@
 <span
   data-testid={name}
   data-primary={theme.color._primary}
+  data-keyword-primary={s.keywords.color._primary}
   data-font-size={theme.fontSize._md}
   class={appearance}>{theme.themeName} / {lang.languageName} / {locale.timeZone}</span
 >

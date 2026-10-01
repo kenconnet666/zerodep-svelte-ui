@@ -93,12 +93,26 @@ packages/ui 已显式声明以下 npm 依赖；根目录的 Zod 仍单独用于 
 
 ## CSS 框架接入
 
-- 组件库已安装 npm 的 zerodep-css、zerodep-css-svelte，均为 0.1.3，包含中文属性、常用值、使用场景、关键字区别和方法调用文档。
-- 文档站安装相同版本，并添加 zerodep-css-sveltekit 0.1.3。Vite 中 CSS 绑定插件放在 SvelteKit 前面，支持组件中的显式 bx。
+- 组件库已安装 npm 的 zerodep-css、zerodep-css-svelte，均为 0.2.0，包含中文属性、常用值、使用场景、关键字区别和方法调用文档。
+- 文档站安装相同版本，并添加 zerodep-css-sveltekit 0.2.0。Vite 中 CSS 绑定插件放在 SvelteKit 前面，支持组件中的显式 bx。
 - hooks.server.ts 创建每请求样式宿主，app.html 的占位符接收 SSR 样式；hooks.client.ts 在水合前恢复登记。
 - 根布局使用组件库 Provider；src/lib/css.ts 转导出组件库 useCss。页面和组件读取同一个作者实例，首页链接使用 npm CSS 包生成样式。
 
 CSS 作者实例和 SSR 宿主按作用域/请求隔离，没有使用本地兄弟仓库 link。所有消费者都必须启用 zerodep-css-svelte/vite，放在 Svelte/SvelteKit 插件之前。
+
+## 注入主题值
+
+UiKeywords 继承核心 SystemKeywords，将 UiTheme 的颜色、间距、动效等分类映射为 CSS 属性值。UiCss 使用 Css<UiKeywords>，原来的 23 个 UiXxxCss 属性子类已移除。每个 Provider 只创建一次作者和值视图；主题替换与响应式字段更新在读取时生效。
+
+```ts
+const s = useCss();
+s.color._primary; // 完整声明，例如 color:#1d4ed8;
+s.color.raw('_primary'); // 相同声明
+s.keywords.color._primary; // 当前主题的原始颜色值
+s.width.px(20); // 原生方法仍可用
+```
+
+这些读取放在模板或 $derived 中；初始化时保存字符串仍是快照。原生属性/关键字沿用核心文档，主题颜色的说明来自 UiTheme，映射后仍显示在 hover 与补全详情中。
 
 ## 样式与 token
 
@@ -136,7 +150,7 @@ Provider 位于 src/lib/provider/Provider.svelte，三个子目录分别提供 J
 
 必须在消费组件外包裹 Provider；组件、useCss()、useTheme()、useLocale() 和 useLang() 缺少 Provider 时直接报错，不创建隐式默认作者。同一个组件的初始化代码不能读取自己模板中 Provider 提供的 context。每个 Provider 创建独立 UiCss，传入当前主题的读取函数；useCss() 返回带主题语义属性的工具，useTheme()、useLocale()、useLang() 分别返回对应的只读对象。可选 css prop 为 (readTheme) => new AppCss(readTheme)，创建函数向下继承，但实例不共享；只用于初始化，更换函数需用 key 块重建。
 
-主题通过 Svelte context 向下传递，并注入 UiCss。组件在模板或 $derived 中使用 s.color._primary、s.backgroundColor._surface、s.fontSize._md；s.theme 提供原始主题对象。语义属性由 getter 读取当前主题，不使用主题 CSS 变量。UiCss、UiColorCss、UiBackgroundColorCss、UiFontSizeCss 可通过继承扩展，原生属性和 raw() 仍可使用。系统 token 的叶子键统一带下划线，分类名保持原名；例如 theme.color._primary、theme.space._2xs。不保留无下划线别名。自定义主题使用普通对象，例如 `{ ...lightTheme, color: { ...lightTheme.color, _primary: 'purple' } }`。默认预设冻结，用户对象不会被 Provider 修改。容器提供 color-scheme 与文字颜色，背景和布局由调用者设置；class/style 不会改变后代读取的配置数据。网页示例位于 /provider。
+主题通过 Svelte context 向下传递，并注入 UiCss。组件在模板或 $derived 中使用 s.color._primary、s.backgroundColor._surface、s.fontSize._md；s.theme 提供原始主题对象。语义属性由 getter 读取当前主题，不使用主题 CSS 变量。UiCss 仍可继承以复用样式方法，UiKeywords 提供系统值与主题值，原生属性和 raw() 仍可使用。系统 token 的叶子键统一带下划线，分类名保持原名；例如 theme.color._primary、theme.space._2xs。不保留无下划线别名。自定义主题使用普通对象，例如 `{ ...lightTheme, color: { ...lightTheme.color, _primary: 'purple' } }`。默认预设冻结，用户对象不会被 Provider 修改。容器提供 color-scheme 与文字颜色，背景和布局由调用者设置；class/style 不会改变后代读取的配置数据。网页示例位于 /provider。
 
 Provider 和 Icon 的 class 使用 CssInput，优先传入同一 CSS 宿主的 css(...) 结果；也接受声明字符串、嵌套数组及 false/null/undefined 条件空项。组件最终使用一个组合类，同等层叠条件下外部声明覆盖默认值。普通类名、多类名字符串和条件对象不作为原生 class 透传；style 仍是原生内联样式。SSR 中先在当前请求宿主登记外部类，客户端沿用同一宿主的水合清单。
 

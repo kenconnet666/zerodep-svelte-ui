@@ -8,6 +8,7 @@
 - Provider 通过 Svelte context 注入 JS 配置对象，主题不依赖 CSS 变量。消费代码在模板或派生表达式中读取配置，保证对象替换与嵌套继承能响应更新。
 - theme、locale、lang 使用独立 context 注入，通过 useTheme()、useLocale()、useLang() 返回各自只读对象；不再提供聚合的 UiConfig/useConfig。
 - 组件必须在 Provider 后代中使用，缺失时直接报错，不在组件内创建默认作者。Provider 将主题读取函数传给 UiCss；组件优先使用 s.color._primary、s.fontSize._md 等语义属性。每个 Provider 创建独立作者，css prop 接收创建函数，嵌套继承创建函数而不是共享主题作者实例。
+- UiKeywords 继承 SystemKeywords，将 UiTheme 分类转接为原始 CSS 值；UiCss 复用 Css<UiKeywords> 的声明与 raw() 解析，不重新建立 UiXxxCss 属性子类。作者和值视图只随 Provider 创建一次；原始值通过 s.keywords.color._primary 等读取，仍须在模板或派生表达式中使用。
 - 系统 token 的叶子键、主题声明及组件主题参数统一带下划线；分类名和普通 props 保持原名。主题数据也使用 color._primary、space._2xs，不保留无下划线别名。尺寸键统一使用 _2xs/_xs/_sm/_md/_lg/_xl/_2xl/_3xl，不混用数字开头的字符串键。声明示例如 s.color._primary、s.color.raw('_primary')、color="_primary"、size="_md"；原生 CSS 关键字如 inherit 保持原名。Icon 的外观 props 从 UiCss 对应 raw() 提取输入类型，不自行维护另一套主题标识。
 - token 统一通过 CSS 工具生成声明：通用 token 由 UiCss 提供，各组件直接复用；组件专用值和默认样式直接写在组件内部，props 默认值在 Svelte $props() 中就近声明，不建立独立的组件 token 对象、注册表、context、Provider.components、tokens prop 或覆盖合并器。外部样式定制使用 class: CssInput，外部声明在默认声明之后组合；不再为组件 token 覆盖预留基础设施。
 - 组件外观 props 默认直接复用 `Parameters<UiCss['属性']['raw']>[0]`，不重新手写主题枚举或扩大成无约束 any；Parameters 的目标是具体方法，不是 UiCss 类本身。通用、常用且需要统一定制的外观 token 进入对应 CSS 工具主题分类，组件专用值就近固定。确有语义差异时，只在当前组件用 Exclude/Extract/联合类型收窄或扩展输入，并补上新增值的运行时转换；开放 CSS 字符串不能靠 Exclude 删除某个具体字符串来形成可靠黑名单。此规则适用于所有后续组件，不只 Icon。

@@ -24,7 +24,7 @@ Provider 使用 Svelte context 注入三个普通 JS 对象；主题、地区、
 组件外观参数默认取 `Parameters<UiCss['属性']['raw']>[0]`。通用、常用且需要统一定制的外观 token 进入 CSS 工具主题树；专用值写在组件内部。局部 Exclude/Extract/联合类型只用于组件确有需求的输入调整，扩展值需要相应转换；完整规则见 [组件参数约定](theme-tokens.md#组件外观参数以-css-输入类型为准)。
 
 - 每个 Provider 创建独立 UiCss，同一 Provider 内的后代复用。css prop 接收 (readTheme) => new AppCss(readTheme)，创建函数通过 createCss 向下继承，但实例不共享；只用于初始化，更换时用 key 重建 Provider。创建函数必须返回新实例，不能复用单例。
-- 主题读取函数传入 UiCss，语义属性通过 getter 生成当前主题声明，例如 css(s.color._primary, s.fontSize._md)。s.theme 保留原始主题类型；UiCss 和各主题属性类复用原生 Css 继承机制，可继续扩展。不生成 --ui-color/--ui-font-size 变量。
+- 主题读取函数传入 UiCss，语义属性通过 getter 生成当前主题声明，例如 css(s.color._primary, s.fontSize._md)。s.theme 保留原始主题类型；UiKeywords 继承 SystemKeywords，将 UI 主题分类映射到原生 CSS 属性值；UiCss 继承 Css<UiKeywords>，声明生成与 raw() 解析交给核心。不生成 --ui-color/--ui-font-size 变量。
 - Provider 容器提供 color-scheme、基础字体排版与文字颜色。背景、间距等布局由使用者提供。
 - class 使用 CssInput。外部 css() 结果放在默认声明后合成一个类，不使用 @layer，不透传普通类名或条件对象。
 - 容器的 class/style 只改变 DOM 样式，不修改后代获取的配置对象。需要整个子树使用新的主题值时，传 theme 对象。

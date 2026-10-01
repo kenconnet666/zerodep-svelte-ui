@@ -229,11 +229,22 @@ test('主题传给自定义作者，创建函数向下继承，替换主题不�
     nestedTheme: darkTheme,
   });
   expect(instances).toHaveLength(3);
+  const keywords = instances[0].keywords;
+  const color = instances[0].color;
   expect(instances[0].brandBackground).toBe('background-color:#1d4ed8;');
   expect(instances[1].brandBackground).toBe('background-color:#93c5fd;');
   const theme = { ...lightTheme, color: { ...lightTheme.color, _primary: 'purple' } };
   await screen.rerender({ theme });
   expect(instances[0].theme).toBe(theme);
+  expect(instances[0].keywords).toBe(keywords);
+  expect(instances[0].color).toBe(color);
+  expect(keywords.color._primary).toBe('purple');
+  await expect
+    .element(screen.getByTestId('root-value'))
+    .toHaveAttribute('data-keyword-primary', 'purple');
+  await expect
+    .element(screen.getByTestId('nested-value'))
+    .toHaveAttribute('data-keyword-primary', '#93c5fd');
   expect(instances[0].brandBackground).toBe('background-color:purple;');
   expect(instances[1].brandBackground).toBe('background-color:#93c5fd;');
   expect(instances[2].brandBackground).toBe('background-color:purple;');

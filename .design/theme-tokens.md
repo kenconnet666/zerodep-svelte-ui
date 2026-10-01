@@ -72,7 +72,7 @@ function strokeDeclaration(s: UiCss, value: OptionalStrokeInput): string {
 
 增加类型不等于 raw() 自动懂得新语义。false 是示例中的局部组件语义，不加入系统 token，也不改变当前 Icon（Icon 不接受 false）。只增加确实需要的值和转换，不把这些特例提升为组件配置框架。
 
-新建通用 token 时，同步维护 UiTheme 的下划线叶子键、亮暗预设、UiCss getter/raw() 及文档；已有组件从 raw() 提取类型后会自然获得对应输入。单个组件专用常量无需进入主题树。类型工具语义见 [TypeScript 官方说明](https://www.typescriptlang.org/docs/handbook/utility-types.html)。
+新建通用 token 时，同步维护 UiTheme 的下划线叶子键、亮暗预设、UiKeywords 的分类映射及文档；已有组件从 raw() 提取类型后会自然获得对应输入。单个组件专用常量无需进入主题树。类型工具语义见 [TypeScript 官方说明](https://www.typescriptlang.org/docs/handbook/utility-types.html)。
 
 ## 系统层
 

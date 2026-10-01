@@ -167,14 +167,17 @@ css(s.transitionDuration._fast, s.zIndex._modal);`}</code
 const locale = useLocale();
 const lang = useLang();
 const s = useCss();
+// 原始值也从同一个作用域读取。
+const primary = $derived(s.keywords.color._primary);
 // 在模板或 $derived 中读取，才能随配置替换更新。
 const appearance = $derived(css(s.color._primary, s.fontSize._md));`}</code
     ></pre>
   <p>
     Provider 将当前主题的读取函数传给 UiCss，不依赖主题 CSS 变量。在模板或派生表达式中读取
     s.color._primary、s.backgroundColor._surface、s.fontSize._md，主题替换时自动更新；s.theme
-    可取得原始主题对象。不要在初始化时缓存这些声明。容器的外部 class 只改变 DOM
-    样式，不修改传给后代的主题数据。
+    可取得原始主题对象，s.keywords.color._primary 可读取对应的原始 CSS 值。UiKeywords 继承
+    SystemKeywords，UiCss 通过核心 Css 注入它；作者和值视图在每个 Provider 内各创建一次。
+    不要在初始化时缓存这些声明。容器的外部 class 只改变 DOM 样式，不修改传给后代的主题数据。
   </p>
   <p>
     主题数据键与声明统一带下划线，例如

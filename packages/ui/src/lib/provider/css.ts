@@ -1,29 +1,4 @@
-import {
-  Css,
-  ColorCss,
-  BackgroundColorCss,
-  BorderColorCss,
-  OutlineColorCss,
-  FontFamilyCss,
-  FontSizeCss,
-  FontWeightCss,
-  LineHeightCss,
-  HeightCss,
-  PaddingCss,
-  PaddingInlineCss,
-  PaddingBlockCss,
-  MarginCss,
-  GapCss,
-  BorderRadiusCss,
-  BorderWidthCss,
-  OpacityCss,
-  BoxShadowCss,
-  TransitionDurationCss,
-  TransitionTimingFunctionCss,
-  AnimationDurationCss,
-  AnimationTimingFunctionCss,
-  ZIndexCss,
-} from 'zerodep-css-svelte';
+import { Css, SystemKeywords, systemKeywords } from 'zerodep-css-svelte';
 import type { UiTheme } from './theme/types.js';
 
 export type UiThemeColor = keyof UiTheme['color'];
@@ -41,916 +16,114 @@ export type UiThemeDuration = keyof UiTheme['motion']['duration'];
 export type UiThemeEasing = keyof UiTheme['motion']['easing'];
 export type UiThemeZIndex = keyof UiTheme['zIndex'];
 
-/** 只解析完整主题标识；原生 CSS 值保持原样，数字仍保留原生参数类型。 */
-function themeValue<V extends string | number, T extends string | number>(
-  value: V,
-  values: Readonly<Record<string, T>>,
-): V | T {
-  if (typeof value === 'string' && value.startsWith('_')) {
-    if (Object.hasOwn(values, value)) return values[value];
+/** 建立一次只读值视图；getter 保留 Svelte 对原始主题字段的依赖跟踪。 */
+function themeValues<S extends object, T extends object>(system: S, read: () => T): S & T {
+  const values = { ...system };
+  for (const key of Object.keys(read()) as (keyof T & string)[]) {
+    Object.defineProperty(values, key, { enumerable: true, get: () => read()[key] });
   }
-  return value;
+  // 视图只组合系统成员和主题成员，不缓存主题值，也不代理作者 API。
+  return Object.freeze(values) as S & T;
 }
 
-/** color 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiColorCss extends ColorCss {
-  constructor(private readonly readTheme: () => UiTheme) {
+/** 将 UI 分类映射为原生 CSS 属性的值；作者实例和此对象都随 Provider 创建一次。 */
+export class UiKeywords extends SystemKeywords {
+  constructor(readTheme: () => UiTheme) {
     super();
+    this.color = themeValues(systemKeywords.color, () => readTheme().color);
+    this.backgroundColor = themeValues(systemKeywords.backgroundColor, () => readTheme().color);
+    this.borderColor = themeValues(systemKeywords.borderColor, () => readTheme().color);
+    this.outlineColor = themeValues(systemKeywords.outlineColor, () => readTheme().color);
+    this.fontFamily = themeValues(systemKeywords.fontFamily, () => readTheme().fontFamily);
+    this.fontSize = themeValues(systemKeywords.fontSize, () => readTheme().fontSize);
+    this.fontWeight = themeValues(systemKeywords.fontWeight, () => readTheme().fontWeight);
+    this.lineHeight = themeValues(systemKeywords.lineHeight, () => readTheme().lineHeight);
+    this.height = themeValues(systemKeywords.height, () => readTheme().controlHeight);
+    this.padding = themeValues(systemKeywords.padding, () => readTheme().space);
+    this.paddingInline = themeValues(systemKeywords.paddingInline, () => readTheme().space);
+    this.paddingBlock = themeValues(systemKeywords.paddingBlock, () => readTheme().space);
+    this.margin = themeValues(systemKeywords.margin, () => readTheme().space);
+    this.gap = themeValues(systemKeywords.gap, () => readTheme().space);
+    this.borderRadius = themeValues(systemKeywords.borderRadius, () => readTheme().radius);
+    this.borderWidth = themeValues(systemKeywords.borderWidth, () => readTheme().borderWidth);
+    this.opacity = themeValues(systemKeywords.opacity, () => readTheme().opacity);
+    this.boxShadow = themeValues(systemKeywords.boxShadow, () => readTheme().shadow);
+    this.transitionDuration = themeValues(
+      systemKeywords.transitionDuration,
+      () => readTheme().motion.duration,
+    );
+    this.transitionTimingFunction = themeValues(
+      systemKeywords.transitionTimingFunction,
+      () => readTheme().motion.easing,
+    );
+    this.animationDuration = themeValues(
+      systemKeywords.animationDuration,
+      () => readTheme().motion.duration,
+    );
+    this.animationTimingFunction = themeValues(
+      systemKeywords.animationTimingFunction,
+      () => readTheme().motion.easing,
+    );
+    this.zIndex = themeValues(systemKeywords.zIndex, () => readTheme().zIndex);
   }
-  override raw(value: UiThemeColor | Parameters<ColorCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().color));
-  }
-  get _background(): string {
-    return this.raw('_background');
-  }
-  get _surface(): string {
-    return this.raw('_surface');
-  }
-  get _surfaceHover(): string {
-    return this.raw('_surfaceHover');
-  }
-  get _text(): string {
-    return this.raw('_text');
-  }
-  get _muted(): string {
-    return this.raw('_muted');
-  }
-  get _textDisabled(): string {
-    return this.raw('_textDisabled');
-  }
-  get _border(): string {
-    return this.raw('_border');
-  }
-  get _divider(): string {
-    return this.raw('_divider');
-  }
-  get _focusRing(): string {
-    return this.raw('_focusRing');
-  }
-  get _primary(): string {
-    return this.raw('_primary');
-  }
-  get _primaryHover(): string {
-    return this.raw('_primaryHover');
-  }
-  get _primaryPressed(): string {
-    return this.raw('_primaryPressed');
-  }
-  get _onPrimary(): string {
-    return this.raw('_onPrimary');
-  }
-  get _info(): string {
-    return this.raw('_info');
-  }
-  get _infoHover(): string {
-    return this.raw('_infoHover');
-  }
-  get _infoPressed(): string {
-    return this.raw('_infoPressed');
-  }
-  get _onInfo(): string {
-    return this.raw('_onInfo');
-  }
-  get _success(): string {
-    return this.raw('_success');
-  }
-  get _successHover(): string {
-    return this.raw('_successHover');
-  }
-  get _successPressed(): string {
-    return this.raw('_successPressed');
-  }
-  get _onSuccess(): string {
-    return this.raw('_onSuccess');
-  }
-  get _warning(): string {
-    return this.raw('_warning');
-  }
-  get _warningHover(): string {
-    return this.raw('_warningHover');
-  }
-  get _warningPressed(): string {
-    return this.raw('_warningPressed');
-  }
-  get _onWarning(): string {
-    return this.raw('_onWarning');
-  }
-  get _danger(): string {
-    return this.raw('_danger');
-  }
-  get _dangerHover(): string {
-    return this.raw('_dangerHover');
-  }
-  get _dangerPressed(): string {
-    return this.raw('_dangerPressed');
-  }
-  get _onDanger(): string {
-    return this.raw('_onDanger');
-  }
+  /** color 的原始值，读取当前作用域主题。 */
+  override readonly color: SystemKeywords['color'] & UiTheme['color'];
+  /** backgroundColor 的原始值，读取当前作用域主题。 */
+  override readonly backgroundColor: SystemKeywords['backgroundColor'] & UiTheme['color'];
+  /** borderColor 的原始值，读取当前作用域主题。 */
+  override readonly borderColor: SystemKeywords['borderColor'] & UiTheme['color'];
+  /** outlineColor 的原始值，读取当前作用域主题。 */
+  override readonly outlineColor: SystemKeywords['outlineColor'] & UiTheme['color'];
+  /** fontFamily 的原始值，读取当前作用域主题。 */
+  override readonly fontFamily: SystemKeywords['fontFamily'] & UiTheme['fontFamily'];
+  /** fontSize 的原始值，读取当前作用域主题。 */
+  override readonly fontSize: SystemKeywords['fontSize'] & UiTheme['fontSize'];
+  /** fontWeight 的原始值，读取当前作用域主题。 */
+  override readonly fontWeight: SystemKeywords['fontWeight'] & UiTheme['fontWeight'];
+  /** lineHeight 的原始值，读取当前作用域主题。 */
+  override readonly lineHeight: SystemKeywords['lineHeight'] & UiTheme['lineHeight'];
+  /** height 的原始值，读取当前作用域主题。 */
+  override readonly height: SystemKeywords['height'] & UiTheme['controlHeight'];
+  /** padding 的原始值，读取当前作用域主题。 */
+  override readonly padding: SystemKeywords['padding'] & UiTheme['space'];
+  /** paddingInline 的原始值，读取当前作用域主题。 */
+  override readonly paddingInline: SystemKeywords['paddingInline'] & UiTheme['space'];
+  /** paddingBlock 的原始值，读取当前作用域主题。 */
+  override readonly paddingBlock: SystemKeywords['paddingBlock'] & UiTheme['space'];
+  /** margin 的原始值，读取当前作用域主题。 */
+  override readonly margin: SystemKeywords['margin'] & UiTheme['space'];
+  /** gap 的原始值，读取当前作用域主题。 */
+  override readonly gap: SystemKeywords['gap'] & UiTheme['space'];
+  /** borderRadius 的原始值，读取当前作用域主题。 */
+  override readonly borderRadius: SystemKeywords['borderRadius'] & UiTheme['radius'];
+  /** borderWidth 的原始值，读取当前作用域主题。 */
+  override readonly borderWidth: SystemKeywords['borderWidth'] & UiTheme['borderWidth'];
+  /** opacity 的原始值，读取当前作用域主题。 */
+  override readonly opacity: SystemKeywords['opacity'] & UiTheme['opacity'];
+  /** boxShadow 的原始值，读取当前作用域主题。 */
+  override readonly boxShadow: SystemKeywords['boxShadow'] & UiTheme['shadow'];
+  /** transitionDuration 的原始值，读取当前作用域主题。 */
+  override readonly transitionDuration: SystemKeywords['transitionDuration'] &
+    UiTheme['motion']['duration'];
+  /** transitionTimingFunction 的原始值，读取当前作用域主题。 */
+  override readonly transitionTimingFunction: SystemKeywords['transitionTimingFunction'] &
+    UiTheme['motion']['easing'];
+  /** animationDuration 的原始值，读取当前作用域主题。 */
+  override readonly animationDuration: SystemKeywords['animationDuration'] &
+    UiTheme['motion']['duration'];
+  /** animationTimingFunction 的原始值，读取当前作用域主题。 */
+  override readonly animationTimingFunction: SystemKeywords['animationTimingFunction'] &
+    UiTheme['motion']['easing'];
+  /** zIndex 的原始值，读取当前作用域主题。 */
+  override readonly zIndex: SystemKeywords['zIndex'] & UiTheme['zIndex'];
 }
 
-/** color 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiBackgroundColorCss extends BackgroundColorCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeColor | Parameters<BackgroundColorCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().color));
-  }
-  get _background(): string {
-    return this.raw('_background');
-  }
-  get _surface(): string {
-    return this.raw('_surface');
-  }
-  get _surfaceHover(): string {
-    return this.raw('_surfaceHover');
-  }
-  get _text(): string {
-    return this.raw('_text');
-  }
-  get _muted(): string {
-    return this.raw('_muted');
-  }
-  get _textDisabled(): string {
-    return this.raw('_textDisabled');
-  }
-  get _border(): string {
-    return this.raw('_border');
-  }
-  get _divider(): string {
-    return this.raw('_divider');
-  }
-  get _focusRing(): string {
-    return this.raw('_focusRing');
-  }
-  get _primary(): string {
-    return this.raw('_primary');
-  }
-  get _primaryHover(): string {
-    return this.raw('_primaryHover');
-  }
-  get _primaryPressed(): string {
-    return this.raw('_primaryPressed');
-  }
-  get _onPrimary(): string {
-    return this.raw('_onPrimary');
-  }
-  get _info(): string {
-    return this.raw('_info');
-  }
-  get _infoHover(): string {
-    return this.raw('_infoHover');
-  }
-  get _infoPressed(): string {
-    return this.raw('_infoPressed');
-  }
-  get _onInfo(): string {
-    return this.raw('_onInfo');
-  }
-  get _success(): string {
-    return this.raw('_success');
-  }
-  get _successHover(): string {
-    return this.raw('_successHover');
-  }
-  get _successPressed(): string {
-    return this.raw('_successPressed');
-  }
-  get _onSuccess(): string {
-    return this.raw('_onSuccess');
-  }
-  get _warning(): string {
-    return this.raw('_warning');
-  }
-  get _warningHover(): string {
-    return this.raw('_warningHover');
-  }
-  get _warningPressed(): string {
-    return this.raw('_warningPressed');
-  }
-  get _onWarning(): string {
-    return this.raw('_onWarning');
-  }
-  get _danger(): string {
-    return this.raw('_danger');
-  }
-  get _dangerHover(): string {
-    return this.raw('_dangerHover');
-  }
-  get _dangerPressed(): string {
-    return this.raw('_dangerPressed');
-  }
-  get _onDanger(): string {
-    return this.raw('_onDanger');
-  }
-}
-
-/** color 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiBorderColorCss extends BorderColorCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeColor | Parameters<BorderColorCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().color));
-  }
-  get _background(): string {
-    return this.raw('_background');
-  }
-  get _surface(): string {
-    return this.raw('_surface');
-  }
-  get _surfaceHover(): string {
-    return this.raw('_surfaceHover');
-  }
-  get _text(): string {
-    return this.raw('_text');
-  }
-  get _muted(): string {
-    return this.raw('_muted');
-  }
-  get _textDisabled(): string {
-    return this.raw('_textDisabled');
-  }
-  get _border(): string {
-    return this.raw('_border');
-  }
-  get _divider(): string {
-    return this.raw('_divider');
-  }
-  get _focusRing(): string {
-    return this.raw('_focusRing');
-  }
-  get _primary(): string {
-    return this.raw('_primary');
-  }
-  get _primaryHover(): string {
-    return this.raw('_primaryHover');
-  }
-  get _primaryPressed(): string {
-    return this.raw('_primaryPressed');
-  }
-  get _onPrimary(): string {
-    return this.raw('_onPrimary');
-  }
-  get _info(): string {
-    return this.raw('_info');
-  }
-  get _infoHover(): string {
-    return this.raw('_infoHover');
-  }
-  get _infoPressed(): string {
-    return this.raw('_infoPressed');
-  }
-  get _onInfo(): string {
-    return this.raw('_onInfo');
-  }
-  get _success(): string {
-    return this.raw('_success');
-  }
-  get _successHover(): string {
-    return this.raw('_successHover');
-  }
-  get _successPressed(): string {
-    return this.raw('_successPressed');
-  }
-  get _onSuccess(): string {
-    return this.raw('_onSuccess');
-  }
-  get _warning(): string {
-    return this.raw('_warning');
-  }
-  get _warningHover(): string {
-    return this.raw('_warningHover');
-  }
-  get _warningPressed(): string {
-    return this.raw('_warningPressed');
-  }
-  get _onWarning(): string {
-    return this.raw('_onWarning');
-  }
-  get _danger(): string {
-    return this.raw('_danger');
-  }
-  get _dangerHover(): string {
-    return this.raw('_dangerHover');
-  }
-  get _dangerPressed(): string {
-    return this.raw('_dangerPressed');
-  }
-  get _onDanger(): string {
-    return this.raw('_onDanger');
-  }
-}
-
-/** color 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiOutlineColorCss extends OutlineColorCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeColor | Parameters<OutlineColorCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().color));
-  }
-  get _background(): string {
-    return this.raw('_background');
-  }
-  get _surface(): string {
-    return this.raw('_surface');
-  }
-  get _surfaceHover(): string {
-    return this.raw('_surfaceHover');
-  }
-  get _text(): string {
-    return this.raw('_text');
-  }
-  get _muted(): string {
-    return this.raw('_muted');
-  }
-  get _textDisabled(): string {
-    return this.raw('_textDisabled');
-  }
-  get _border(): string {
-    return this.raw('_border');
-  }
-  get _divider(): string {
-    return this.raw('_divider');
-  }
-  get _focusRing(): string {
-    return this.raw('_focusRing');
-  }
-  get _primary(): string {
-    return this.raw('_primary');
-  }
-  get _primaryHover(): string {
-    return this.raw('_primaryHover');
-  }
-  get _primaryPressed(): string {
-    return this.raw('_primaryPressed');
-  }
-  get _onPrimary(): string {
-    return this.raw('_onPrimary');
-  }
-  get _info(): string {
-    return this.raw('_info');
-  }
-  get _infoHover(): string {
-    return this.raw('_infoHover');
-  }
-  get _infoPressed(): string {
-    return this.raw('_infoPressed');
-  }
-  get _onInfo(): string {
-    return this.raw('_onInfo');
-  }
-  get _success(): string {
-    return this.raw('_success');
-  }
-  get _successHover(): string {
-    return this.raw('_successHover');
-  }
-  get _successPressed(): string {
-    return this.raw('_successPressed');
-  }
-  get _onSuccess(): string {
-    return this.raw('_onSuccess');
-  }
-  get _warning(): string {
-    return this.raw('_warning');
-  }
-  get _warningHover(): string {
-    return this.raw('_warningHover');
-  }
-  get _warningPressed(): string {
-    return this.raw('_warningPressed');
-  }
-  get _onWarning(): string {
-    return this.raw('_onWarning');
-  }
-  get _danger(): string {
-    return this.raw('_danger');
-  }
-  get _dangerHover(): string {
-    return this.raw('_dangerHover');
-  }
-  get _dangerPressed(): string {
-    return this.raw('_dangerPressed');
-  }
-  get _onDanger(): string {
-    return this.raw('_onDanger');
-  }
-}
-
-/** fontFamily 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiFontFamilyCss extends FontFamilyCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeFontFamily | Parameters<FontFamilyCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().fontFamily));
-  }
-  get _sans(): string {
-    return this.raw('_sans');
-  }
-  get _mono(): string {
-    return this.raw('_mono');
-  }
-}
-
-/** fontSize 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiFontSizeCss extends FontSizeCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeFontSize | Parameters<FontSizeCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().fontSize));
-  }
-  get _xs(): string {
-    return this.raw('_xs');
-  }
-  get _sm(): string {
-    return this.raw('_sm');
-  }
-  get _md(): string {
-    return this.raw('_md');
-  }
-  get _lg(): string {
-    return this.raw('_lg');
-  }
-  get _xl(): string {
-    return this.raw('_xl');
-  }
-  get _2xl(): string {
-    return this.raw('_2xl');
-  }
-}
-
-/** fontWeight 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiFontWeightCss extends FontWeightCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeFontWeight | Parameters<FontWeightCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().fontWeight));
-  }
-  get _normal(): string {
-    return this.raw('_normal');
-  }
-  get _medium(): string {
-    return this.raw('_medium');
-  }
-  get _semibold(): string {
-    return this.raw('_semibold');
-  }
-  get _bold(): string {
-    return this.raw('_bold');
-  }
-}
-
-/** lineHeight 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiLineHeightCss extends LineHeightCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeLineHeight | Parameters<LineHeightCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().lineHeight));
-  }
-  get _tight(): string {
-    return this.raw('_tight');
-  }
-  get _normal(): string {
-    return this.raw('_normal');
-  }
-  get _relaxed(): string {
-    return this.raw('_relaxed');
-  }
-}
-
-/** controlHeight 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiHeightCss extends HeightCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeControlHeight | Parameters<HeightCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().controlHeight));
-  }
-  get _xs(): string {
-    return this.raw('_xs');
-  }
-  get _sm(): string {
-    return this.raw('_sm');
-  }
-  get _md(): string {
-    return this.raw('_md');
-  }
-  get _lg(): string {
-    return this.raw('_lg');
-  }
-  get _xl(): string {
-    return this.raw('_xl');
-  }
-}
-
-/** space 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiPaddingCss extends PaddingCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeSpace | Parameters<PaddingCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().space));
-  }
-  get _2xs(): string {
-    return this.raw('_2xs');
-  }
-  get _xs(): string {
-    return this.raw('_xs');
-  }
-  get _sm(): string {
-    return this.raw('_sm');
-  }
-  get _md(): string {
-    return this.raw('_md');
-  }
-  get _lg(): string {
-    return this.raw('_lg');
-  }
-  get _xl(): string {
-    return this.raw('_xl');
-  }
-  get _2xl(): string {
-    return this.raw('_2xl');
-  }
-  get _3xl(): string {
-    return this.raw('_3xl');
-  }
-}
-
-/** space 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiPaddingInlineCss extends PaddingInlineCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeSpace | Parameters<PaddingInlineCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().space));
-  }
-  get _2xs(): string {
-    return this.raw('_2xs');
-  }
-  get _xs(): string {
-    return this.raw('_xs');
-  }
-  get _sm(): string {
-    return this.raw('_sm');
-  }
-  get _md(): string {
-    return this.raw('_md');
-  }
-  get _lg(): string {
-    return this.raw('_lg');
-  }
-  get _xl(): string {
-    return this.raw('_xl');
-  }
-  get _2xl(): string {
-    return this.raw('_2xl');
-  }
-  get _3xl(): string {
-    return this.raw('_3xl');
-  }
-}
-
-/** space 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiPaddingBlockCss extends PaddingBlockCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeSpace | Parameters<PaddingBlockCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().space));
-  }
-  get _2xs(): string {
-    return this.raw('_2xs');
-  }
-  get _xs(): string {
-    return this.raw('_xs');
-  }
-  get _sm(): string {
-    return this.raw('_sm');
-  }
-  get _md(): string {
-    return this.raw('_md');
-  }
-  get _lg(): string {
-    return this.raw('_lg');
-  }
-  get _xl(): string {
-    return this.raw('_xl');
-  }
-  get _2xl(): string {
-    return this.raw('_2xl');
-  }
-  get _3xl(): string {
-    return this.raw('_3xl');
-  }
-}
-
-/** space 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiMarginCss extends MarginCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeSpace | Parameters<MarginCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().space));
-  }
-  get _2xs(): string {
-    return this.raw('_2xs');
-  }
-  get _xs(): string {
-    return this.raw('_xs');
-  }
-  get _sm(): string {
-    return this.raw('_sm');
-  }
-  get _md(): string {
-    return this.raw('_md');
-  }
-  get _lg(): string {
-    return this.raw('_lg');
-  }
-  get _xl(): string {
-    return this.raw('_xl');
-  }
-  get _2xl(): string {
-    return this.raw('_2xl');
-  }
-  get _3xl(): string {
-    return this.raw('_3xl');
-  }
-}
-
-/** space 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiGapCss extends GapCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeSpace | Parameters<GapCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().space));
-  }
-  get _2xs(): string {
-    return this.raw('_2xs');
-  }
-  get _xs(): string {
-    return this.raw('_xs');
-  }
-  get _sm(): string {
-    return this.raw('_sm');
-  }
-  get _md(): string {
-    return this.raw('_md');
-  }
-  get _lg(): string {
-    return this.raw('_lg');
-  }
-  get _xl(): string {
-    return this.raw('_xl');
-  }
-  get _2xl(): string {
-    return this.raw('_2xl');
-  }
-  get _3xl(): string {
-    return this.raw('_3xl');
-  }
-}
-
-/** radius 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiBorderRadiusCss extends BorderRadiusCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeRadius | Parameters<BorderRadiusCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().radius));
-  }
-  get _sm(): string {
-    return this.raw('_sm');
-  }
-  get _md(): string {
-    return this.raw('_md');
-  }
-  get _lg(): string {
-    return this.raw('_lg');
-  }
-  get _full(): string {
-    return this.raw('_full');
-  }
-}
-
-/** borderWidth 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiBorderWidthCss extends BorderWidthCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeBorderWidth | Parameters<BorderWidthCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().borderWidth));
-  }
-  get _thin(): string {
-    return this.raw('_thin');
-  }
-  get _thick(): string {
-    return this.raw('_thick');
-  }
-}
-
-/** opacity 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiOpacityCss extends OpacityCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeOpacity | Parameters<OpacityCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().opacity));
-  }
-  get _disabled(): string {
-    return this.raw('_disabled');
-  }
-  get _hover(): string {
-    return this.raw('_hover');
-  }
-  get _pressed(): string {
-    return this.raw('_pressed');
-  }
-}
-
-/** shadow 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiBoxShadowCss extends BoxShadowCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeShadow | Parameters<BoxShadowCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().shadow));
-  }
-  get _sm(): string {
-    return this.raw('_sm');
-  }
-  get _md(): string {
-    return this.raw('_md');
-  }
-  get _lg(): string {
-    return this.raw('_lg');
-  }
-}
-
-/** motion.duration 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiTransitionDurationCss extends TransitionDurationCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeDuration | Parameters<TransitionDurationCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().motion.duration));
-  }
-  get _fast(): string {
-    return this.raw('_fast');
-  }
-  get _normal(): string {
-    return this.raw('_normal');
-  }
-  get _slow(): string {
-    return this.raw('_slow');
-  }
-}
-
-/** motion.easing 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiTransitionTimingFunctionCss extends TransitionTimingFunctionCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeEasing | Parameters<TransitionTimingFunctionCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().motion.easing));
-  }
-  get _standard(): string {
-    return this.raw('_standard');
-  }
-  get _enter(): string {
-    return this.raw('_enter');
-  }
-  get _exit(): string {
-    return this.raw('_exit');
-  }
-}
-
-/** motion.duration 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiAnimationDurationCss extends AnimationDurationCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeDuration | Parameters<AnimationDurationCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().motion.duration));
-  }
-  get _fast(): string {
-    return this.raw('_fast');
-  }
-  get _normal(): string {
-    return this.raw('_normal');
-  }
-  get _slow(): string {
-    return this.raw('_slow');
-  }
-}
-
-/** motion.easing 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiAnimationTimingFunctionCss extends AnimationTimingFunctionCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeEasing | Parameters<AnimationTimingFunctionCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().motion.easing));
-  }
-  get _standard(): string {
-    return this.raw('_standard');
-  }
-  get _enter(): string {
-    return this.raw('_enter');
-  }
-  get _exit(): string {
-    return this.raw('_exit');
-  }
-}
-
-/** zIndex 的主题声明；每次读取当前作用域，不缓存主题快照。 */
-export class UiZIndexCss extends ZIndexCss {
-  constructor(private readonly readTheme: () => UiTheme) {
-    super();
-  }
-  override raw(value: UiThemeZIndex | Parameters<ZIndexCss['raw']>[0]): string {
-    return super.raw(themeValue(value, this.readTheme().zIndex));
-  }
-  get _dropdown(): string {
-    return this.raw('_dropdown');
-  }
-  get _sticky(): string {
-    return this.raw('_sticky');
-  }
-  get _modal(): string {
-    return this.raw('_modal');
-  }
-  get _popover(): string {
-    return this.raw('_popover');
-  }
-  get _tooltip(): string {
-    return this.raw('_tooltip');
-  }
-  get _toast(): string {
-    return this.raw('_toast');
-  }
-}
-
-/** 每个 Provider 持有独立作者；原生 CSS 属性继续复用基础库。 */
-export class UiCss<T extends UiTheme = UiTheme> extends Css {
-  override readonly color: UiColorCss;
-  override readonly backgroundColor: UiBackgroundColorCss;
-  override readonly borderColor: UiBorderColorCss;
-  override readonly outlineColor: UiOutlineColorCss;
-  override readonly fontFamily: UiFontFamilyCss;
-  override readonly fontSize: UiFontSizeCss;
-  override readonly fontWeight: UiFontWeightCss;
-  override readonly lineHeight: UiLineHeightCss;
-  override readonly height: UiHeightCss;
-  override readonly padding: UiPaddingCss;
-  override readonly paddingInline: UiPaddingInlineCss;
-  override readonly paddingBlock: UiPaddingBlockCss;
-  override readonly margin: UiMarginCss;
-  override readonly gap: UiGapCss;
-  override readonly borderRadius: UiBorderRadiusCss;
-  override readonly borderWidth: UiBorderWidthCss;
-  override readonly opacity: UiOpacityCss;
-  override readonly boxShadow: UiBoxShadowCss;
-  override readonly transitionDuration: UiTransitionDurationCss;
-  override readonly transitionTimingFunction: UiTransitionTimingFunctionCss;
-  override readonly animationDuration: UiAnimationDurationCss;
-  override readonly animationTimingFunction: UiAnimationTimingFunctionCss;
-  override readonly zIndex: UiZIndexCss;
+/** 每个 Provider 注入一份作者；声明生成、raw 解析和属性视图由 CSS 核心处理。 */
+export class UiCss<T extends UiTheme = UiTheme> extends Css<UiKeywords> {
   constructor(private readonly readTheme: () => T) {
-    super();
-    this.color = new UiColorCss(readTheme);
-    this.backgroundColor = new UiBackgroundColorCss(readTheme);
-    this.borderColor = new UiBorderColorCss(readTheme);
-    this.outlineColor = new UiOutlineColorCss(readTheme);
-    this.fontFamily = new UiFontFamilyCss(readTheme);
-    this.fontSize = new UiFontSizeCss(readTheme);
-    this.fontWeight = new UiFontWeightCss(readTheme);
-    this.lineHeight = new UiLineHeightCss(readTheme);
-    this.height = new UiHeightCss(readTheme);
-    this.padding = new UiPaddingCss(readTheme);
-    this.paddingInline = new UiPaddingInlineCss(readTheme);
-    this.paddingBlock = new UiPaddingBlockCss(readTheme);
-    this.margin = new UiMarginCss(readTheme);
-    this.gap = new UiGapCss(readTheme);
-    this.borderRadius = new UiBorderRadiusCss(readTheme);
-    this.borderWidth = new UiBorderWidthCss(readTheme);
-    this.opacity = new UiOpacityCss(readTheme);
-    this.boxShadow = new UiBoxShadowCss(readTheme);
-    this.transitionDuration = new UiTransitionDurationCss(readTheme);
-    this.transitionTimingFunction = new UiTransitionTimingFunctionCss(readTheme);
-    this.animationDuration = new UiAnimationDurationCss(readTheme);
-    this.animationTimingFunction = new UiAnimationTimingFunctionCss(readTheme);
-    this.zIndex = new UiZIndexCss(readTheme);
+    super(new UiKeywords(readTheme));
   }
+  /** 当前作用域的原始 UI 主题；在模板或派生表达式中读取。 */
   get theme(): T {
     return this.readTheme();
   }
